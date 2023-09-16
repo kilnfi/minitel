@@ -38,10 +38,8 @@
                 </div>
             </form>
             {#if data.html}
-                <div class="overflow-auto dark-mode my-6">
-                    <pre class="json-container rounded-md bg-gray-800">
-                        {@html data.html}
-                    </pre>
+                <div class="overflow-auto dark-mode my-6 bg-gray-800">
+                    <pre class="json-container rounded-md bg-gray-800">{@html data.html}</pre>
                 </div>
             {/if}
             <svg viewBox="0 0 1024 1024" class="absolute left-1/2 top-1/2 -z-10 h-[64rem] w-[64rem] -translate-x-1/2" aria-hidden="true">
