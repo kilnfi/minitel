@@ -2,9 +2,6 @@ import type { PageServerLoad } from "./$types";
 import { parseTransaction } from 'viem';
 import { prettyPrintJson } from 'pretty-print-json';
 
-// @ts-ignore
-BigInt.prototype.toJSON = function() { return this.toString() }
-
 export const load = (async ({ url }) => {
   const txRaw = url.searchParams.get("txRaw")?.trim();
   if (!txRaw) {
