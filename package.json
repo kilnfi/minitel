@@ -34,6 +34,7 @@
 	"type": "module",
 	"dependencies": {
 		"@cosmjs/proto-signing": "^0.31.1",
+		"@emurgo/cardano-serialization-lib-nodejs": "^11.5.0",
 		"@melt-ui/svelte": "^0.50.0",
 		"@rollup/plugin-inject": "^5.0.3",
 		"@solana/web3.js": "^1.78.5",

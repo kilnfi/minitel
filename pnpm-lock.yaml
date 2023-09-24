@@ -8,6 +8,9 @@ dependencies:
   '@cosmjs/proto-signing':
     specifier: ^0.31.1
     version: 0.31.1
+  '@emurgo/cardano-serialization-lib-nodejs':
+    specifier: ^11.5.0
+    version: 11.5.0
   '@melt-ui/svelte':
     specifier: ^0.50.0
     version: 0.50.0(svelte@4.2.0)
@@ -171,6 +174,10 @@ packages:
 
   /@cosmjs/utils@0.31.1:
     resolution: {integrity: sha512-n4Se1wu4GnKwztQHNFfJvUeWcpvx3o8cWhSbNs9JQShEuB3nv3R5lqFBtDCgHZF/emFQAP+ZjF8bTfCs9UBGhA==}
+    dev: false
+
+  /@emurgo/cardano-serialization-lib-nodejs@11.5.0:
+    resolution: {integrity: sha512-IlVABlRgo9XaTR1NunwZpWcxnfEv04ba2l1vkUz4S1W7Jt36F4CtffP+jPeqBZGnAe+fnUwo0XjIJC3ZTNToNQ==}
     dev: false
 
   /@esbuild/android-arm64@0.18.20:
