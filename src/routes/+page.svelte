@@ -57,7 +57,7 @@
 <div class="bg-white">
     <div class="mx-auto max-w-7xl">
         <div class="relative isolate overflow-hidden bg-gray-900 py-24 shadow-2xl rounded-3xl px-24">
-            <h2 class="mx-auto max-w-2xl text-center font-bold tracking-tight text-white text-4xl">Decode raw transaction</h2>
+            <h2 class="mx-auto max-w-2xl text-center font-bold tracking-tight text-white text-4xl">Raw transaction decoder</h2>
             <p class="mx-auto mt-2 max-w-xl text-center text-lg leading-8 text-gray-300">
                 Choose your blockchain and decode a raw transaction hex string into a JSON object. Get valuable insights into transaction details, including sender and recipient addresses, gas price, decoded inputs and more.
             </p>
