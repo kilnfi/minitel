@@ -1,20 +1,48 @@
 import type { PageServerLoad } from "./$types";
-import { parseTransaction } from 'viem';
-import { prettyPrintJson } from 'pretty-print-json';
+import { parseEthTx } from "$lib/parseEthTx";
+import { parseSolTx } from "$lib/parseSolTx";
+
+// @ts-ignore
+BigInt.prototype.toJSON = function() { return this.toString() }
+
 
 export const load = (async ({ url }) => {
   const txRaw = url.searchParams.get("txRaw")?.trim();
-  if (!txRaw) {
-    return { txRaw: "", html: "" };
+  const protocol = url.searchParams.get("protocol");
+  if (!txRaw || !protocol) {
+    return { txRaw: "", html: "", protocol: "" };
   }
+
   try {
-    const hex = txRaw.startsWith("0x") ? txRaw : `0x${txRaw}`;
-    const tx = parseTransaction(hex as `0x${string}`);
-    const html = prettyPrintJson.toHtml(tx, {
-      quoteKeys: true,
-    })
-    return { txRaw, html };
+    let html = "";
+    switch (protocol) {
+      case 'ETH':
+        html = await parseEthTx(txRaw);
+        break;
+      case 'SOL':
+        html = await parseSolTx(txRaw);
+        break;
+      default:
+        return {
+          txRaw,
+          protocol,
+          html,
+          error: "Unknown protocol"
+        };
+    }
+    return {
+      txRaw,
+      protocol,
+      html,
+      error: ""
+    };
   } catch (err) {
-    return { txRaw, html: "", error: err instanceof Error ? err.message : "Unknown error" };
+    console.log(err);
+    return {
+      txRaw,
+      protocol,
+      html: "",
+      error: err instanceof Error ? err.message : "Unknown error"
+    };
   }
 }) satisfies PageServerLoad;
