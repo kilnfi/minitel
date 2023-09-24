@@ -33,10 +33,12 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@cosmjs/proto-signing": "^0.31.1",
 		"@melt-ui/svelte": "^0.50.0",
 		"@rollup/plugin-inject": "^5.0.3",
 		"@solana/web3.js": "^1.78.5",
 		"buffer": "^6.0.3",
+		"cosmjs-types": "^0.8.0",
 		"lucide-svelte": "^0.279.0",
 		"path-browserify": "^1.0.1",
 		"pretty-print-json": "^2.0.3",

@@ -1,6 +1,7 @@
 import type { PageServerLoad } from "./$types";
 import { parseEthTx } from "$lib/parseEthTx";
 import { parseSolTx } from "$lib/parseSolTx";
+import { parseAtomTx } from "$lib/parseAtomTx";
 
 // @ts-ignore
 BigInt.prototype.toJSON = function() { return this.toString() }
@@ -21,6 +22,9 @@ export const load = (async ({ url }) => {
         break;
       case 'SOL':
         html = await parseSolTx(txRaw);
+        break;
+      case 'ATOM':
+        html = await parseAtomTx(txRaw);
         break;
       default:
         return {
