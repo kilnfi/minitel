@@ -28,7 +28,7 @@
     if (_tx) tx = _tx;
   });
 
-  $: tryMeLink = EXAMPLE_LINKS[$selected?.value as Token];
+  $: tryMeLink = EXAMPLE_LINKS[$selected?.value ?? "eth"];
 </script>
 
 <div>
