@@ -28,6 +28,7 @@
         fitViewport: true,
         sameWidth: true,
       },
+      preventScroll: false,
     });
 
     const getTryMeLink = (token) => {
@@ -54,94 +55,81 @@
 
 </script>
 
-<div class="bg-white">
-    <div class="mx-auto max-w-7xl">
-        <div class="relative isolate overflow-hidden bg-gray-900 py-24 shadow-2xl rounded-3xl px-24">
-            <h2 class="mx-auto max-w-2xl text-center font-bold tracking-tight text-white text-4xl">Raw transaction decoder</h2>
-            <p class="mx-auto mt-2 max-w-xl text-center text-lg leading-8 text-gray-300">
-                Choose your blockchain and decode a raw transaction hex string into a JSON object. Get valuable insights into transaction details, including sender and recipient addresses, gas price, decoded inputs and more.
-            </p>
-            <form class="mx-auto mt-10">
-                <div class="flex items-center justify-between mb-4">
-                    <label class="sr-only" use:melt={$label}>Protocol</label>
-                    <input
-                            value={selectedToken}
-                            name="protocol"
-                            type="hidden"
-                    />
-                    <button
-                            type="button"
-                            class="flex h-10 w-[200px] items-center justify-between rounded-lg bg-white px-3 py-2
+<div class="">
+    <h2 class="mx-auto max-w-2xl text-center font-bold tracking-tight text-white text-4xl">Raw transaction decoder</h2>
+    <p class="mx-auto mt-2 max-w-xl text-center text-lg leading-8 text-gray-300">
+        Choose your blockchain and decode a raw transaction hex string into a JSON object. Get valuable insights into transaction details, including sender and recipient addresses, gas price, decoded inputs and more.
+    </p>
+    <form class="mx-auto mt-10">
+        <div class="flex items-center justify-between mb-4">
+            <label class="sr-only" use:melt={$label}>Protocol</label>
+            <input
+                    value={selectedToken}
+                    name="protocol"
+                    type="hidden"
+            />
+            <button
+                    type="button"
+                    class="flex h-10 w-[200px] items-center justify-between rounded-lg bg-white px-3 py-2
   text-gray-900 shadow transition-opacity hover:opacity-90"
-                            use:melt={$trigger}
-                            aria-label="protocol"
-                    >
-                        {$selectedLabel || 'Select a protocol'}
-                        <ChevronDown class="square-5" />
-                    </button>
+                    use:melt={$trigger}
+                    aria-label="protocol"
+            >
+                {$selectedLabel || 'Select a protocol'}
+                <ChevronDown class="square-5" />
+            </button>
 
-                    {#if $open}
-                        <div
-                                class="z-10 flex max-h-[300px] flex-col
+            {#if $open}
+                <div
+                        class="z-10 flex max-h-[300px] flex-col
     overflow-y-auto rounded-lg bg-white p-1
     shadow focus:!ring-0"
-                                use:melt={$menu}
-                                transition:fade={{ duration: 150 }}
-                        >
-                            {#each protocols as protocol}
-                                <div
-                                        class="relative cursor-pointer rounded-lg py-1 px-4 text-gray-900
+                        use:melt={$menu}
+                        transition:fade={{ duration: 150 }}
+                >
+                    {#each protocols as protocol}
+                        <div
+                                class="relative cursor-pointer rounded-lg py-1 px-4 text-gray-900
               focus:z-10
             data-[highlighted]:bg-gray-100 data-[selected]:bg-gray-100"
-                                        use:melt={$option({ value: protocol.token, label: protocol.name })}
-                                >
-                                    {protocol.name}
-                                </div>
-                            {/each}
+                                use:melt={$option({ value: protocol.token, label: protocol.name })}
+                        >
+                            {protocol.name}
                         </div>
-                    {/if}
-
-                    <a data-sveltekit-reload href={tryMeLink} class="text-sm font-semibold leading-6 text-white">Try me <span aria-hidden="true">→</span></a>
-                </div>
-                <label for="raw-tx" class="sr-only">Raw tx</label>
-                <textarea
-                        bind:value={txRaw}
-                        rows="4"
-                        id="raw-tx"
-                        name="txRaw"
-                        type="text"
-                        required
-                        class="min-w-0 w-full mb-3 flex-auto rounded-md border-0 bg-gray-800 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-white leading-6"
-                        placeholder="Enter raw transaction..."></textarea>
-
-                {#if data.error}
-                    <p class="text-red-600 mb-3">{data.error}</p>
-                {/if}
-
-                <div class="flex items-center justify-center gap-4">
-                    <button
-                            disabled={$navigating?.type === "goto"}
-                            type="submit"
-                            class="flex items-center gap-2 rounded-md bg-white px-4 py-3 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:bg-gray-400"
-                    >
-                        Decode
-                    </button>
-                </div>
-            </form>
-            {#if data.html}
-                <div class="overflow-auto dark-mode my-6 bg-gray-800 rounded-md">
-                    <pre class="json-container bg-gray-800 p-2">{@html data.html}</pre>
+                    {/each}
                 </div>
             {/if}
-            <svg viewBox="0 0 1024 1024" class="absolute left-1/2 top-1/2 -z-10 h-[64rem] w-[64rem] -translate-x-1/2" aria-hidden="true">
-                <circle cx="512" cy="512" r="512" fill="url(#759c1415-0410-454c-8f7c-9a820de03641)" fill-opacity="0.7" />
-                <defs>
-                    <radialGradient id="759c1415-0410-454c-8f7c-9a820de03641" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(512 512) rotate(90) scale(512)">
-                        <stop stop-color="#7775D6" />
-                        <stop offset="1" stop-color="#E935C1" stop-opacity="0" />
-                    </radialGradient>
-                </defs>
-            </svg>
+
+            <a data-sveltekit-reload href={tryMeLink} class="text-sm font-semibold leading-6 text-white">Try me <span aria-hidden="true">→</span></a>
         </div>
-    </div>
+        <label for="raw-tx" class="sr-only">Raw tx</label>
+        <textarea
+                bind:value={txRaw}
+                rows="4"
+                id="raw-tx"
+                name="txRaw"
+                type="text"
+                required
+                class="min-w-0 w-full mb-3 flex-auto rounded-md border-0 bg-gray-800 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-white leading-6"
+                placeholder="Enter raw transaction..."></textarea>
+
+        {#if data.error}
+            <p class="text-red-600 mb-3">{data.error}</p>
+        {/if}
+
+        <div class="flex items-center justify-center gap-4">
+            <button
+                    disabled={$navigating?.type === "goto"}
+                    type="submit"
+                    class="flex items-center gap-2 rounded-md bg-white px-4 py-3 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:bg-gray-400"
+            >
+                Decode
+            </button>
+        </div>
+    </form>
+    {#if data.html}
+        <div class="overflow-auto dark-mode my-6 bg-gray-800 rounded-md">
+            <pre class="json-container bg-gray-800 p-2">{@html data.html}</pre>
+        </div>
+    {/if}
 </div>

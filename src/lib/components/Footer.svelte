@@ -1,6 +1,6 @@
 <footer
-  class="mt-auto pt-6 flex flex-wrap text-center
-    text-black
+  class="mt-auto py-6 flex flex-wrap text-center
+    text-white px-4
     items-center justify-center text-sm gap-x-1"
 >
   made with
