@@ -4,8 +4,5 @@ import { Buffer } from "buffer";
 
 export const parseSolTx = async (txRaw: string): Promise<string> => {
   const tx = Transaction.from(Buffer.from(txRaw, "hex"));
-
-  return prettyPrintJson.toHtml(tx, {
-    quoteKeys: true,
-  })
-}
+  return prettyPrintJson.toHtml(tx, { quoteKeys: true });
+};

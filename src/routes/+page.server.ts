@@ -3,54 +3,31 @@ import { parseEthTx } from "$lib/parseEthTx";
 import { parseSolTx } from "$lib/parseSolTx";
 import { parseAtomTx } from "$lib/parseAtomTx";
 import { parseAdaTx } from "$lib/parseAdaTx";
+import { parseToken } from "$lib/parseToken";
 
 // @ts-ignore
-BigInt.prototype.toJSON = function() { return this.toString() }
-
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
 
 export const load = (async ({ url }) => {
-  const txRaw = url.searchParams.get("txRaw")?.trim();
-  const protocol = url.searchParams.get("protocol");
-  if (!txRaw || !protocol) {
-    return { txRaw: "", html: "", protocol: "" };
-  }
+  const tx = url.searchParams.get("tx")?.trim();
+  const protocol = parseToken(url.searchParams.get("protocol"));
+
+  if (!tx) return;
 
   try {
-    let html = "";
-    switch (protocol) {
-      case 'ETH':
-        html = await parseEthTx(txRaw);
-        break;
-      case 'SOL':
-        html = await parseSolTx(txRaw);
-        break;
-      case 'ATOM':
-        html = await parseAtomTx(txRaw);
-        break;
-      case 'ADA':
-        html = await parseAdaTx(txRaw);
-        break;
-      default:
-        return {
-          txRaw,
-          protocol,
-          html,
-          error: "Unknown protocol"
-        };
-    }
-    return {
-      txRaw,
-      protocol,
-      html,
-      error: ""
-    };
+    const html = await (() => {
+      if (protocol === "eth") return parseEthTx(tx);
+      if (protocol === "sol") return parseSolTx(tx);
+      if (protocol === "atom") return parseAtomTx(tx);
+      if (protocol === "ada") return parseAdaTx(tx);
+      throw new Error(`Unknown protocol: ${protocol}`);
+    })();
+
+    return { html };
   } catch (err) {
-    console.log(err);
-    return {
-      txRaw,
-      protocol,
-      html: "",
-      error: err instanceof Error ? err.message : "Unknown error"
-    };
+    console.error(err);
+    return { error: err instanceof Error ? err.message : "Unknown error" };
   }
 }) satisfies PageServerLoad;
