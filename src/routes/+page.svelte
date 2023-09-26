@@ -4,7 +4,7 @@
   import { createSelect, melt } from "@melt-ui/svelte";
   import { ChevronDown } from "lucide-svelte";
   import { fade } from "svelte/transition";
-  import { PROTOCOLS, protocol, type Token } from "$lib/protocol";
+  import { PROTOCOLS, protocol } from "$lib/protocol";
   import { EXAMPLE_LINKS } from "$lib/examples";
   import { afterNavigate } from "$app/navigation";
 
