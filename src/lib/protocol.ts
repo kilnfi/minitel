@@ -17,7 +17,7 @@ export type Token = Protocol["token"];
 export const protocol = derived(
   page,
   ($page, set) => {
-    let protocol = PROTOCOLS.find((p) => $page.url.pathname.startsWith(`/${p.token}`));
+    let protocol = PROTOCOLS.find((p) => p.token === $page.url.searchParams.get("protocol"));
     if (protocol) set(protocol);
   },
   PROTOCOLS[0] as Protocol
