@@ -52,13 +52,16 @@
         type="button"
         class="
           flex h-10 w-[200px] items-center
-          justify-between rounded-lg bg-white px-3 py-2
-          text-gray-900 shadow transition-opacity hover:opacity-90
+          gap-2 rounded-lg bg-white p-3
+          text-gray-900 shadow transition-opacity hover:opacity-90 font-bold
         "
         use:melt={$trigger}
       >
+        {#if $selected.value}
+          <svelte:component this={PROTOCOLS.find((p) => p.token === $selected?.value).icon} className="w-8 h-8" />
+        {/if}
         {$selectedLabel || "Select a protocol"}
-        <ChevronDown class="square-5" />
+        <ChevronDown class="ml-auto square-5" />
       </button>
 
       {#if $open}
@@ -74,12 +77,16 @@
           {#each PROTOCOLS as protocol (protocol.token)}
             <div
               class="
-                relative rounded-lg py-1 px-4 text-gray-900
+                flex items-center gap-2
+                relative rounded-lg p-2 text-gray-900
                 focus:z-10 cursor-pointer
-                data-[highlighted]:bg-gray-100 data-[selected]:bg-gray-100
+                data-[highlighted]:bg-gray-100 data-[selected]:bg-gray-100 data-[selected]:font-bold
               "
               use:melt={$option({ value: protocol.token, label: protocol.name })}
             >
+              {#if protocol.icon}
+                <svelte:component this={protocol.icon} className="w-8 h-8" />
+              {/if}
               {protocol.name}
             </div>
           {/each}
