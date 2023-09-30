@@ -45,6 +45,7 @@
 		"buffer": "^6.0.3",
 		"cosmjs-types": "^0.8.0",
 		"lucide-svelte": "^0.279.0",
+		"near-api-js": "^2.1.4",
 		"path-browserify": "^1.0.1",
 		"pretty-print-json": "^2.0.3",
 		"viem": "^1.10.14"

@@ -6,6 +6,7 @@ import { parseAdaTx } from "$lib/parseAdaTx";
 import { parseToken } from "$lib/parseToken";
 import { parseDotTx } from "$lib/parseDotTx";
 import { parseXtzTx } from "$lib/parseXtzTx";
+import { parseNearTx } from "$lib/parseNearTx";
 
 // @ts-ignore
 BigInt.prototype.toJSON = function () {
@@ -27,6 +28,7 @@ export const load = (async ({ url }) => {
       if (protocol === "dot") return parseDotTx(tx, false);
       if (protocol === "wnd") return parseDotTx(tx, true);
       if (protocol === "xtz") return parseXtzTx(tx);
+      if (protocol === "near") return parseNearTx(tx);
       throw new Error(`Unknown protocol: ${protocol}`);
     })();
 
