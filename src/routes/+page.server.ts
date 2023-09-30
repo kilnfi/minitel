@@ -4,6 +4,7 @@ import { parseSolTx } from "$lib/parseSolTx";
 import { parseAtomTx } from "$lib/parseAtomTx";
 import { parseAdaTx } from "$lib/parseAdaTx";
 import { parseToken } from "$lib/parseToken";
+import { parseDotTx } from "$lib/parseDotTx";
 
 // @ts-ignore
 BigInt.prototype.toJSON = function () {
@@ -22,6 +23,8 @@ export const load = (async ({ url }) => {
       if (protocol === "sol") return parseSolTx(tx);
       if (protocol === "atom") return parseAtomTx(tx);
       if (protocol === "ada") return parseAdaTx(tx);
+      if (protocol === "dot") return parseDotTx(tx, false);
+      if (protocol === "wnd") return parseDotTx(tx, true);
       throw new Error(`Unknown protocol: ${protocol}`);
     })();
 

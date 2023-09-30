@@ -86,9 +86,11 @@
         </div>
       {/if}
 
-      <a href={tryMeLink} class="text-sm font-semibold leading-6 text-white">
-        Try me <span aria-hidden="true">→</span>
-      </a>
+      {#if tryMeLink}
+        <a href={tryMeLink} class="text-sm font-semibold leading-6 text-white">
+          Try me <span aria-hidden="true">→</span>
+        </a>
+      {/if}
     </div>
 
     <label for="transaction" class="sr-only">Raw tx</label>
@@ -104,7 +106,7 @@
         ring-white/10 focus:ring-2 focus:ring-inset focus:ring-white leading-6
       "
       placeholder="Enter raw transaction..."
-    />
+    ></textarea>
 
     <div class="flex items-center justify-center gap-4">
       <button

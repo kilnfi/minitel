@@ -6,6 +6,8 @@ export const PROTOCOLS = [
   { name: "Solana", token: "sol" },
   { name: "Cosmos", token: "atom" },
   { name: "Cardano", token: "ada" },
+  { name: "Polkadot", token: "dot" },
+  { name: "Polkadot - Westend", token: "wnd" },
 ] as const;
 
 export type Protocol = (typeof PROTOCOLS)[number];
