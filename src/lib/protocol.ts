@@ -14,14 +14,11 @@ export const PROTOCOLS = [
   { name: "Cosmos", token: "atom", icon: AtomIcon },
   { name: "Cardano", token: "ada", icon: AdaIcon },
   { name: "Polkadot", token: "dot", icon: DotIcon },
-  { name: "Westend", token: "wnd", icon: DotIcon },
   { name: "Tezos", token: "xtz", icon: XtzIcon },
   { name: "Near", token: "near", icon: NearIcon },
 ] as const;
 
 export type Protocol = (typeof PROTOCOLS)[number];
-
-export type TokenNames = Protocol["name"];
 
 export type Token = Protocol["token"];
 

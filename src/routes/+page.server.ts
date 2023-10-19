@@ -25,8 +25,7 @@ export const load = (async ({ url }) => {
       if (protocol === "sol") return parseSolTx(tx);
       if (protocol === "atom") return parseAtomTx(tx);
       if (protocol === "ada") return parseAdaTx(tx);
-      if (protocol === "dot") return parseDotTx(tx, false);
-      if (protocol === "wnd") return parseDotTx(tx, true);
+      if (protocol === "dot") return parseDotTx(tx);
       if (protocol === "xtz") return parseXtzTx(tx);
       if (protocol === "near") return parseNearTx(tx);
       throw new Error(`Unknown protocol: ${protocol}`);
