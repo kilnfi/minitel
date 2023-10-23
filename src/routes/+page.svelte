@@ -33,7 +33,7 @@
 
 <div>
   <h2 class="mx-auto max-w-2xl text-center font-bold tracking-tight text-white text-4xl">
-    Minitel.wtf Raw transaction decoder
+    Raw transaction decoder
   </h2>
 
   <p class="mx-auto mt-2 max-w-xl text-center text-lg leading-8 text-gray-300">
