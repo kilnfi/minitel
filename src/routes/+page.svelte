@@ -33,13 +33,14 @@
 
 <div>
   <h2 class="mx-auto max-w-2xl text-center font-bold tracking-tight text-white text-4xl">
-    Raw transaction decoder
+    Minitel.wtf Raw transaction decoder
   </h2>
 
   <p class="mx-auto mt-2 max-w-xl text-center text-lg leading-8 text-gray-300">
     Choose your blockchain and decode a raw transaction hex string into a JSON object. Get valuable
     insights into transaction details, including sender and recipient addresses, gas price, decoded
-    inputs and more.
+    inputs and more.<br/><br/>
+    You can also use this tool to hash a raw transaction and check that you are effectively signing what you are supposed to sign.
   </p>
 
   <form class="mx-auto mt-10">
@@ -118,6 +119,8 @@
     <div class="flex items-center justify-center gap-4">
       <button
         disabled={$navigating?.type === "goto"}
+        name="action"
+        value="decode"
         type="submit"
         class="
           flex items-center gap-2 rounded-md bg-white px-4 py-3 text-sm
@@ -126,6 +129,19 @@
         "
       >
         Decode
+      </button>
+      <button
+              disabled={$navigating?.type === "goto"}
+              name="action"
+              value="hash"
+              type="submit"
+              class="
+          flex items-center gap-2 rounded-md bg-white px-4 py-3 text-sm
+          font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline
+          focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:bg-gray-400
+        "
+      >
+        Hash
       </button>
     </div>
   </form>
