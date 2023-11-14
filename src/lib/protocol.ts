@@ -11,7 +11,7 @@ import NearIcon from "$lib/components/icons/NearIcon.svelte";
 export const PROTOCOLS = [
   { name: "Ethereum", token: "eth", icon: EthIcon },
   { name: "Solana", token: "sol", icon: SolIcon },
-  { name: "Cosmos", token: "atom", icon: AtomIcon },
+  { name: "Cosmos", token: "cosmos", icon: AtomIcon },
   { name: "Cardano", token: "ada", icon: AdaIcon },
   { name: "Polkadot", token: "dot", icon: DotIcon },
   { name: "Tezos", token: "xtz", icon: XtzIcon },
@@ -25,7 +25,11 @@ export type Token = Protocol["token"];
 export const protocol = derived(
   page,
   ($page, set) => {
-    let protocol = PROTOCOLS.find((p) => p.token === $page.url.searchParams.get("protocol"));
+    let protocol = PROTOCOLS.find((p) => {
+      //todo: remove when dashboard only use ?protocol=cosmos
+      if ($page.url.searchParams.get("protocol") === "atom") return p.token === "cosmos";
+      return p.token === $page.url.searchParams.get("protocol");
+    });
     if (protocol) set(protocol);
   },
   PROTOCOLS[0] as Protocol

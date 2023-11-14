@@ -29,6 +29,7 @@
   });
 
   $: tryMeLink = EXAMPLE_LINKS[$selected?.value ?? "eth"];
+
 </script>
 
 <div>

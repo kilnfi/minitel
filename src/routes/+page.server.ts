@@ -2,7 +2,7 @@ import type { PageServerLoad } from "./$types";
 import { createHash } from "node:crypto";
 import { parseEthTx } from "$lib/parseEthTx";
 import { parseSolTx } from "$lib/parseSolTx";
-import { parseAtomTx } from "$lib/parseAtomTx";
+import { parseCosmosTx } from "$lib/parseCosmosTx";
 import { parseAdaTx } from "$lib/parseAdaTx";
 import { parseToken } from "$lib/parseToken";
 import { parseDotTx } from "$lib/parseDotTx";
@@ -18,7 +18,10 @@ BigInt.prototype.toJSON = function () {
 export const load = (async ({ url }) => {
   const action = url.searchParams.get("action");
   const tx = url.searchParams.get("tx")?.trim();
-  const protocol = parseToken(url.searchParams.get("protocol"));
+  let protocol = parseToken(url.searchParams.get("protocol"));
+
+  // todo remove when dashboard only use ?protocol=cosmos
+  if (url.searchParams.get("protocol") === "atom") protocol = "cosmos";
 
   if (!tx) return;
 
@@ -31,7 +34,7 @@ export const load = (async ({ url }) => {
     const html = await (() => {
       if (protocol === "eth") return parseEthTx(tx);
       if (protocol === "sol") return parseSolTx(tx);
-      if (protocol === "atom") return parseAtomTx(tx);
+      if (protocol === "cosmos") return parseCosmosTx(tx);
       if (protocol === "ada") return parseAdaTx(tx);
       if (protocol === "dot") return parseDotTx(tx);
       if (protocol === "xtz") return parseXtzTx(tx);
