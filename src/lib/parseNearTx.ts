@@ -1,8 +1,7 @@
-import { prettyPrintJson } from "pretty-print-json";
-import { transactions } from "near-api-js";
 import { Buffer } from "buffer";
+import { transactions } from "near-api-js";
 
-export const parseNearTx = async (txRaw: string): Promise<string> => {
+export const parseNearTx = async (txRaw: string): Promise<object> => {
   const tx = transactions.Transaction.decode(Buffer.from(txRaw, "hex"));
-  return prettyPrintJson.toHtml(tx, { quoteKeys: true });
+  return tx;
 };

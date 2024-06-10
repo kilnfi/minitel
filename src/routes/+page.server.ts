@@ -1,14 +1,14 @@
-import type { PageServerLoad } from "./$types";
-import { createHash } from "node:crypto";
-import { parseEthTx } from "$lib/parseEthTx";
-import { parseSolTx } from "$lib/parseSolTx";
-import { parseCosmosTx } from "$lib/parseCosmosTx";
 import { parseAdaTx } from "$lib/parseAdaTx";
-import { parseToken } from "$lib/parseToken";
+import { parseCosmosTx } from "$lib/parseCosmosTx";
 import { parseDotTx } from "$lib/parseDotTx";
-import { parseXtzTx } from "$lib/parseXtzTx";
+import { parseEthTx } from "$lib/parseEthTx";
 import { parseNearTx } from "$lib/parseNearTx";
+import { parseSolTx } from "$lib/parseSolTx";
+import { parseToken } from "$lib/parseToken";
+import { parseXtzTx } from "$lib/parseXtzTx";
 import { Buffer } from "buffer";
+import { createHash } from "node:crypto";
+import type { PageServerLoad } from "./$types";
 
 // @ts-ignore
 BigInt.prototype.toJSON = function () {
@@ -28,10 +28,10 @@ export const load = (async ({ url }) => {
   try {
     if (action === "hash") {
       const txU = Uint8Array.from(Buffer.from(tx, "hex"));
-      const hash = createHash("sha256").update(txU).digest("hex");
-      return { html: `<span class="text-white">${hash}</span>` };
+      const txHash = createHash("sha256").update(txU).digest("hex");
+      return { txHash };
     }
-    const html = await (() => {
+    const decodedTx = await (() => {
       if (protocol === "eth") return parseEthTx(tx);
       if (protocol === "sol") return parseSolTx(tx);
       if (protocol === "cosmos") return parseCosmosTx(tx);
@@ -42,7 +42,7 @@ export const load = (async ({ url }) => {
       throw new Error(`Unknown protocol: ${protocol}`);
     })();
 
-    return { html };
+    return { decodedTx };
   } catch (err) {
     console.error(err);
     return { error: err instanceof Error ? err.message : "Unknown error" };
