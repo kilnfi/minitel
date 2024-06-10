@@ -1,12 +1,19 @@
 <script lang="ts">
-  import type { PageServerData } from "./$types";
+  import { afterNavigate } from "$app/navigation";
   import { navigating, page } from "$app/stores";
+  import CopyToClipboard from "$lib/components/CopyToClipboard.svelte";
+  import { EXAMPLE_LINKS } from "$lib/examples";
+  import { PROTOCOLS, protocol } from "$lib/protocol";
   import { createSelect, melt } from "@melt-ui/svelte";
   import { ChevronDown } from "lucide-svelte";
+  import { prettyPrintJson } from "pretty-print-json";
   import { fade } from "svelte/transition";
-  import { PROTOCOLS, protocol } from "$lib/protocol";
-  import { EXAMPLE_LINKS } from "$lib/examples";
-  import { afterNavigate } from "$app/navigation";
+  import type { PageServerData } from "./$types";
+
+  // @ts-ignore
+  BigInt.prototype.toJSON = function () {
+    return this.toString();
+  };
 
   export let data: PageServerData;
 
@@ -29,7 +36,6 @@
   });
 
   $: tryMeLink = EXAMPLE_LINKS[$selected?.value ?? "eth"];
-
 </script>
 
 <div>
@@ -40,8 +46,9 @@
   <p class="mx-auto mt-2 max-w-xl text-center text-lg leading-8 text-gray-300">
     Choose your blockchain and decode a raw transaction hex string into a JSON object. Get valuable
     insights into transaction details, including sender and recipient addresses, gas price, decoded
-    inputs and more.<br/><br/>
-    You can also use this tool to hash a raw transaction and check that you are effectively signing what you are supposed to sign.
+    inputs and more.<br /><br />
+    You can also use this tool to hash a raw transaction and check that you are effectively signing what
+    you are supposed to sign.
   </p>
 
   <form class="mx-auto mt-10">
@@ -60,7 +67,10 @@
         use:melt={$trigger}
       >
         {#if $selected.value}
-          <svelte:component this={PROTOCOLS.find((p) => p.token === $selected?.value).icon} className="w-8 h-8" />
+          <svelte:component
+            this={PROTOCOLS.find((p) => p.token === $selected?.value).icon}
+            className="w-8 h-8"
+          />
         {/if}
         {$selectedLabel || "Select a protocol"}
         <ChevronDown class="ml-auto square-5" />
@@ -132,11 +142,11 @@
         Decode
       </button>
       <button
-              disabled={$navigating?.type === "goto"}
-              name="action"
-              value="hash"
-              type="submit"
-              class="
+        disabled={$navigating?.type === "goto"}
+        name="action"
+        value="hash"
+        type="submit"
+        class="
           flex items-center gap-2 rounded-md bg-white px-4 py-3 text-sm
           font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline
           focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:bg-gray-400
@@ -147,9 +157,21 @@
     </div>
   </form>
 
-  {#if data.html}
-    <div class="overflow-auto dark-mode my-6 bg-gray-800 rounded-md">
-      <pre class="json-container bg-gray-800 p-2">{@html data.html}</pre>
+  {#if data.decodedTx || data.txHash}
+    <div class="relative">
+      <CopyToClipboard
+        text={data.txHash ?? JSON.stringify(data.decodedTx, null, 2)}
+        class="absolute top-2 right-2"
+      />
+      <div class="overflow-auto dark-mode my-6 bg-gray-800 rounded-md">
+        <pre class="json-container bg-gray-800 p-2">
+{#if data.txHash}
+            <span class="text-white">{data.txHash}</span>
+          {:else if data.decodedTx}
+            {@html prettyPrintJson.toHtml(data.decodedTx)}
+          {/if}
+        </pre>
+      </div>
     </div>
   {:else if data.error}
     <p class="text-red-600 my-6 px-4 py-2 bg-red-50 border rounded-lg">

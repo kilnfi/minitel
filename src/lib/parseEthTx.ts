@@ -1,13 +1,12 @@
-import { decodeFunctionData, parseTransaction, type TransactionSerializableLegacy } from "viem";
 import { ETHERSCAN_API_KEY } from "$env/static/private";
-import { prettyPrintJson } from "pretty-print-json";
+import { decodeFunctionData, parseTransaction, type TransactionSerializableLegacy } from "viem";
 
 type AugmentedTransaction = TransactionSerializableLegacy & {
   functionName?: string;
   args?: any[];
 };
 
-export const parseEthTx = async (txRaw: string): Promise<string> => {
+export const parseEthTx = async (txRaw: string): Promise<object> => {
   const hex = txRaw.startsWith("0x") ? txRaw : `0x${txRaw}`;
   const tx: AugmentedTransaction = parseTransaction(hex as `0x${string}`);
 
@@ -30,5 +29,5 @@ export const parseEthTx = async (txRaw: string): Promise<string> => {
     }
   }
 
-  return prettyPrintJson.toHtml(tx, { quoteKeys: true });
+  return tx;
 };
