@@ -41,8 +41,7 @@ export const load = (async ({ url }) => {
       if (protocol === "near") return parseNearTx(tx);
       throw new Error(`Unknown protocol: ${protocol}`);
     })();
-
-    return { decodedTx };
+    return { decodedTx: JSON.parse(JSON.stringify(decodedTx)) };
   } catch (err) {
     console.error(err);
     return { error: err instanceof Error ? err.message : "Unknown error" };
