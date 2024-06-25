@@ -7,6 +7,7 @@ import AdaIcon from "$lib/components/icons/AdaIcon.svelte";
 import DotIcon from "$lib/components/icons/DotIcon.svelte";
 import XtzIcon from "$lib/components/icons/XtzIcon.svelte";
 import NearIcon from "$lib/components/icons/NearIcon.svelte";
+import KsmIcon from "./components/icons/KsmIcon.svelte";
 
 export const PROTOCOLS = [
   { name: "Ethereum", token: "eth", icon: EthIcon },
@@ -14,6 +15,7 @@ export const PROTOCOLS = [
   { name: "Cosmos", token: "cosmos", icon: AtomIcon },
   { name: "Cardano", token: "ada", icon: AdaIcon },
   { name: "Polkadot", token: "dot", icon: DotIcon },
+  { name: "Kusama", token: "ksm", icon: KsmIcon },
   { name: "Tezos", token: "xtz", icon: XtzIcon },
   { name: "Near", token: "near", icon: NearIcon },
 ] as const;
