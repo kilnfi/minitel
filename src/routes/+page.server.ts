@@ -1,9 +1,9 @@
 import { parseAdaTx } from "$lib/parseAdaTx";
 import { parseCosmosTx } from "$lib/parseCosmosTx";
-import { parseDotTx } from "$lib/parseDotTx";
 import { parseEthTx } from "$lib/parseEthTx";
 import { parseNearTx } from "$lib/parseNearTx";
 import { parseSolTx } from "$lib/parseSolTx";
+import { parseSubstrateTx, type SupportedSubstrateChains } from "$lib/parseSubstrateTx";
 import { parseToken } from "$lib/parseToken";
 import { parseXtzTx } from "$lib/parseXtzTx";
 import { Buffer } from "buffer";
@@ -36,7 +36,8 @@ export const load = (async ({ url }) => {
       if (protocol === "sol") return parseSolTx(tx);
       if (protocol === "cosmos") return parseCosmosTx(tx);
       if (protocol === "ada") return parseAdaTx(tx);
-      if (protocol === "dot") return parseDotTx(tx);
+      if (protocol === "dot" || protocol === "ksm")
+        return parseSubstrateTx(protocol.toUpperCase() as SupportedSubstrateChains, tx);
       if (protocol === "xtz") return parseXtzTx(tx);
       if (protocol === "near") return parseNearTx(tx);
       throw new Error(`Unknown protocol: ${protocol}`);
