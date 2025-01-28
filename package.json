@@ -42,7 +42,7 @@
 		"@rollup/plugin-inject": "^5.0.3",
 		"@solana/web3.js": "^1.78.5",
 		"@substrate/txwrapper-polkadot": "^7.5.1",
-		"@taquito/local-forging": "^17.3.1",
+		"@taquito/local-forging": "^21.0.2",
 		"buffer": "^6.0.3",
 		"cosmjs-types": "^0.8.0",
 		"lucide-svelte": "^0.279.0",
