@@ -9,7 +9,7 @@ import { parseXtzTx } from "$lib/parseXtzTx";
 import { Buffer } from "buffer";
 import { createHash } from "node:crypto";
 import type { PageServerLoad } from "./$types";
-import { hash_transaction, Transaction } from "@emurgo/cardano-serialization-lib-nodejs";
+import { FixedTransaction } from "@emurgo/cardano-serialization-lib-nodejs";
 
 // @ts-ignore
 BigInt.prototype.toJSON = function () {
@@ -29,10 +29,12 @@ export const load = (async ({ url }) => {
   try {
     if (action === "hash") {
       if (protocol === "ada") {
-        const txObject = Transaction.from_hex(tx);
-        const txHash = hash_transaction(txObject.body()).to_hex();
-        return { txHash };
-      }
+				const fixedTx = FixedTransaction.from_hex(tx);
+				const txHash = Buffer.from(
+					fixedTx.transaction_hash().to_bytes(),
+				).toString("hex");
+				return { txHash };
+			}
       const txU = Uint8Array.from(Buffer.from(tx, "hex"));
       const txHash = createHash("sha256").update(txU).digest("hex");
       return { txHash };
