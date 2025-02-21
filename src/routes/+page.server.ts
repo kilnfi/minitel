@@ -10,6 +10,7 @@ import { Buffer } from "buffer";
 import { createHash } from "node:crypto";
 import type { PageServerLoad } from "./$types";
 import { FixedTransaction } from "@emurgo/cardano-serialization-lib-nodejs";
+import { parseSuiTx } from "$lib/parseSuiTx";
 
 // @ts-ignore
 BigInt.prototype.toJSON = function () {
@@ -29,12 +30,10 @@ export const load = (async ({ url }) => {
   try {
     if (action === "hash") {
       if (protocol === "ada") {
-				const fixedTx = FixedTransaction.from_hex(tx);
-				const txHash = Buffer.from(
-					fixedTx.transaction_hash().to_bytes(),
-				).toString("hex");
-				return { txHash };
-			}
+        const fixedTx = FixedTransaction.from_hex(tx);
+        const txHash = Buffer.from(fixedTx.transaction_hash().to_bytes()).toString("hex");
+        return { txHash };
+      }
       const txU = Uint8Array.from(Buffer.from(tx, "hex"));
       const txHash = createHash("sha256").update(txU).digest("hex");
       return { txHash };
@@ -44,6 +43,7 @@ export const load = (async ({ url }) => {
       if (protocol === "sol") return parseSolTx(tx);
       if (protocol === "cosmos") return parseCosmosTx(tx);
       if (protocol === "ada") return parseAdaTx(tx);
+      if (protocol === "sui") return parseSuiTx(tx);
       if (protocol === "dot" || protocol === "ksm")
         return parseSubstrateTx(protocol.toUpperCase() as SupportedSubstrateChains, tx);
       if (protocol === "xtz") return parseXtzTx(tx);
