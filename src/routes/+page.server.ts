@@ -1,6 +1,6 @@
 import { parseAdaTx } from "$lib/parseAdaTx";
 import { parseCosmosTx } from "$lib/parseCosmosTx";
-import { hashEthTx, parseEthTx } from "$lib/eth";
+import { hashEthTx, parseEthTx } from "$lib/parseEthTx";
 import { parseNearTx } from "$lib/parseNearTx";
 import { parseSolTx } from "$lib/parseSolTx";
 import { parseSubstrateTx, type SupportedSubstrateChains } from "$lib/parseSubstrateTx";
