@@ -1,12 +1,12 @@
 import { parseAdaTx } from "$lib/parseAdaTx";
 import { parseCosmosTx } from "$lib/parseCosmosTx";
-import { parseEthTx } from "$lib/parseEthTx";
+import { hashEthTx, parseEthTx } from "$lib/parseEthTx";
 import { parseNearTx } from "$lib/parseNearTx";
 import { parseSolTx } from "$lib/parseSolTx";
 import { parseSubstrateTx, type SupportedSubstrateChains } from "$lib/parseSubstrateTx";
 import { parseToken } from "$lib/parseToken";
 import { parseXtzTx } from "$lib/parseXtzTx";
-import { Buffer } from "buffer";
+import { Buffer } from "node:buffer";
 import { createHash } from "node:crypto";
 import type { PageServerLoad } from "./$types";
 import { FixedTransaction } from "@emurgo/cardano-serialization-lib-nodejs";
@@ -34,10 +34,13 @@ export const load = (async ({ url }) => {
         const txHash = Buffer.from(fixedTx.transaction_hash().to_bytes()).toString("hex");
         return { txHash };
       }
+      if (protocol === "eth") return { txHash: hashEthTx(tx) };
+
       const txU = Uint8Array.from(Buffer.from(tx, "hex"));
       const txHash = createHash("sha256").update(txU).digest("hex");
       return { txHash };
     }
+
     const decodedTx = await (() => {
       if (protocol === "eth") return parseEthTx(tx);
       if (protocol === "sol") return parseSolTx(tx);

@@ -1,5 +1,5 @@
 import { ETHERSCAN_API_KEY } from "$env/static/private";
-import { decodeFunctionData, parseTransaction, type TransactionSerializableLegacy } from "viem";
+import { decodeFunctionData, keccak256, parseTransaction, serializeTransaction, type TransactionSerializableLegacy } from "viem";
 import { formatAbiItem } from "viem/utils";
 
 type AugmentedTransaction = TransactionSerializableLegacy & {
@@ -9,6 +9,11 @@ type AugmentedTransaction = TransactionSerializableLegacy & {
     args: any[];
   };
 };
+
+export const hashEthTx = (txRaw: string): string => {
+  const hex = txRaw.startsWith("0x") ? txRaw : `0x${txRaw}`;
+  return keccak256(serializeTransaction( parseTransaction(hex as `0x${string}`)));
+}
 
 export const parseEthTx = async (txRaw: string): Promise<object> => {
   const hex = txRaw.startsWith("0x") ? txRaw : `0x${txRaw}`;
