@@ -6,7 +6,6 @@ Raw transaction decoder for most blockchains.
 
 ```bash
 cp .env.example .env
-asdf install
-pnpm i
-pnpm dev
+bun install
+bun dev
 ```
