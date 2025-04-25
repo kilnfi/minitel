@@ -6,6 +6,7 @@ import { parseSolTx } from "$lib/parseSolTx";
 import { parseSubstrateTx, type SupportedSubstrateChains } from "$lib/parseSubstrateTx";
 import { parseToken } from "$lib/parseToken";
 import { parseXtzTx } from "$lib/parseXtzTx";
+import { parseTonTx } from "$lib/parseTonTx";
 import { Buffer } from "node:buffer";
 import { createHash } from "node:crypto";
 import type { PageServerLoad } from "./$types";
@@ -51,6 +52,7 @@ export const load = (async ({ url }) => {
         return parseSubstrateTx(protocol.toUpperCase() as SupportedSubstrateChains, tx);
       if (protocol === "xtz") return parseXtzTx(tx);
       if (protocol === "near") return parseNearTx(tx);
+      if (protocol === "ton") return parseTonTx(tx);
       throw new Error(`Unknown protocol: ${protocol}`);
     })();
     return { decodedTx: JSON.parse(JSON.stringify(decodedTx)) };

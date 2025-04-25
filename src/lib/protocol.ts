@@ -9,6 +9,7 @@ import XtzIcon from "$lib/components/icons/XtzIcon.svelte";
 import NearIcon from "$lib/components/icons/NearIcon.svelte";
 import KsmIcon from "./components/icons/KsmIcon.svelte";
 import SuiIcon from "$lib/components/icons/SuiIcon.svelte";
+import TonIcon from "$lib/components/icons/TonIcon.svelte";
 
 export const PROTOCOLS = [
   { name: "Ethereum", token: "eth", icon: EthIcon },
@@ -20,6 +21,7 @@ export const PROTOCOLS = [
   { name: "Tezos", token: "xtz", icon: XtzIcon },
   { name: "Near", token: "near", icon: NearIcon },
   { name: "Sui", token: "sui", icon: SuiIcon },
+  { name: "Ton", token: "ton", icon: TonIcon },
 ] as const;
 
 export type Protocol = (typeof PROTOCOLS)[number];
