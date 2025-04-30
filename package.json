@@ -51,6 +51,7 @@
 		"path-browserify": "^1.0.1",
 		"pretty-print-json": "^2.0.3",
 		"tonweb": "^0.0.66",
+		"tronweb": "^6.0.3",
 		"viem": "^1.10.14"
 	}
 }
