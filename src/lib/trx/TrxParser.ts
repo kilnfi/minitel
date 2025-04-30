@@ -1,7 +1,7 @@
 import tronweb from 'tronweb';
 
 interface TxPb {
-  setRawData(raw: TxRawPb): void;
+  setRawData(raw: object): void;
   toObject(): object;
 }
 
@@ -12,7 +12,7 @@ export class TrxParser {
   }
   public serializedToPb(tx_serialized: string): TxPb {
     // @ts-ignore
-    const txData = globalThis.proto.Transaction.raw.deserializeBinary(Buffer.from(tx_serialized, 'hex')) as TxRawPb;
+    const txData = globalThis.proto.Transaction.raw.deserializeBinary(Buffer.from(tx_serialized, 'hex'));
     // @ts-ignore
     const tx = new globalThis.proto.Transaction() as TxPb;
     tx.setRawData(txData);
