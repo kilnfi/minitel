@@ -37,7 +37,9 @@ export const parseSubstrateTx = async (
 ): Promise<AnyJson> => {
   const wsClient = await getWsClient(token);
   try {
-    const decoded = wsClient.registry.createType("ExtrinsicPayload", txRaw) as any;
+    const tx_raw_hex = txRaw.startsWith("0x") ? txRaw : `0x${txRaw}`;
+
+    const decoded = wsClient.registry.createType("ExtrinsicPayload", tx_raw_hex) as any;
     const call = wsClient.registry.createType("Call", decoded.method.toHex()).toHuman();
     const payloadHumand = decoded.toHuman();
     delete payloadHumand.method;
