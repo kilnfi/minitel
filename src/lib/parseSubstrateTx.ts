@@ -1,57 +1,54 @@
-import { ApiPromise, HttpProvider } from "@polkadot/api";
-import {
-  decode,
-  getRegistry,
-  type OptionsWithMeta,
-  type TypeRegistry,
-} from "@substrate/txwrapper-polkadot";
+import { SubstrateWsClient } from "./substrate/substrateWsClient";
+import type { AnyJson } from "@polkadot/types/types";
 
 const chains = {
   DOT: {
     chainName: "Polkadot",
     specName: "polkadot",
-    rpcUrl: "https://rpc.polkadot.io",
+    rpcUrl: "wss://rpc.polkadot.io",
   },
   KSM: {
     chainName: "Kusama",
     specName: "kusama",
-    rpcUrl: "https://kusama-rpc.polkadot.io",
+    rpcUrl: "wss://kusama-rpc.polkadot.io",
   },
-} as const;
+};
+
 export type SupportedSubstrateChains = keyof typeof chains;
-type ChainOptions =
-  | OptionsWithMeta
-  | { metadataRpc: `0x${string}`; registry: TypeRegistry; specVersion: number };
-const cachedChainOptions: Map<SupportedSubstrateChains, ChainOptions> = new Map();
 
-const chainOptions = async (chain: SupportedSubstrateChains) => {
-  if (cachedChainOptions.has(chain)) {
-    return cachedChainOptions.get(chain)!;
+let wsClients: {
+  [key in SupportedSubstrateChains]?: SubstrateWsClient;
+} = {};
+
+const getWsClient = async (chain: SupportedSubstrateChains) => {
+  if (wsClients[chain] && wsClients[chain].isConnected) {
+    return wsClients[chain];
   }
-  const client = await ApiPromise.create({ provider: new HttpProvider(chains[chain].rpcUrl) });
-  const metadataRpc = (await client.rpc.state.getMetadata()).toHex();
 
-  const runtimeVersion = await client.rpc.state.getRuntimeVersion();
-  const specVersion = runtimeVersion.specVersion.toNumber();
-
-  const registry = getRegistry({
-    ...chains[chain],
-    metadataRpc,
-    specVersion,
-  });
-  const options = { metadataRpc, registry, specVersion };
-  cachedChainOptions.set(chain, options);
-  return options;
+  const wsClient = new SubstrateWsClient(chains[chain].rpcUrl);
+  await wsClient.connect();
+  wsClients[chain] = wsClient;
+  return wsClient;
 };
 
 export const parseSubstrateTx = async (
   token: SupportedSubstrateChains,
   txRaw: string
-): Promise<object> => {
-  const payload = decode(
-    JSON.parse(Buffer.from(txRaw, "hex").toString()),
-    await chainOptions(token)
-  );
-  payload.metadataRpc = "0x"; // remove heavy and unnecessary metadata
-  return payload;
+): Promise<AnyJson> => {
+  const wsClient = await getWsClient(token);
+  try {
+    const tx_raw_hex = txRaw.startsWith("0x") ? txRaw : `0x${txRaw}`;
+
+    const decoded = wsClient.registry.createType("ExtrinsicPayload", tx_raw_hex) as any;
+    const call = wsClient.registry.createType("Call", decoded.method.toHex()).toHuman();
+    const payloadHumand = decoded.toHuman();
+    delete payloadHumand.method;
+    return {
+      ...call,
+      ...payloadHumand,
+    };
+  } catch (error) {
+    console.error("Error parsing substrate tx", error);
+    throw new Error("Error parsing substrate tx");
+  }
 };
