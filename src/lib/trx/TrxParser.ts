@@ -66,7 +66,7 @@ export class TrxParser {
     return {
       owner_address: this.formatAddress(decoded.owner_address),
       frozen_balance: decoded.frozen_balance,
-      resource: decoded.resource,
+      resource: this.enhanceResource(decoded.resource),
       receiver_address: this.formatAddress(decoded.receiver_address),
     };
   }
@@ -84,7 +84,7 @@ export class TrxParser {
     return {
       owner_address: this.formatAddress(decoded.owner_address),
       unfreeze_balance: decoded.unfreeze_balance,
-      resource: decoded.resource,
+      resource: this.enhanceResource(decoded.resource),
     };
   }
 
@@ -145,5 +145,19 @@ export class TrxParser {
     return {
       owner_address: this.formatAddress(decoded.owner_address),
     };
+  }
+
+  private enhanceResource(
+    resource: number
+  ): {
+    resource: string;
+    resourceName: string;
+  } {
+    const resources = {
+      0: { resource: "BANDWIDTH", resourceName: "BANDWIDTH" },
+      1: { resource: "ENERGY", resourceName: "ENERGY" },
+      2: { resource: "ALL", resourceName: "ALL" },
+    };
+    return resources[resource as keyof typeof resources] || { resource: "UNKNOWN", resourceName: "UNKNOWN" };
   }
 }
