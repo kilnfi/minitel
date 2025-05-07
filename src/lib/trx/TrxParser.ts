@@ -42,9 +42,8 @@ export class TrxParser {
         return this.decodeCancelUnfreezeBalanceV2Contract(value);
       case "protocol.WithdrawExpireUnfreezeContract":
         return this.decodeWithdrawExpireUnfreezeContract(value);
-      case "protocol.VoteContract":
-      case "protocol.VoteWitnessContract":
-        return this.decodeVoteContract(value);
+        case "protocol.VoteWitnessContract":
+        return this.decodeVoteWitnessContract(value);
       case "protocol.WithdrawBalanceContract":
         return this.decodeWithdrawBalanceContract(value);
       default:
@@ -116,11 +115,11 @@ export class TrxParser {
     };
   }
 
-  private decodeVoteContract(value: string): object {
+  private decodeVoteWitnessContract(value: string): object {
     const buffer = Buffer.from(value, "base64");
 
-    const VoteContract = TrxProtobuf.lookupType("protocol.VoteContract");
-    const decoded = VoteContract.decode(buffer) as unknown as {
+    const VoteWitnessContract = TrxProtobuf.lookupType("protocol.VoteWitnessContract");
+    const decoded = VoteWitnessContract.decode(buffer) as unknown as {
       owner_address: Buffer;
       votes: Array<{ vote_address: Buffer; vote_count: Long }>;
     };

@@ -36,11 +36,11 @@ const Vote = {
   },
 };
 
-const VoteContract = {
-  fields: {
-    owner_address: { type: "bytes", id: 1 },
-    votes: { rule: "repeated", type: "Vote", id: 2 },
-  },
+const VoteWitnessContract = {
+    fields: {
+        owner_address: { type: "bytes", id: 1 },
+        votes: { rule: "repeated", type: "Vote", id: 2 },
+    },
 };
 
 const WithdrawBalanceContract = {
@@ -58,7 +58,7 @@ export const TrxProtobuf = protobuf.Root.fromJSON({
         CancelUnfreezeBalanceV2Contract,
         WithdrawExpireUnfreezeContract,
         Vote,
-        VoteContract,
+        VoteWitnessContract,
         WithdrawBalanceContract,
       },
     },
