@@ -14,9 +14,9 @@ export class TrxParser {
     );
     const txDataObj = txData.toObject();
 
-    const tranactionType = txDataObj.contractList[0].parameter.typeUrl.split("/").pop();
+    const transactionType = txDataObj.contractList[0].parameter.typeUrl.split("/").pop();
     const value = txDataObj.contractList[0].parameter.value;
-    const decodedValue = this.decodeValue(tranactionType, value);
+    const decodedValue = this.decodeValue(transactionType, value);
 
     const enhancedDecoded = {
       decodedValue,
