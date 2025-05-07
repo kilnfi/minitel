@@ -9,7 +9,7 @@ const FreezeBalanceV2Contract = {
   },
 };
 
-const UnFreezeBalanceV2Contract = {
+const UnfreezeBalanceV2Contract = {
   fields: {
     owner_address: { type: "bytes", id: 1 },
     unfreeze_balance: { type: "int64", id: 2 },
@@ -17,13 +17,13 @@ const UnFreezeBalanceV2Contract = {
   },
 };
 
-const CancelUnFreezeBalanceV2Contract = {
+const CancelUnfreezeBalanceV2Contract = {
   fields: {
     owner_address: { type: "bytes", id: 1 },
   },
 };
 
-const WithdrawExpiredUnfreezeContract = {
+const WithdrawExpireUnfreezeContract = {
   fields: {
     owner_address: { type: "bytes", id: 1 },
   },
@@ -43,10 +43,10 @@ const VoteContract = {
   },
 };
 
-const WithdrawBlockRewardContract = {
-    fields: {
-        owner_address: { type: "bytes", id: 1 },
-    },
+const WithdrawBalanceContract = {
+  fields: {
+    owner_address: { type: "bytes", id: 1 },
+  },
 };
 
 export const TrxProtobuf = protobuf.Root.fromJSON({
@@ -54,12 +54,12 @@ export const TrxProtobuf = protobuf.Root.fromJSON({
     protocol: {
       nested: {
         FreezeBalanceV2Contract,
-        UnFreezeBalanceV2Contract,
-        CancelUnFreezeBalanceV2Contract,
-        WithdrawExpiredUnfreezeContract,
+        UnfreezeBalanceV2Contract,
+        CancelUnfreezeBalanceV2Contract,
+        WithdrawExpireUnfreezeContract,
         Vote,
         VoteContract,
-        WithdrawBlockRewardContract,
+        WithdrawBalanceContract,
       },
     },
   },
