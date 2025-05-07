@@ -149,15 +149,16 @@ export class TrxParser {
 
   private enhanceResource(
     resource: number
-  ): {
-    resource: string;
-    resourceName: string;
-  } {
-    const resources = {
-      0: { resource: "BANDWIDTH", resourceName: "BANDWIDTH" },
-      1: { resource: "ENERGY", resourceName: "ENERGY" },
-      2: { resource: "ALL", resourceName: "ALL" },
-    };
-    return resources[resource as keyof typeof resources] || { resource: "UNKNOWN", resourceName: "UNKNOWN" };
+  ): string {
+    switch (resource) {
+      case 0:
+        return "BANDWIDTH";
+      case 1:
+        return "ENERGY";
+      case 2:
+        return "ALL";
+      default:
+        return "UNKNOWN";
+    }
   }
 }
