@@ -49,6 +49,7 @@
 		"near-api-js": "^2.1.4",
 		"path-browserify": "^1.0.1",
 		"pretty-print-json": "^2.0.3",
+		"protobufjs": "^7.4.0",
 		"tonweb": "^0.0.66",
 		"tronweb": "^6.0.3",
 		"viem": "^1.10.14"
