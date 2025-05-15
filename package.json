@@ -45,6 +45,7 @@
 		"@taquito/local-forging": "^21.0.2",
 		"buffer": "^6.0.3",
 		"cosmjs-types": "^0.8.0",
+		"long": "^5.3.2",
 		"lucide-svelte": "^0.279.0",
 		"near-api-js": "^2.1.4",
 		"path-browserify": "^1.0.1",
