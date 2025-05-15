@@ -1,5 +1,6 @@
 import tronweb from "tronweb";
 import { TrxProtobuf } from "./protos";
+import Long from "long";
 
 const TronWeb = tronweb.TronWeb;
 const addressUtils = TronWeb.address;
