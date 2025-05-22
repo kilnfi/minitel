@@ -1,5 +1,6 @@
 import { SubstrateWsClient } from "./substrate/substrateWsClient";
-import type { AnyJson } from "@polkadot/types/types";
+import type { AnyJson, SignerPayloadJSON } from "@polkadot/types/types";
+import { compactToU8a, u8aConcat } from "@polkadot/util";
 
 const chains = {
   DOT: {
@@ -37,15 +38,13 @@ export const parseSubstrateTx = async (
 ): Promise<AnyJson> => {
   const wsClient = await getWsClient(token);
   try {
-    const tx_raw_hex = txRaw.startsWith("0x") ? txRaw : `0x${txRaw}`;
-
-    const decoded = wsClient.registry.createType("ExtrinsicPayload", tx_raw_hex) as any;
-    const call = wsClient.registry.createType("Call", decoded.method.toHex()).toHuman();
-    const payloadHumand = decoded.toHuman();
-    delete payloadHumand.method;
+    const decodedExtrinsic = wsClient.client.createType('Call', txRaw);
+    const prefixed = u8aConcat(compactToU8a(decodedExtrinsic.encodedLength), txRaw);
+    const extrinsic_payload = wsClient.client.createType('ExtrinsicPayload', prefixed).toHuman() as any;
+    delete extrinsic_payload.method;
     return {
-      ...call,
-      ...payloadHumand,
+      ...decodedExtrinsic.toHuman(),
+      ...extrinsic_payload,
     };
   } catch (error) {
     console.error("Error parsing substrate tx", error);
