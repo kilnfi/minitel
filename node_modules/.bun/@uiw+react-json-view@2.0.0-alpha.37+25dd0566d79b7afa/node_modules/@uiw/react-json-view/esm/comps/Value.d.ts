@@ -1,0 +1,11 @@
+export declare const isFloat: (n: number) => boolean;
+interface ValueProps {
+    value: unknown;
+    keyName: string | number;
+    keys?: (string | number)[];
+}
+export declare const Value: {
+    (props: ValueProps): import("react/jsx-runtime").JSX.Element | null;
+    displayName: string;
+};
+export {};

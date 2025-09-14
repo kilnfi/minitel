@@ -1,0 +1,27 @@
+{
+  "name": "protocols-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "installConfig": {
+    "hoisting": false
+  },
+  "scripts": {
+    "format": "bun --filter '*' format",
+    "lint": "bun --filter '*' lint",
+    "dev": "bun --filter '*' dev",
+    "build": "bun --filter '*' build",
+    "clean": "rm -rf node_modules packages/*/node_modules apps/*/node_modules"
+  },
+  "dependencies": {
+    "lucide-react": "^0.544.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.2.4",
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  }
+}

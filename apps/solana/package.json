@@ -1,0 +1,30 @@
+{
+  "name": "@protocols/solana",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "tsc && biome check ./src",
+    "format": "biome check ./src --write --unsafe"
+  },
+  "dependencies": {
+    "@protocols/ui": "workspace:*",
+    "@solana/web3.js": "^1.78.5",
+    "@uiw/react-json-view": "^2.0.0-alpha.36",
+    "bs58": "^6.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.13",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^7.0.0",
+    "vite-plugin-node-polyfills": "^0.24.0"
+  }
+}
