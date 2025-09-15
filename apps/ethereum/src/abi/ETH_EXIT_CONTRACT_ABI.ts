@@ -1,0 +1,18 @@
+export const ETH_EXIT_CONTRACT_ABI = [
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: false, internalType: 'bytes', name: 'pubkey', type: 'bytes' },
+    ],
+    name: 'ExitRequest',
+    type: 'event',
+  },
+  {
+    inputs: [{ internalType: 'bytes[]', name: 'validators_', type: 'bytes[]' }],
+    name: 'requestExit',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+] as const;

@@ -1,154 +1,69 @@
-/** biome-ignore-all lint/suspicious/noArrayIndexKey: <safe to use> */
-import {
-  Button,
-  Card,
-  CardContent,
-  CopyButton,
-  Label,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-  Textarea,
-} from '@protocols/ui';
-import JsonView from '@uiw/react-json-view';
-import { CopyIcon, DownloadIcon, ZapIcon } from 'lucide-react';
-import { useId, useState } from 'react';
-import { parseEthTx } from '@/parser';
+import { TransactionDecoder } from '@protocols/ui';
+import { useState } from 'react';
+import { formatEther } from 'viem';
+import { TransactionSummary } from '@/components/TransactionSummary';
+import { useUrlParam } from '@/hooks/useUrlParam';
+import { hashEthTx, parseEthTx } from '@/parser';
+import type { AugmentedTransaction } from '@/utils';
+import { getActionDescription, sampleTransaction } from '@/utils';
 
 function App() {
-  const [rawTransaction, setRawTransaction] = useState('');
-  const [decodedTransaction, setDecodedTransaction] = useState<object | null>(null);
+  const [rawTransaction, setRawTransaction] = useUrlParam({
+    paramName: 'tx',
+    defaultValue: '',
+  });
+  const [decodedTransaction, setDecodedTransaction] = useState<AugmentedTransaction | null>(null);
   const [hash, setHash] = useState('');
 
   const handleDecode = async () => {
-    const decoded_tx = parseEthTx(rawTransaction);
-    const transactionUint8Array = new Uint8Array(
-      rawTransaction.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || [],
-    );
-
-    const hashBuffer = await crypto.subtle.digest('SHA-256', transactionUint8Array);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    const decoded_tx = await parseEthTx(rawTransaction);
+    const hashHex = hashEthTx(rawTransaction);
     setHash(hashHex);
     setDecodedTransaction(decoded_tx);
   };
 
+  const renderSummary = (data: any) => <TransactionSummary transaction={data} hash={hash} />;
+
+  const valueWei = decodedTransaction?.value ?? 0n;
+  const ethAmount = formatEther(valueWei);
+  const isHighValue = Number(ethAmount) > 1;
+  const highValueWarning = isHighValue ? `High value transaction: ${ethAmount} ETH` : '';
+
+  const warnings = decodedTransaction
+    ? [{ message: getActionDescription(decodedTransaction).warning }, { message: highValueWarning }]
+    : [];
+
   return (
-    <div className="flex flex-col items-center gap-y-14 py-14 min-h-screen">
-      <div className="gap-4 flex flex-col items-center justify-center">
-        <h1 className="text-5xl font-extrabold">Ethereum Raw transaction decoder</h1>
-        <p>Decode and analyze blockchain transactions</p>
-      </div>
-      <div className="flex flex-col gap-4 w-full max-w-3xl">
-        <Card>
-          <CardContent className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xl font-semibold">Paste your transaction</span>
-              <Button variant="outline" onClick={() => setRawTransaction('')}>
-                Try sample
-              </Button>
-            </div>
-            <div className="grid w-full gap-3">
-              <Label htmlFor="transaction">Raw transaction</Label>
-              <Textarea
-                className="h-48 resize-y"
-                placeholder={'Paste your transaction as hex or Fireblocks message JSON'}
-                id={useId()}
-                value={rawTransaction}
-                onChange={(e) => setRawTransaction(e.target.value)}
-              />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex flex-col gap-4">
-            <span className="text-xl font-semibold">Run decoder</span>
-            <Button className="w-full" size="sm" onClick={() => handleDecode()}>
-              <ZapIcon /> Run
-            </Button>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex flex-col gap-4">
-            <span className="text-xl font-semibold">Hash</span>
-            {hash ? (
-              <pre className="relative bg-secondary rounded-md px-4 py-3.5 font-mono text-sm overflow-x-auto">
-                <code>{hash}</code>
-                <Button
-                  className="size-5 absolute right-4 top-1/2 -translate-y-1/2"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => navigator.clipboard.writeText(hash)}
-                >
-                  <CopyIcon className="size-4" />
-                </Button>
-              </pre>
-            ) : (
-              <p className="text-sm text-muted-foreground">Decode a transaction to get the hash</p>
-            )}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex flex-col gap-4">
-            <span className="text-xl font-semibold">Output</span>
-            <div className="w-full">
-              <Tabs className="w-full gap-6" defaultValue="summary">
-                <TabsList className="w-full">
-                  <TabsTrigger value="summary">Summary</TabsTrigger>
-                  <TabsTrigger value="json">JSON</TabsTrigger>
-                </TabsList>
-                <TabsContent className="space-y-6" value="summary">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Decoded transaction data</span>
-                    <div className="flex items-center gap-2">
-                      <CopyButton disabled={!decodedTransaction} textToCopy={JSON.stringify(decodedTransaction)}>
-                        Copy
-                      </CopyButton>
-                      <Button
-                        disabled={!decodedTransaction}
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          const blob = new Blob([JSON.stringify(decodedTransaction)], {
-                            type: 'application/json',
-                          });
-                          const url = URL.createObjectURL(blob);
-                          const a = document.createElement('a');
-                          a.href = url;
-                          a.download = 'transaction.json';
-                          a.click();
-                        }}
-                      >
-                        <DownloadIcon />
-                        Downlaod
-                      </Button>
-                    </div>
-                  </div>
-                </TabsContent>
-                <TabsContent value="json">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Decoded transaction data</span>
-                    <div className="flex items-center gap-2">
-                      <Button size="sm" variant="outline" disabled={!decodedTransaction}>
-                        <CopyIcon />
-                        Copy JSON
-                      </Button>
-                      <Button size="sm" variant="outline" disabled={!decodedTransaction}>
-                        <DownloadIcon />
-                        Downlaod
-                      </Button>
-                    </div>
-                  </div>
-                  <JsonView value={decodedTransaction as object} />
-                </TabsContent>
-              </Tabs>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+    <TransactionDecoder
+      title="Ethereum raw transaction decoder"
+      subtitle="Decode and analyze ethereum transactions"
+      rawTransaction={rawTransaction}
+      onRawTransactionChange={setRawTransaction}
+      onDecode={handleDecode}
+      decodedTransaction={decodedTransaction}
+      hash={hash}
+      sampleTransaction={sampleTransaction}
+      warnings={warnings}
+      renderSummary={renderSummary}
+      placeholder="Paste your transaction as hex or Fireblocks message JSON"
+    />
   );
 }
 
 export default App;
+
+// const stakeTransaction = {
+//   to: '0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852' as `0x${string}`,
+//   nonce: 1,
+//   maxPriorityFeePerGas: 2000000000n, // 2 Gwei
+//   maxFeePerGas: 383687469748n,
+//   gas: 140244n,
+//   value: 32000000000000000000n, // 32 ETH
+//   data: '0xca0bfcce0000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000001a000000000000000000000000000000000000000000000000000000000000002600000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000309696c02ec4dbb99f714e26ff1acdf6b258d36dcbad7b8b549553bc99b94ea639cd247f31683564995afd48568c1b6edd00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020010000000000000000000000bc86717bad3f8ccf86d2882a6bc351c94580a994000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000060a3869da2ed5cc558f016d59fc5ceb0cac28e58743836aa3cf146221f1ef0b959e3cc5c589e05e171f1473596aadf36411767ad92edaae421ba0291bd7568267b3faabc3ab6ed9ddfc048ea6640370977f16f4f626a0e567a11ba25acdc520bb000000000000000000000000000000000000000000000000000000000000000012dd65914dda46639df6344701de54ac3ebe34a4b230262d3017fcd6c29954452' as `0x${string}`,
+//   chainId: 1,
+// };
+
+// const serializedTransaction = serializeTransaction({
+//   ...stakeTransaction,
+//   authorizationList: [],
+// });

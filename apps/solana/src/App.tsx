@@ -75,7 +75,7 @@ function App() {
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-3 pb-3">
-              <span className="text-xs font-medium">
+              <span className="text-xs font-medium inline-flex items-center flex-wrap">
                 <InstructionSummary instruction={instruction} index={index} />
               </span>
             </AccordionContent>
