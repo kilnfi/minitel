@@ -2,7 +2,7 @@ import JsonView from '@uiw/react-json-view';
 import { githubLightTheme } from '@uiw/react-json-view/githubLight';
 import { vscodeTheme } from '@uiw/react-json-view/vscode';
 import { DownloadIcon, InfoIcon, TriangleAlertIcon, ZapIcon } from 'lucide-react';
-import { useEffect, useId, useState } from 'react';
+import { useId } from 'react';
 import { CopyButton, CopyButtonIcon } from '#/components/copy-button';
 import { Alert, AlertDescription, AlertTitle } from '#/components/ui/alert';
 import { Button } from '#/components/ui/button';
@@ -10,6 +10,7 @@ import { Card, CardContent, CardFooter } from '#/components/ui/card';
 import { Label } from '#/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '#/components/ui/tabs';
 import { Textarea } from '#/components/ui/textarea';
+import { useIsDarkMode } from '#/hooks/useIsDarkMode';
 import { cn } from '#/lib/utils';
 import { Badge } from '#/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '#/ui/tooltip';
@@ -27,6 +28,8 @@ export interface TransactionDecoderProps<T = unknown> {
   renderSummary?: (data: T) => React.ReactNode;
   placeholder?: string;
   error?: string;
+  onPlaygroundChange?: (value: boolean) => void;
+  playground?: boolean;
 }
 
 export function TransactionDecoder<T = unknown>({
@@ -42,20 +45,12 @@ export function TransactionDecoder<T = unknown>({
   renderSummary,
   placeholder = 'Paste your transaction as hex or JSON',
   error,
+  onPlaygroundChange,
+  playground,
 }: TransactionDecoderProps<T>) {
   const textareaId = useId();
   const warningsAmount = warnings.length;
-  const [isDarkMode, setIsDarkMode] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      setIsDarkMode(e.matches);
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
+  const isDarkMode = useIsDarkMode();
 
   return (
     <div className="relative flex flex-col gap-4 items-center justify-center px-4 w-full">
@@ -69,11 +64,18 @@ export function TransactionDecoder<T = unknown>({
             <CardContent className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <span className="text-xl font-semibold">Paste your transaction</span>
-                {sampleTransaction && (
-                  <Button variant="outline" onClick={() => onRawTransactionChange(sampleTransaction)}>
-                    <InfoIcon />
-                  </Button>
-                )}
+                <div className="flex items-center gap-2">
+                  {sampleTransaction && (
+                    <Button variant="outline" onClick={() => onRawTransactionChange(sampleTransaction)}>
+                      Try Sample
+                    </Button>
+                  )}
+                  {onPlaygroundChange && (
+                    <Button variant="outline" onClick={() => onPlaygroundChange(!playground)}>
+                      <InfoIcon />
+                    </Button>
+                  )}
+                </div>
               </div>
               <div className="grid w-full gap-3">
                 <Label htmlFor="transaction">Raw transaction</Label>
@@ -167,26 +169,46 @@ export function TransactionDecoder<T = unknown>({
                   </Button>
                 </div>
               </div>
-              <div className="w-full">
-                <Tabs className="w-full gap-6" defaultValue={renderSummary ? 'summary' : 'json'}>
-                  <TabsList className="w-full">
-                    {renderSummary && <TabsTrigger value="summary">Summary</TabsTrigger>}
-                    <TabsTrigger value="json">JSON</TabsTrigger>
-                  </TabsList>
-                  {renderSummary && (
-                    <TabsContent className="space-y-6" value="summary">
-                      <div className="space-y-3">{decodedTransaction && renderSummary(decodedTransaction)}</div>
-                    </TabsContent>
-                  )}
-                  <TabsContent value="json">
-                    <JsonView value={decodedTransaction ?? {}} style={isDarkMode ? vscodeTheme : githubLightTheme} />
-                  </TabsContent>
-                </Tabs>
-              </div>
+              <TransactionDecoderTabs
+                renderSummary={renderSummary}
+                decodedTransaction={decodedTransaction}
+                isDarkMode={isDarkMode}
+              />
             </CardContent>
           </Card>
         </div>
       </div>
+    </div>
+  );
+}
+
+export type TransactionDecoderTabsProps<T = unknown> = {
+  renderSummary?: (data: T) => React.ReactNode;
+  decodedTransaction: T | null;
+  isDarkMode: boolean;
+};
+
+export function TransactionDecoderTabs<T = unknown>({
+  renderSummary,
+  decodedTransaction,
+  isDarkMode,
+}: TransactionDecoderTabsProps<T>) {
+  return (
+    <div className="w-full">
+      <Tabs className="w-full gap-6" defaultValue={renderSummary ? 'summary' : 'json'}>
+        <TabsList className="w-full">
+          {renderSummary && <TabsTrigger value="summary">Summary</TabsTrigger>}
+          <TabsTrigger value="json">JSON</TabsTrigger>
+        </TabsList>
+        {renderSummary && (
+          <TabsContent className="space-y-6" value="summary">
+            <div className="space-y-3">{decodedTransaction && renderSummary(decodedTransaction)}</div>
+          </TabsContent>
+        )}
+        <TabsContent value="json">
+          <JsonView value={decodedTransaction ?? {}} style={isDarkMode ? vscodeTheme : githubLightTheme} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
