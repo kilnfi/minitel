@@ -14,18 +14,26 @@ function App() {
   });
   const [decodedTransaction, setDecodedTransaction] = useState<ParseSolTxResult | null>(null);
   const [hash, setHash] = useState('');
+  const [error, setError] = useState<string | undefined>(undefined);
 
   const handleDecode = async () => {
-    const decoded_tx = parseSolTx(rawTransaction);
-    const transactionUint8Array = new Uint8Array(
-      rawTransaction.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || [],
-    );
+    try {
+      setError(undefined);
+      const decoded_tx = parseSolTx(rawTransaction);
+      const transactionUint8Array = new Uint8Array(
+        rawTransaction.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || [],
+      );
 
-    const hashBuffer = await crypto.subtle.digest('SHA-256', transactionUint8Array);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-    setHash(hashHex);
-    setDecodedTransaction(decoded_tx);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', transactionUint8Array);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+      setHash(hashHex);
+      setDecodedTransaction(decoded_tx);
+    } catch (error) {
+      console.error(error);
+      setError(error instanceof Error ? error.message : 'Unknown error');
+      setDecodedTransaction(null);
+    }
   };
 
   const instructions = decodedTransaction?.instructions || [];
@@ -97,6 +105,7 @@ function App() {
       warnings={warnings}
       renderSummary={renderSummary}
       placeholder="Paste your transaction as hex or Fireblocks message JSON"
+      error={error}
     />
   );
 }

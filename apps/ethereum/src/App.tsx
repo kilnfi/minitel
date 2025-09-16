@@ -14,12 +14,20 @@ function App() {
   });
   const [decodedTransaction, setDecodedTransaction] = useState<AugmentedTransaction | null>(null);
   const [hash, setHash] = useState('');
+  const [error, setError] = useState<string | undefined>(undefined);
 
   const handleDecode = async () => {
-    const decoded_tx = await parseEthTx(rawTransaction);
-    const hashHex = hashEthTx(rawTransaction);
-    setHash(hashHex);
-    setDecodedTransaction(decoded_tx);
+    try {
+      setError(undefined);
+      const decoded_tx = await parseEthTx(rawTransaction);
+      const hashHex = hashEthTx(rawTransaction);
+      setHash(hashHex);
+      setDecodedTransaction(decoded_tx);
+    } catch (error) {
+      console.error(error);
+      setError(error instanceof Error ? error.message : 'Unknown error');
+      setDecodedTransaction(null);
+    }
   };
 
   const renderSummary = (data: AugmentedTransaction) => <TransactionSummary transaction={data} hash={hash} />;
@@ -46,6 +54,7 @@ function App() {
       warnings={warnings}
       renderSummary={renderSummary}
       placeholder="Paste your transaction as hex or Fireblocks message JSON"
+      error={error}
     />
   );
 }

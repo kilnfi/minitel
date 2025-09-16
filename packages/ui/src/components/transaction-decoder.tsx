@@ -26,6 +26,7 @@ export interface TransactionDecoderProps<T = unknown> {
   warnings?: Array<{ message: string }>;
   renderSummary?: (data: T) => React.ReactNode;
   placeholder?: string;
+  error?: string;
 }
 
 export function TransactionDecoder<T = unknown>({
@@ -40,6 +41,7 @@ export function TransactionDecoder<T = unknown>({
   warnings = [],
   renderSummary,
   placeholder = 'Paste your transaction as hex or JSON',
+  error,
 }: TransactionDecoderProps<T>) {
   const textareaId = useId();
   const warningsAmount = warnings.length;
@@ -93,6 +95,13 @@ export function TransactionDecoder<T = unknown>({
           <Card>
             <CardContent className="flex flex-col gap-4">
               <span className="text-xl font-semibold">Output</span>
+              {error && (
+                <Alert variant="destructive">
+                  <TriangleAlertIcon />
+                  <AlertTitle>Error decoding transaction</AlertTitle>
+                  <AlertDescription className="text-sm overflow-y-auto max-h-40 break-all">{error}</AlertDescription>
+                </Alert>
+              )}
               {warningsAmount > 0 && (
                 <Alert variant="warning">
                   <TriangleAlertIcon />
