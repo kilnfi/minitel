@@ -12,6 +12,7 @@ import {
   type TransactionSerializableLegacy,
 } from 'viem';
 import type { ETH_DEPOSIT_CONTRACT_ABI } from '@/abi/ETH_DEPOSIT_CONTRACT_ABI';
+import type { ETH_EXIT_CONTRACT_ABI } from '@/abi/ETH_EXIT_CONTRACT_ABI';
 import type { MATIC_STAKE_MANAGER_CONTRACT_ABI } from '@/abi/MATIC_STAKE_MANAGER_CONTRACT_ABI';
 import type { FunctionNameToAbiMap } from '@/constant';
 
@@ -37,6 +38,7 @@ export const normalizeHex = (txRaw: string): `0x${string}` => {
   return (txRaw.startsWith('0x') ? txRaw : `0x${txRaw}`) as `0x${string}`;
 };
 
+// biome-ignore lint/suspicious/noExplicitAny: <not necessary>
 export const convertBigIntToString = (obj: any): any => {
   if (typeof obj === 'bigint') {
     return obj.toString();
@@ -47,6 +49,7 @@ export const convertBigIntToString = (obj: any): any => {
   }
 
   if (obj !== null && typeof obj === 'object') {
+    // biome-ignore lint/suspicious/noExplicitAny: <not necessary>
     const converted: any = {};
     for (const key in obj) {
       converted[key] = convertBigIntToString(obj[key]);
@@ -91,12 +94,6 @@ const ACTION_HANDLERS = {
       description: (
         <div>
           Batch staking {ethAmount} ETH for {dataRoots.length} validator(s)
-          <br />
-          <ul>
-            {dataRoots.map((root) => (
-              <li key={root}>- deposit of 32 ETH to {shortenAddress(root)}</li>
-            ))}
-          </ul>
         </div>
       ),
       riskLevel: 'high',
@@ -108,7 +105,11 @@ const ACTION_HANDLERS = {
     const args = tx.inputData.args as ExtractArgs<typeof ETH_DEPOSIT_CONTRACT_ABI, 'batchDepositCustom'>;
     const dataRoots = args[3];
     return {
-      description: `Batch staking ${ethAmount} ETH for ${dataRoots.length} validator(s)`,
+      description: (
+        <>
+          Batch staking {ethAmount} ETH for {dataRoots.length} validator(s)
+        </>
+      ),
       riskLevel: 'high',
       warning: 'Batch staking is a high risk operation',
     };
@@ -116,7 +117,11 @@ const ACTION_HANDLERS = {
   buyVoucher: (tx) => {
     const [amount, minShares] = tx.inputData.args as ExtractArgs<typeof MATIC_STAKE_MANAGER_CONTRACT_ABI, 'buyVoucher'>;
     return {
-      description: `Delegating ${formatEther(amount)} tokens (min shares: ${formatEther(minShares)})`,
+      description: (
+        <>
+          Delegating {formatEther(amount)} tokens (min shares: {formatEther(minShares)})
+        </>
+      ),
       riskLevel: 'high',
       warning: 'Delegating is a high risk operation',
     };
@@ -127,7 +132,11 @@ const ACTION_HANDLERS = {
       'sellVoucher'
     >;
     return {
-      description: `Undelegating ${formatEther(claimAmount)} tokens (max shares: ${formatEther(maxShares)})`,
+      description: (
+        <>
+          Undelegating {formatEther(claimAmount)} tokens (max shares: {formatEther(maxShares)})
+        </>
+      ),
       riskLevel: 'high',
       warning: 'Undelegating is a high risk operation',
     };
@@ -164,7 +173,11 @@ const ACTION_HANDLERS = {
       'buyVoucherPOL'
     >;
     return {
-      description: `Delegating ${formatEther(amount)} POL tokens (min shares: ${formatEther(minShares)})`,
+      description: (
+        <>
+          Delegating {formatEther(amount)} POL tokens (min shares: {formatEther(minShares)})
+        </>
+      ),
       riskLevel: 'high',
       warning: 'Delegating POL tokens is a high risk operation',
     };
@@ -175,7 +188,11 @@ const ACTION_HANDLERS = {
       'sellVoucherPOL'
     >;
     return {
-      description: `Undelegating ${formatEther(claimAmount)} POL tokens (max shares: ${formatEther(maxShares)})`,
+      description: (
+        <>
+          Undelegating {formatEther(claimAmount)} POL tokens (max shares: {formatEther(maxShares)})
+        </>
+      ),
       riskLevel: 'high',
       warning: 'Undelegating POL tokens is a high risk operation',
     };
@@ -183,7 +200,7 @@ const ACTION_HANDLERS = {
   withdrawRewardsPOL: (tx) => {
     const to = tx.to ?? '0x';
     return {
-      description: `Withdrawing POL rewards from ${shortenAddress(to)}`,
+      description: <>Withdrawing POL rewards from {shortenAddress(to)}</>,
       riskLevel: 'high',
       warning: 'Withdrawing POL rewards is a high risk operation',
     };
@@ -228,7 +245,11 @@ const ACTION_HANDLERS = {
     const spender = args[0];
     const amount = args[1];
     return {
-      description: `Approving ${amount.toString()} tokens for ${shortenAddress(spender)}`,
+      description: (
+        <>
+          Approving {amount.toString()} tokens for {shortenAddress(spender)}
+        </>
+      ),
       riskLevel: 'high',
       warning: 'Approving tokens is a high risk operation',
     };
@@ -244,7 +265,11 @@ const ACTION_HANDLERS = {
     const ethAmount = tx.value ? formatEther(tx.value) : '0';
     const to = tx.to ?? '0x';
     return {
-      description: `Staking ${ethAmount} ETH to ${shortenAddress(to)}`,
+      description: (
+        <>
+          Staking {ethAmount} ETH to {shortenAddress(to)}
+        </>
+      ),
       riskLevel: 'high',
       warning: 'Staking ETH is a high risk operation',
     };
@@ -254,7 +279,11 @@ const ACTION_HANDLERS = {
     const hasEthValue = BigInt(ethAmount) > 0n;
     const to = tx.to ?? '0x';
     return {
-      description: `Depositing ${ethAmount} ETH${hasEthValue ? '' : ' tokens'} to ${shortenAddress(to)}`,
+      description: (
+        <>
+          Depositing {ethAmount} ETH{hasEthValue ? '' : ' tokens'} to {shortenAddress(to)}
+        </>
+      ),
       riskLevel: 'high',
       warning: 'Depositing ETH is a high risk operation',
     };
@@ -262,7 +291,7 @@ const ACTION_HANDLERS = {
   redeem: (tx) => {
     const to = tx.to ?? '0x';
     return {
-      description: `Redeeming tokens from ${shortenAddress(to)}`,
+      description: <>Redeeming tokens from {shortenAddress(to)}</>,
       riskLevel: 'high',
       warning: 'Redeeming tokens is a high risk operation',
     };
@@ -271,7 +300,11 @@ const ACTION_HANDLERS = {
     const ethAmount = tx.value ? formatEther(tx.value) : '0';
     const to = tx.to ?? '0x';
     return {
-      description: `Withdrawing ${ethAmount} tokens from ${shortenAddress(to)}`,
+      description: (
+        <>
+          Withdrawing {ethAmount} tokens from {shortenAddress(to)}
+        </>
+      ),
       riskLevel: 'high',
       warning: 'Withdrawing tokens is a high risk operation',
     };
@@ -284,27 +317,35 @@ const ACTION_HANDLERS = {
     };
   },
   requestExit: (tx) => {
-    const validators = tx.inputData.args[0];
+    const [validators] = tx.inputData.args as ExtractArgs<typeof ETH_EXIT_CONTRACT_ABI, 'requestExit'>;
     return {
-      description: `Requesting validator exit for ${(validators as readonly any[]).length} validator(s)`,
+      description: <>Requesting validator exit for {validators.length} validator(s)</>,
       riskLevel: 'high',
       warning: 'Requesting validator exit is a high risk operation',
     };
   },
   bigBatchDeposit: (tx) => {
     const ethAmount = tx.value ? formatEther(tx.value) : '0';
-    const validators = tx.inputData.args[0];
+    const [validators] = tx.inputData.args as ExtractArgs<typeof ETH_DEPOSIT_CONTRACT_ABI, 'bigBatchDeposit'>;
     return {
-      description: `Big batch staking ${ethAmount} ETH for ${(validators as readonly any[]).length} validator(s)`,
+      description: (
+        <>
+          Big batch staking {ethAmount} ETH for {validators.length} validator(s)
+        </>
+      ),
       riskLevel: 'high',
       warning: 'Big batch staking is a high risk operation',
     };
   },
   bigBatchDepositCustom: (tx) => {
     const ethAmount = tx.value ? formatEther(tx.value) : '0';
-    const validators = tx.inputData.args[0];
+    const [validators] = tx.inputData.args as ExtractArgs<typeof ETH_DEPOSIT_CONTRACT_ABI, 'bigBatchDepositCustom'>;
     return {
-      description: `Big batch staking ${ethAmount} ETH for ${(validators as readonly any[]).length} validator(s)`,
+      description: (
+        <>
+          Big batch staking {ethAmount} ETH for {validators.length} validator(s)
+        </>
+      ),
       riskLevel: 'high',
       warning: 'Big batch staking is a high risk operation',
     };
@@ -312,7 +353,7 @@ const ACTION_HANDLERS = {
   delegatedTo: (tx) => {
     const to = tx.to ?? '0x';
     return {
-      description: `Delegating to ${shortenAddress(to)}`,
+      description: <>Delegating to {shortenAddress(to)}</>,
       riskLevel: 'high',
       warning: 'Delegating to EigenLayer operator is a high risk operation',
     };
@@ -320,7 +361,7 @@ const ACTION_HANDLERS = {
   maxWithdraw: (tx) => {
     const to = tx.to ?? '0x';
     return {
-      description: `Withdrawing max tokens from ${shortenAddress(to)}`,
+      description: <>Withdrawing max tokens from {shortenAddress(to)}</>,
       riskLevel: 'high',
       warning: 'Withdrawing max tokens is a high risk operation',
     };
@@ -328,7 +369,7 @@ const ACTION_HANDLERS = {
   withdrawableRestakedExecutionLayerGwei: (tx) => {
     const to = tx.to ?? '0x';
     return {
-      description: `Withdrawing restaked execution layer Gwei from ${shortenAddress(to)}`,
+      description: <>Withdrawing restaked execution layer Gwei from {shortenAddress(to)}</>,
       riskLevel: 'high',
       warning: 'Withdrawing restaked execution layer Gwei is a high risk operation',
     };
@@ -368,7 +409,7 @@ export function getActionDescription(tx: AugmentedTransaction): DetailsResult {
       };
     }
     return {
-      description: `Calling contract ${shortenAddress(to)}`,
+      description: <>Calling contract {shortenAddress(to)}</>,
       riskLevel: 'low',
       warning: '',
     };
@@ -377,7 +418,7 @@ export function getActionDescription(tx: AugmentedTransaction): DetailsResult {
   const funcName = tx.inputData.functionName;
   if (!(funcName in ACTION_HANDLERS)) {
     return {
-      description: `Unknown function: ${funcName}`,
+      description: <>Unknown function: {funcName}</>,
       riskLevel: 'unknown',
       warning: 'Unknown function proceed with caution',
     };

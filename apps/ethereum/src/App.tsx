@@ -22,7 +22,7 @@ function App() {
     setDecodedTransaction(decoded_tx);
   };
 
-  const renderSummary = (data: any) => <TransactionSummary transaction={data} hash={hash} />;
+  const renderSummary = (data: AugmentedTransaction) => <TransactionSummary transaction={data} hash={hash} />;
 
   const valueWei = decodedTransaction?.value ?? 0n;
   const ethAmount = formatEther(valueWei);

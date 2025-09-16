@@ -1,15 +1,18 @@
 import JsonView from '@uiw/react-json-view';
 import { githubLightTheme } from '@uiw/react-json-view/githubLight';
 import { vscodeTheme } from '@uiw/react-json-view/vscode';
-import { DownloadIcon, TriangleAlertIcon, ZapIcon } from 'lucide-react';
+import { DownloadIcon, InfoIcon, TriangleAlertIcon, ZapIcon } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
 import { CopyButton, CopyButtonIcon } from '#/components/copy-button';
 import { Alert, AlertDescription, AlertTitle } from '#/components/ui/alert';
 import { Button } from '#/components/ui/button';
-import { Card, CardContent } from '#/components/ui/card';
+import { Card, CardContent, CardFooter } from '#/components/ui/card';
 import { Label } from '#/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '#/components/ui/tabs';
 import { Textarea } from '#/components/ui/textarea';
+import { cn } from '#/lib/utils';
+import { Badge } from '#/ui/badge';
+import { Tooltip, TooltipContent, TooltipTrigger } from '#/ui/tooltip';
 
 export interface TransactionDecoderProps<T = unknown> {
   title?: string;
@@ -53,20 +56,20 @@ export function TransactionDecoder<T = unknown>({
   }, []);
 
   return (
-    <div className="relative flex flex-col gap-4 items-center justify-center px-4">
-      <div className="flex flex-col items-center gap-y-14 py-14 min-h-screen">
+    <div className="relative flex flex-col gap-4 items-center justify-center px-4 w-full">
+      <div className="flex flex-col items-center gap-y-14 py-14 min-h-screen w-full">
         <div className="gap-4 text-foreground flex flex-col items-center justify-center">
           <h1 className="text-5xl font-extrabold">{title}</h1>
           <p>{subtitle}</p>
         </div>
-        <div className="flex flex-col gap-4 w-full max-w-3xl">
+        <div className="flex flex-col gap-4 max-w-5xl w-full mx-auto">
           <Card>
             <CardContent className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <span className="text-xl font-semibold">Paste your transaction</span>
                 {sampleTransaction && (
                   <Button variant="outline" onClick={() => onRawTransactionChange(sampleTransaction)}>
-                    Try sample
+                    <InfoIcon />
                   </Button>
                 )}
               </div>
@@ -81,30 +84,12 @@ export function TransactionDecoder<T = unknown>({
                 />
               </div>
             </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex flex-col gap-4">
-              <span className="text-xl font-semibold">Run decoder</span>
-              <Button className="w-full" size="sm" onClick={onDecode}>
+            <CardFooter className="flex justify-end">
+              <Button disabled={!rawTransaction} size="lg" onClick={onDecode}>
                 <ZapIcon /> Run
               </Button>
-            </CardContent>
+            </CardFooter>
           </Card>
-          {hash && (
-            <Card>
-              <CardContent className="flex flex-col gap-4">
-                <span className="text-xl font-semibold">Hash</span>
-                <pre className="relative bg-secondary rounded-md px-4 py-3.5 font-mono text-sm overflow-x-auto">
-                  <code>{hash}</code>
-                  <CopyButtonIcon
-                    wrapperClassName="absolute right-4 top-1/2 -translate-y-1/2"
-                    textToCopy={hash}
-                    disabled={!hash}
-                  />
-                </pre>
-              </CardContent>
-            </Card>
-          )}
           <Card>
             <CardContent className="flex flex-col gap-4">
               <span className="text-xl font-semibold">Output</span>
@@ -125,6 +110,54 @@ export function TransactionDecoder<T = unknown>({
                   </AlertDescription>
                 </Alert>
               )}
+              <div className="flex items-center justify-between gap-2 w-full max-w-full overflow-hidden">
+                <div
+                  className={cn(
+                    'flex items-center gap-2 bg-transparent dark:bg-input/30 rounded-md p-2 text-sm border border-input min-w-0',
+                    hash ? 'text-foreground' : 'text-muted-foreground',
+                  )}
+                >
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Badge variant="secondary">
+                        <InfoIcon />
+                        Transaction hash
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-[360px] w-full">
+                      <p className="text-pretty text-center w-full">
+                        Hash computed from the inputed raw transaction hex string. Compare this with your wallet’s
+                        prompt to ensure you’re signing the exact bytes you decoded.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <span className="text-xs truncate">{hash ? hash : 'No transaction hash yet'}</span>
+                  <CopyButtonIcon textToCopy={hash ?? ''} disabled={!hash} />
+                </div>
+                <div className="flex items-center gap-2">
+                  <CopyButton size="lg" disabled={!decodedTransaction} textToCopy={JSON.stringify(decodedTransaction)}>
+                    Copy JSON
+                  </CopyButton>
+                  <Button
+                    disabled={!decodedTransaction}
+                    size="lg"
+                    variant="outline"
+                    onClick={() => {
+                      const blob = new Blob([JSON.stringify(decodedTransaction)], {
+                        type: 'application/json',
+                      });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'transaction.json';
+                      a.click();
+                    }}
+                  >
+                    <DownloadIcon />
+                    Download
+                  </Button>
+                </div>
+              </div>
               <div className="w-full">
                 <Tabs className="w-full gap-6" defaultValue={renderSummary ? 'summary' : 'json'}>
                   <TabsList className="w-full">
@@ -133,62 +166,10 @@ export function TransactionDecoder<T = unknown>({
                   </TabsList>
                   {renderSummary && (
                     <TabsContent className="space-y-6" value="summary">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Decoded transaction data</span>
-                        <div className="flex items-center gap-2">
-                          <CopyButton disabled={!decodedTransaction} textToCopy={JSON.stringify(decodedTransaction)}>
-                            Copy JSON
-                          </CopyButton>
-                          <Button
-                            disabled={!decodedTransaction}
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                              const blob = new Blob([JSON.stringify(decodedTransaction)], {
-                                type: 'application/json',
-                              });
-                              const url = URL.createObjectURL(blob);
-                              const a = document.createElement('a');
-                              a.href = url;
-                              a.download = 'transaction.json';
-                              a.click();
-                            }}
-                          >
-                            <DownloadIcon />
-                            Download
-                          </Button>
-                        </div>
-                      </div>
                       <div className="space-y-3">{decodedTransaction && renderSummary(decodedTransaction)}</div>
                     </TabsContent>
                   )}
                   <TabsContent value="json">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Decoded transaction data</span>
-                      <div className="flex items-center gap-2">
-                        <CopyButton disabled={!decodedTransaction} textToCopy={JSON.stringify(decodedTransaction)}>
-                          Copy JSON
-                        </CopyButton>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          disabled={!decodedTransaction}
-                          onClick={() => {
-                            const blob = new Blob([JSON.stringify(decodedTransaction)], {
-                              type: 'application/json',
-                            });
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = 'transaction.json';
-                            a.click();
-                          }}
-                        >
-                          <DownloadIcon />
-                          Download
-                        </Button>
-                      </div>
-                    </div>
                     <JsonView value={decodedTransaction ?? {}} style={isDarkMode ? vscodeTheme : githubLightTheme} />
                   </TabsContent>
                 </Tabs>

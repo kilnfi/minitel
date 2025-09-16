@@ -9,12 +9,13 @@ export const CopyButton = ({
   children,
   disabled,
   className,
+  ...buttonProps
 }: {
   textToCopy: string;
   children: React.ReactNode;
   disabled?: boolean;
   className?: string;
-}) => {
+} & React.ComponentProps<typeof Button>) => {
   const [isCopied, setIsCopied] = useState(false);
   return (
     <Tooltip>
@@ -22,7 +23,6 @@ export const CopyButton = ({
         <Button
           className={cn('gap-2', className)}
           variant="outline"
-          size="sm"
           onClick={() => {
             navigator.clipboard.writeText(textToCopy);
             setIsCopied(true);
@@ -31,6 +31,7 @@ export const CopyButton = ({
             }, 2000);
           }}
           disabled={disabled}
+          {...buttonProps}
         >
           {isCopied ? <CopyCheckIcon className="size-4" /> : <CopyIcon className="size-4" />}
           {children}
@@ -44,12 +45,10 @@ export const CopyButton = ({
 export const CopyButtonIcon = ({
   textToCopy,
   disabled,
-  className,
   wrapperClassName,
 }: {
   textToCopy: string;
   disabled?: boolean;
-  className?: string;
   wrapperClassName?: string;
 }) => {
   const [isCopied, setIsCopied] = useState(false);
@@ -58,9 +57,8 @@ export const CopyButtonIcon = ({
       <Tooltip>
         <TooltipTrigger>
           <Button
-            className={cn('size-5', className)}
+            size="iconXs"
             variant="ghost"
-            size="icon"
             onClick={() => {
               navigator.clipboard.writeText(textToCopy);
               setIsCopied(true);
@@ -70,7 +68,7 @@ export const CopyButtonIcon = ({
             }}
             disabled={disabled}
           >
-            {isCopied ? <CopyCheckIcon className="size-4" /> : <CopyIcon className="size-4" />}
+            {isCopied ? <CopyCheckIcon className="size-3" /> : <CopyIcon className="size-3" />}
           </Button>
         </TooltipTrigger>
         <TooltipContent>Copy to clipboard</TooltipContent>

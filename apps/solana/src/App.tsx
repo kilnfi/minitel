@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/suspicious/noArrayIndexKey: <safe to use> */
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, TransactionDecoder } from '@protocols/ui';
 import { useState } from 'react';
 import { InstructionIcon } from '@/components/instructions/InstructionIcon';
@@ -87,8 +86,8 @@ function App() {
 
   return (
     <TransactionDecoder
-      title="Raw transaction decoder"
-      subtitle="Decode and analyze blockchain transactions"
+      title="Solana raw transaction decoder"
+      subtitle="Decode and analyze Solana transactions"
       rawTransaction={rawTransaction}
       onRawTransactionChange={setRawTransaction}
       onDecode={handleDecode}

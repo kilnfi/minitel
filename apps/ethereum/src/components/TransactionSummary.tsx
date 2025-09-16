@@ -1,4 +1,4 @@
-import { Address, Badge, Card, CardContent, CardTitle, CopyButtonIcon } from '@protocols/ui';
+import { Address, Badge, Card, CardContent, CopyButtonIcon } from '@protocols/ui';
 import { formatEther, formatGwei } from 'viem';
 import type { AugmentedTransaction } from '@/utils';
 import { ethExplorerLink, getActionDescription } from '@/utils';
@@ -18,17 +18,17 @@ export function TransactionSummary({ transaction, hash }: TransactionSummaryProp
 
   return (
     <Card className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <CardTitle className="text-lg font-semibold">Transaction Summary</CardTitle>
-        <Badge variant={riskLevel === 'high' ? 'destructive' : riskLevel === 'medium' ? 'warning' : 'success'}>
-          {riskLevel.toUpperCase()} RISK
-        </Badge>
-      </div>
-
       <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-3">
-          <div>
-            <div className="text-sm">Transaction Type</div>
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">Risk Level</div>
+            <Badge variant={riskLevel === 'high' ? 'destructive' : riskLevel === 'medium' ? 'warning' : 'success'}>
+              {riskLevel.toUpperCase()} RISK
+            </Badge>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">Transaction Type</div>
             <Badge variant="success">
               {'inputData' in transaction && transaction.inputData?.functionName
                 ? transaction.inputData.functionName
@@ -36,20 +36,20 @@ export function TransactionSummary({ transaction, hash }: TransactionSummaryProp
             </Badge>
           </div>
 
-          <div>
-            <div className="text-sm">Action</div>
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">Action</div>
             <div className="font-medium text-sm">{actionDetails.description}</div>
           </div>
 
-          <div>
-            <div className="text-sm">ETH Amount</div>
-            <div className="font-semibold text-xl">{ethValue} ETH</div>
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">ETH Amount</div>
+            <div className="font-medium text-sm">{ethValue} ETH</div>
           </div>
         </div>
 
         <div className="space-y-3">
-          <div>
-            <div className="text-sm">To Address</div>
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">To Address</div>
             <div className="font-mono text-sm">
               <Address
                 address={transaction.to ?? '0x0000000000000000000000000000000000000000'}
@@ -59,14 +59,14 @@ export function TransactionSummary({ transaction, hash }: TransactionSummaryProp
             </div>
           </div>
 
-          <div>
-            <div className="text-sm">Max Fee</div>
-            <div className="font-medium">{maxFeeGwei} Gwei</div>
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">Max Fee</div>
+            <div className="font-medium text-sm">{maxFeeGwei} Gwei</div>
           </div>
 
           {hash && (
-            <div>
-              <div className="text-sm">Transaction Hash</div>
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">Transaction Hash</div>
               <div className="font-mono text-sm">
                 <Address
                   address={hash}
