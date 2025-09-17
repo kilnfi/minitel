@@ -1,6 +1,7 @@
 import {
   ArrowRightIcon,
   CoinsIcon,
+  CpuIcon,
   FileIcon,
   GitBranchIcon,
   MinusIcon,
@@ -33,6 +34,16 @@ export function InstructionIcon({
 
   const getOperationIcon = () => {
     switch (type) {
+      // Compute Budget Program Instructions
+      case 'SetComputeUnitLimit':
+        return <CoinsIcon className="size-4" />;
+      case 'SetComputeUnitPrice':
+        return <CoinsIcon className="size-4" />;
+      case 'RequestUnits':
+        return <CpuIcon className="size-4" />;
+      case 'RequestHeapFrame':
+        return <CpuIcon className="size-4" />;
+
       // System Program Instructions
       case 'AdvanceNonceAccount':
         return <ArrowRightIcon className="size-4" />;
