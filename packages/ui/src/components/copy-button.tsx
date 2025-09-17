@@ -55,7 +55,7 @@ export const CopyButtonIcon = ({
   return (
     <div className={cn(wrapperClassName)}>
       <Tooltip>
-        <TooltipTrigger>
+        <TooltipTrigger asChild>
           <Button
             size="iconXs"
             variant="ghost"

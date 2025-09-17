@@ -1,6 +1,7 @@
-import { PublicKey, StakeProgram, SystemProgram } from '@solana/web3.js';
+import { ComputeBudgetProgram, PublicKey, StakeProgram, SystemProgram } from '@solana/web3.js';
 
 export const SYSTEM_PROGRAM_ID = new PublicKey(SystemProgram.programId);
+export const COMPUTE_BUDGET_PROGRAM_ID = new PublicKey(ComputeBudgetProgram.programId);
 export const STAKE_PROGRAM_ID = new PublicKey(StakeProgram.programId);
 
 export const solExplorerLink = (hash: string, type: 'tx' | 'address') => {

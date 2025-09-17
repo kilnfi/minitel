@@ -1,8 +1,7 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge } from '@protocols/ui';
 import { InstructionIcon } from '@/components/instructions/InstructionIcon';
 import { InstructionSummary } from '@/components/instructions/InstructionSummary';
-import type { DecodedInstruction } from '@/types';
-import { STAKE_PROGRAM_ID, SYSTEM_PROGRAM_ID } from '@/utils';
+import { type DecodedInstruction, getProgramName } from '@/types';
 
 export const Summary = ({ instructions }: { instructions: DecodedInstruction[] }) => {
   return (
@@ -31,15 +30,7 @@ export const Summary = ({ instructions }: { instructions: DecodedInstruction[] }
                 </Badge>
                 <span>on</span>
                 <Badge className="font-semibold" variant="secondary">
-                  {instruction.programId === SYSTEM_PROGRAM_ID.toString()
-                    ? 'System Program'
-                    : instruction.programId === STAKE_PROGRAM_ID.toString()
-                      ? 'Stake Program'
-                      : instruction.type === 'unknown'
-                        ? 'unknown'
-                        : instruction.type === 'error'
-                          ? 'error'
-                          : `${instruction.programId.slice(0, 8)}...`}
+                  {getProgramName(instruction.programId)}
                 </Badge>
               </div>
             </AccordionTrigger>

@@ -1,4 +1,3 @@
-import type { StakeInstructionType, SystemInstructionType } from '@solana/web3.js';
 import {
   ArrowRightIcon,
   CoinsIcon,
@@ -17,13 +16,14 @@ import {
   UserIcon,
   ZapIcon,
 } from 'lucide-react';
+import type { InstructionType } from '@/types';
 
 export function InstructionIcon({
   type,
   hasWarning,
   hasError,
 }: {
-  type: StakeInstructionType | SystemInstructionType | 'unknown' | 'error';
+  type: InstructionType;
   hasWarning?: boolean;
   hasError?: boolean;
 }) {

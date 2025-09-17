@@ -17,6 +17,8 @@ import type {
   InitializeNonceParams,
   InitializeStakeParams,
   MergeStakeParams,
+  SetComputeUnitLimitParams,
+  SetComputeUnitPriceParams,
   SplitStakeParams,
   WithdrawNonceParams,
   WithdrawStakeParams,
@@ -46,6 +48,21 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
 
   try {
     switch (type) {
+      // Compute Budget Program Instructions
+      case 'SetComputeUnitLimit': {
+        const computeBudgetData = data as SetComputeUnitLimitParams;
+        return <>Transaction-wide compute unit limit: {computeBudgetData.units || 'unknown'} units</>;
+      }
+      case 'SetComputeUnitPrice': {
+        const computeBudgetData = data as SetComputeUnitPriceParams;
+        return (
+          <>
+            Transaction compute unit price: {computeBudgetData.microLamports || 'unknown'} microlamports (used for
+            prioritization fees)
+          </>
+        );
+      }
+
       // System Program Instructions
       case 'AdvanceNonceAccount': {
         const systemData = data as AdvanceNonceParams;

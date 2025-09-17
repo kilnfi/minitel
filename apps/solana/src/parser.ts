@@ -1,7 +1,12 @@
 import { Buffer } from 'node:buffer';
 import {
+  ComputeBudgetInstruction,
   Message,
   PublicKey,
+  type RequestHeapFrameParams,
+  type RequestUnitsParams,
+  type SetComputeUnitLimitParams,
+  type SetComputeUnitPriceParams,
   StakeInstruction,
   SystemInstruction,
   Transaction,
@@ -9,7 +14,7 @@ import {
 } from '@solana/web3.js';
 import bs58 from 'bs58';
 import type { DecodedInstruction, StakeInstructionParams, SystemInstructionParams } from '@/types';
-import { STAKE_PROGRAM_ID, SYSTEM_PROGRAM_ID } from '@/utils';
+import { COMPUTE_BUDGET_PROGRAM_ID, STAKE_PROGRAM_ID, SYSTEM_PROGRAM_ID } from '@/utils';
 
 type MessageLike = {
   header: {
@@ -58,6 +63,40 @@ function buildInstructionsFromMessage(rawMsg: MessageLike): TransactionInstructi
 
 function decodeOne(instruction: TransactionInstruction): DecodedInstruction {
   try {
+    if (instruction.programId.equals(COMPUTE_BUDGET_PROGRAM_ID)) {
+      const type = ComputeBudgetInstruction.decodeInstructionType(instruction);
+      let data: SetComputeUnitLimitParams | SetComputeUnitPriceParams | RequestUnitsParams | RequestHeapFrameParams;
+
+      switch (type) {
+        case 'SetComputeUnitLimit':
+          data = ComputeBudgetInstruction.decodeSetComputeUnitLimit(instruction);
+          break;
+        case 'SetComputeUnitPrice':
+          data = {
+            ...ComputeBudgetInstruction.decodeSetComputeUnitPrice(instruction),
+            microLamports: Number(ComputeBudgetInstruction.decodeSetComputeUnitPrice(instruction).microLamports),
+          };
+          break;
+        case 'RequestUnits':
+          data = ComputeBudgetInstruction.decodeRequestUnits(instruction);
+          break;
+        case 'RequestHeapFrame':
+          data = ComputeBudgetInstruction.decodeRequestHeapFrame(instruction);
+          break;
+      }
+
+      return {
+        programId: instruction.programId.toString(),
+        type,
+        data,
+        accounts: instruction.keys.map((key) => ({
+          pubkey: key.pubkey.toString(),
+          isSigner: key.isSigner,
+          isWritable: key.isWritable,
+        })),
+      };
+    }
+
     if (instruction.programId.equals(SYSTEM_PROGRAM_ID)) {
       const type = SystemInstruction.decodeInstructionType(instruction);
       let data: SystemInstructionParams | Record<string, unknown>;
