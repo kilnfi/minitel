@@ -1,4 +1,4 @@
-import { TransactionDecoder } from '@protocols/ui';
+import { EthereumIcon, Header, type Protocol, SolanaIcon, TransactionDecoder } from '@protocols/ui';
 import { useState } from 'react';
 import { formatEther } from 'viem';
 import { TransactionSummary } from '@/components/TransactionSummary';
@@ -6,6 +6,21 @@ import { useUrlParam } from '@/hooks/useUrlParam';
 import { hashEthTx, parseEthTx } from '@/parser';
 import type { AugmentedTransaction } from '@/utils';
 import { getActionDescription, sampleTransaction } from '@/utils';
+
+const protocols: Protocol[] = [
+  {
+    name: 'Ethereum',
+    icon: <EthereumIcon className="size-5" />,
+    url: import.meta.env.VITE_ETHEREUM_URL,
+  },
+  {
+    name: 'Solana',
+    icon: <SolanaIcon className="size-5" />,
+    url: import.meta.env.VITE_SOLANA_URL,
+  },
+];
+
+const currentProtocol = protocols.find((protocol) => protocol.url === window.location.origin);
 
 function App() {
   const [rawTransaction, setRawTransaction] = useUrlParam({
@@ -42,20 +57,23 @@ function App() {
     : [];
 
   return (
-    <TransactionDecoder
-      title="Ethereum raw transaction decoder"
-      subtitle="Decode and analyze ethereum transactions"
-      rawTransaction={rawTransaction}
-      onRawTransactionChange={setRawTransaction}
-      onDecode={handleDecode}
-      decodedTransaction={decodedTransaction}
-      hash={hash}
-      sampleTransaction={sampleTransaction}
-      warnings={warnings}
-      renderSummary={renderSummary}
-      placeholder="Paste your transaction as hex or Fireblocks message JSON"
-      error={error}
-    />
+    <div className="relative flex flex-col">
+      <Header protocols={protocols} currentProtocol={currentProtocol} />
+      <TransactionDecoder
+        title="Ethereum raw transaction decoder"
+        subtitle="Decode and analyze ethereum transactions"
+        rawTransaction={rawTransaction}
+        onRawTransactionChange={setRawTransaction}
+        onDecode={handleDecode}
+        decodedTransaction={decodedTransaction}
+        hash={hash}
+        sampleTransaction={sampleTransaction}
+        warnings={warnings}
+        renderSummary={renderSummary}
+        placeholder="Paste your transaction as hex or Fireblocks message JSON"
+        error={error}
+      />
+    </div>
   );
 }
 

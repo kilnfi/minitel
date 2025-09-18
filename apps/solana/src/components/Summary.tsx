@@ -11,12 +11,12 @@ export const Summary = ({ instructions }: { instructions: DecodedInstruction[] }
           key={index}
           type="single"
           collapsible
-          defaultValue="unstake-details"
+          defaultValue={`${instruction.type}-details`}
           className="bg-card text-card-foreground rounded-xl border"
         >
-          <AccordionItem key={index} value="unstake-details" className="border-0">
+          <AccordionItem key={index} value={`${instruction.type}-details`} className="border-0">
             <AccordionTrigger className="px-3 py-2.5 hover:no-underline">
-              <div className="flex items-center gap-2 text-muted-foreground text-sm">
+              <div className="flex items-center flex-wrap gap-2 text-muted-foreground text-sm">
                 <div className="p-1 rounded-md bg-secondary">
                   <InstructionIcon
                     type={instruction.type}
