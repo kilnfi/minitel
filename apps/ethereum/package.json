@@ -11,12 +11,14 @@
     "format": "biome check ./src --write --unsafe"
   },
   "dependencies": {
+    "@protocols/shared": "workspace:*",
     "@protocols/ui": "workspace:*",
     "@uiw/react-json-view": "^2.0.0-alpha.36",
     "lucide-react": "^0.544.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "tw-animate-css": "^1.3.8",
+    "zod": "^3.22.4",
     "viem": "^2.37.5"
   },
   "devDependencies": {

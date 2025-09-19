@@ -1,4 +1,5 @@
-import { EthereumIcon, Header, type Protocol, SolanaIcon, TransactionDecoder } from '@protocols/ui';
+import { getCurrentProtocol, protocols } from '@protocols/shared';
+import { Background, Header, TransactionDecoder } from '@protocols/ui';
 import { useState } from 'react';
 import { cn } from '#/lib/utils';
 import { SolanaPlaybook } from '@/components/SolanaPlaybook';
@@ -8,20 +9,7 @@ import { useUrlParam } from '@/hooks/useUrlParam';
 import type { ParseSolTxResult } from '@/parser';
 import { sampleTransaction } from '@/utils';
 
-const protocols: Protocol[] = [
-  {
-    name: 'Ethereum',
-    icon: <EthereumIcon className="size-5" />,
-    url: import.meta.env.VITE_ETHEREUM_URL,
-  },
-  {
-    name: 'Solana',
-    icon: <SolanaIcon className="size-5" />,
-    url: import.meta.env.VITE_SOLANA_URL,
-  },
-];
-
-const currentProtocol = protocols.find((protocol) => protocol.url === window.location.origin);
+const currentProtocol = getCurrentProtocol();
 
 function App() {
   const [rawTransaction, setRawTransaction] = useUrlParam({
@@ -46,9 +34,15 @@ function App() {
   };
 
   return (
-    <div className="relative flex">
+    <div className="relative flex min-h-screen">
+      <Background />
       <div className={cn('w-full transition-all duration-300 ease-in-out', playground ? 'pr-[40%]' : 'pr-0')}>
-        <Header togglePlayground={togglePlayground} protocols={protocols} currentProtocol={currentProtocol} />
+        <Header
+          protocols={protocols}
+          currentProtocol={currentProtocol}
+          togglePlayground={togglePlayground}
+          isPlaygroundOpen={playground}
+        />
         <TransactionDecoder
           title="Solana raw transaction decoder"
           subtitle="Decode and analyze Solana transactions"

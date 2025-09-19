@@ -1,7 +1,7 @@
 import JsonView from '@uiw/react-json-view';
 import { githubLightTheme } from '@uiw/react-json-view/githubLight';
 import { vscodeTheme } from '@uiw/react-json-view/vscode';
-import { CopyIcon, DownloadIcon, InboxIcon, InfoIcon, TriangleAlertIcon, ZapIcon } from 'lucide-react';
+import { DownloadIcon, InboxIcon, InfoIcon, TriangleAlertIcon, ZapIcon } from 'lucide-react';
 import { useId, useRef } from 'react';
 import { CopyButtonIcon } from '#/components/copy-button';
 import { Alert, AlertDescription, AlertTitle } from '#/components/ui/alert';
@@ -57,7 +57,7 @@ export function TransactionDecoder<T = unknown>({
 
   return (
     <div className="relative flex flex-col gap-4 items-center justify-center px-4 w-full">
-      <div className="flex flex-col items-center gap-y-8 py-8 min-h-screen w-full">
+      <div className="flex flex-col items-center gap-y-8 py-8 w-full">
         <div className="gap-4 text-foreground flex flex-col items-center justify-center">
           <h1 className="text-4xl font-extrabold">{title}</h1>
         </div>
@@ -83,7 +83,7 @@ export function TransactionDecoder<T = unknown>({
                   )}
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="outline">
+                      <Button size="icon" variant="outline">
                         <InfoIcon />
                       </Button>
                     </DialogTrigger>
@@ -216,17 +216,14 @@ export function TransactionDecoderTabs<T = unknown>({
                 <div className="space-y-3">{decodedTransaction && renderSummary(decodedTransaction)}</div>
               </TabsContent>
             )}
-            <TabsContent value="json" className="max-h-96 overflow-y-auto border-border border rounded-md p-2">
-              <div className="flex items-center justify-end gap-2">
-                <Button
+            <TabsContent value="json" className="max-h-96 overflow-y-auto border-border border rounded-md p-2 relative">
+              <div className="flex items-center sticky right-0 top-0 justify-end gap-2 z-10">
+                <CopyButtonIcon
                   variant="outline"
+                  size="icon"
+                  textToCopy={JSON.stringify(decodedTransaction)}
                   disabled={!decodedTransaction}
-                  onClick={() => {
-                    navigator.clipboard.writeText(JSON.stringify(decodedTransaction));
-                  }}
-                >
-                  <CopyIcon />
-                </Button>
+                />
                 <Button
                   disabled={!decodedTransaction}
                   size="icon"

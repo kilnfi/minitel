@@ -84,11 +84,12 @@ export function TransactionSummary({ transaction, hash }: TransactionSummaryProp
             <span className="text-xl font-semibold">Function Called</span>
             <pre className="relative bg-secondary rounded-md px-4 py-3.5 font-mono text-sm overflow-x-auto">
               <code>{transaction.inputData.functionSignature}</code>
-              <CopyButtonIcon
-                wrapperClassName="absolute right-4 top-1/2 -translate-y-1/2"
-                textToCopy={transaction.inputData.functionSignature}
-                disabled={!transaction.inputData.functionSignature}
-              />
+              <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                <CopyButtonIcon
+                  textToCopy={transaction.inputData.functionSignature}
+                  disabled={!transaction.inputData.functionSignature}
+                />
+              </div>
             </pre>
           </CardContent>
         </Card>

@@ -1,4 +1,5 @@
 export * from './components/address';
+export * from './components/background';
 export * from './components/copy-button';
 export * from './components/header';
 export * from './components/icons';

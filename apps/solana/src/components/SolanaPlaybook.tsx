@@ -16,7 +16,7 @@ import {
   SelectValue,
   TransactionDecoderTabs,
 } from '@protocols/ui';
-import { CodeIcon, FileIcon, HashIcon, InfoIcon, ListChecksIcon, ListIcon } from 'lucide-react';
+import { CodeIcon, InfoIcon, KeyRoundIcon, ListChecksIcon, ListIcon, ListIndentDecreaseIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '#/components/ui/tooltip';
 import { useIsDarkMode } from '#/hooks/useIsDarkMode';
@@ -170,6 +170,71 @@ const OPERATIONS: Operation[] = [
       },
     ],
   },
+  {
+    label: '⚠️ Malicious stake authority change',
+    value: 'malicious-stake-authority',
+    description: 'Malicious stake authority change example',
+    rawTransaction: `0200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a23a6609a1fb1c53713baa3126c49d67bc0e25c1abe8fe117e9308e220f4807ce6f5b3ece93801a9cb70754021aadde065b485b406d38de2da52cf10919df90402010310367c028c53021ed2a144b3e0d46dd06216a989dec748a24b3fefbecec65628f051f5f3871e65b84cc393458d0f23a413184cf2bb7093ae4e2c99d55b39a575c545a2d07a42915e1ac8ea972643827eb8fef8c121d74a555afa1e31506abce33646e1a1bb9419fdb9e9cfb6f43bd2ee131a47e08965b356941b17946dfc068f3f5649b1ea61af5a48b4c4cc3bffd8507587c7bda7204275f06e19c9b3f13719155ae4b64986d565b08719e6395ec5781ae297fbfbe3dd4dc192ea6007a6ce46816b6ce5ff737271e8a765a2c395e6db84301d7a6f6db9d11f0577fc78b3f45fa981f3e54c80d7f57c30e8b5a2f8af29add5fff2b5ccefec0de69db730ac8897b28acd6b78eea3aa40dd9b23706be03f64c65a2da13d86ac49a2b3154aa83c3d6e9da44be35733abbb4b4e2c4c623a439970b13197b793f87186b0b58d695f3a5dba3a6283a4e688218964d2d3aad7f3bed9c190ab0d268c2e4a20192240a0a7baecb32973b9d627f80dfbe9f84f9284c037d7b7869e1dbe56e9c3b97bbffb5f3806a7d51718c774c928566398691d5eb68b5eb8a39b4b6d5c73555b2100000000000000000000000000000000000000000000000000000000000000000000000006a1d8179137542a983437bdfe2a7ab2557f535c8a78722b68a49dc00000000006a7d517192c568ee08a845f73d29788cf035c3145b21ab344d8062ea9400000ecb1dbeda3c9b33b1aa2ed8a8392544b28cd5a5a985c507b59eb794c6492ec360a0d03040f0104040000000e03020c0004050000000e030a0c00280100000006cc6f84306e580d107e04f0b24ff68df16ed7c31a9d379b1cc325998dae0f9c010000000e03070c00280100000006cc6f84306e580d107e04f0b24ff68df16ed7c31a9d379b1cc325998dae0f9c010000000e030b0c00280100000006cc6f84306e580d107e04f0b24ff68df16ed7c31a9d379b1cc325998dae0f9c010000000e03050c00280100000006cc6f84306e580d107e04f0b24ff68df16ed7c31a9d379b1cc325998dae0f9c010000000e03080c00280100000006cc6f84306e580d107e04f0b24ff68df16ed7c31a9d379b1cc325998dae0f9c010000000e03030c00280100000006cc6f84306e580d107e04f0b24ff68df16ed7c31a9d379b1cc325998dae0f9c010000000e03090c00280100000006cc6f84306e580d107e04f0b24ff68df16ed7c31a9d379b1cc325998dae0f9c010000000e03060c00280100000006cc6f84306e580d107e04f0b24ff68df16ed7c31a9d379b1cc325998dae0f9c01000000`,
+    operationOverview: [
+      {
+        type: 'text',
+        content:
+          '⚠️ WARNING: This malicious transaction attempts to modify stake account authorities for 8 different stake accounts. It includes an advance nonce operation followed by a deactivation and 8 separate authorize instructions that change the withdrawer authority to a potentially malicious address.',
+      },
+    ],
+    stepByStep: [
+      {
+        title: 'AdvanceNonceAccount',
+        program: 'System Program',
+        description: 'Advance nonce account 6oqE...cp by authority 6WwY...68',
+      },
+      {
+        title: 'Deactivate',
+        program: 'Stake Program',
+        description: 'Deactivate stake account 5gq8...ZX by authority 4fgh...x7',
+      },
+      {
+        title: 'Authorize (1/8)',
+        program: 'Stake Program',
+        description: 'Set Withdrawer authority from 4fgh...x7 to TYFW...K1 on stake account DXxU...XX',
+      },
+      {
+        title: 'Authorize (2/8)',
+        program: 'Stake Program',
+        description: 'Set Withdrawer authority from 4fgh...x7 to TYFW...K1 on stake account 9kHJ...CV',
+      },
+      {
+        title: 'Authorize (3/8)',
+        program: 'Stake Program',
+        description: 'Set Withdrawer authority from 4fgh...x7 to TYFW...K1 on stake account Gvyf...D5',
+      },
+      {
+        title: 'Authorize (4/8)',
+        program: 'Stake Program',
+        description: 'Set Withdrawer authority from 4fgh...x7 to TYFW...K1 on stake account 77oy...SY',
+      },
+      {
+        title: 'Authorize (5/8)',
+        program: 'Stake Program',
+        description: 'Set Withdrawer authority from 4fgh...x7 to TYFW...K1 on stake account ALpw...cZ',
+      },
+      {
+        title: 'Authorize (6/8)',
+        program: 'Stake Program',
+        description: 'Set Withdrawer authority from 4fgh...x7 to TYFW...K1 on stake account 5mh6...34',
+      },
+      {
+        title: 'Authorize (7/8)',
+        program: 'Stake Program',
+        description: 'Set Withdrawer authority from 4fgh...x7 to TYFW...K1 on stake account BcNK...Gx',
+      },
+      {
+        title: 'Authorize (8/8)',
+        program: 'Stake Program',
+        description: 'Set Withdrawer authority from 4fgh...x7 to TYFW...K1 on stake account 8ELw...Ki',
+      },
+    ],
+  },
 ];
 
 const renderOperationOverview = (items: OperationOverviewItem[]) => {
@@ -206,7 +271,7 @@ const renderStepByStep = (steps: StepByStepItem[]) => {
               `${index + 1}. ${step.title}`
             )}
           </AccordionTrigger>
-          <AccordionContent className="pt-3 text-muted-foreground">{step.description}</AccordionContent>
+          <AccordionContent className="pt-3 pb-0 text-muted-foreground">{step.description}</AccordionContent>
         </AccordionItem>
       ))}
     </Accordion>
@@ -232,7 +297,7 @@ export const SolanaPlaybook = ({ playground }: { playground: boolean }) => {
         playground ? 'w-[40%]' : 'w-0',
       )}
     >
-      <div className="p-4 flex flex-col gap-4">
+      <div className="px-4 pt-7 flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <h2 className="text-xl font-medium">Solana decode playbook</h2>
           <span className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -279,17 +344,17 @@ export const SolanaPlaybook = ({ playground }: { playground: boolean }) => {
             <div className="space-y-4">
               <div className="p-3 border rounded-md space-y-2">
                 <div className="inline-flex items-center gap-1 px-2 py-1 bg-secondary rounded text-xs font-semibold">
-                  <FileIcon className="size-4" />
+                  <ListIndentDecreaseIcon className="size-4" />
                   Raw transaction
                 </div>
-                <p className="text-muted-foreground text-sm break-all max-h-48 h-auto overflow-y-auto">
+                <p className="text-muted-foreground text-sm break-all max-h-32 h-auto overflow-y-auto">
                   {selectedOperationData?.rawTransaction}
                 </p>
               </div>
 
               <div className="p-3 border rounded-md space-y-2">
                 <div className="inline-flex items-center gap-1 px-2 py-1 bg-secondary rounded text-xs font-semibold">
-                  <HashIcon className="size-4" />
+                  <KeyRoundIcon className="size-4" />
                   Transaction hash
                 </div>
                 <p className="text-muted-foreground text-sm break-all">{hash}</p>

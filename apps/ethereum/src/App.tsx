@@ -1,4 +1,5 @@
-import { EthereumIcon, Header, type Protocol, SolanaIcon, TransactionDecoder } from '@protocols/ui';
+import { getCurrentProtocol, protocols } from '@protocols/shared';
+import { Background, Header, TransactionDecoder } from '@protocols/ui';
 import { useState } from 'react';
 import { formatEther } from 'viem';
 import { TransactionSummary } from '@/components/TransactionSummary';
@@ -7,20 +8,7 @@ import { hashEthTx, parseEthTx } from '@/parser';
 import type { AugmentedTransaction } from '@/utils';
 import { getActionDescription, sampleTransaction } from '@/utils';
 
-const protocols: Protocol[] = [
-  {
-    name: 'Ethereum',
-    icon: <EthereumIcon className="size-5" />,
-    url: import.meta.env.VITE_ETHEREUM_URL,
-  },
-  {
-    name: 'Solana',
-    icon: <SolanaIcon className="size-5" />,
-    url: import.meta.env.VITE_SOLANA_URL,
-  },
-];
-
-const currentProtocol = protocols.find((protocol) => protocol.url === window.location.origin);
+const currentProtocol = getCurrentProtocol();
 
 function App() {
   const [rawTransaction, setRawTransaction] = useUrlParam({
@@ -57,7 +45,8 @@ function App() {
     : [];
 
   return (
-    <div className="relative flex flex-col">
+    <div className="relative flex flex-col min-h-screen">
+      <Background />
       <Header protocols={protocols} currentProtocol={currentProtocol} />
       <TransactionDecoder
         title="Ethereum raw transaction decoder"

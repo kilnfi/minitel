@@ -11,6 +11,7 @@
     "format": "biome check ./src --write --unsafe"
   },
   "dependencies": {
+    "@protocols/shared": "workspace:*",
     "@protocols/ui": "workspace:*",
     "@solana/web3.js": "^1.78.5",
     "@uiw/react-json-view": "^2.0.0-alpha.36",

@@ -19,7 +19,11 @@ node_modules
 **/*.tsbuildinfo
 
 **/.vite/
+**/.vite/deps/
+**/.vite/deps/_metadata.json
 *.local
+
+apps/*/node_modules/*
 
 coverage/
 .nyc_output/
@@ -33,3 +37,5 @@ apps/*/node_modules/
 
 packages/ui/dist/
 packages/*/node_modules/
+
+packages/shared/dist/

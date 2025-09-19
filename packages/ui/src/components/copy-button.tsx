@@ -1,28 +1,27 @@
+import type { VariantProps } from 'class-variance-authority';
 import { CopyCheckIcon, CopyIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from '#/components/ui/button';
+import { Button, type buttonVariants } from '#/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '#/components/ui/tooltip';
-import { cn } from '#/lib/utils';
 
-export const CopyButton = ({
+export const CopyButtonIcon = ({
   textToCopy,
-  children,
   disabled,
-  className,
-  ...buttonProps
+  variant = 'ghost',
+  size = 'iconXs',
 }: {
   textToCopy: string;
-  children: React.ReactNode;
   disabled?: boolean;
-  className?: string;
-} & React.ComponentProps<typeof Button>) => {
+  variant?: VariantProps<typeof buttonVariants>['variant'];
+  size?: VariantProps<typeof buttonVariants>['size'];
+}) => {
   const [isCopied, setIsCopied] = useState(false);
   return (
     <Tooltip>
-      <TooltipTrigger>
+      <TooltipTrigger asChild>
         <Button
-          className={cn('gap-2', className)}
-          variant="outline"
+          size={size}
+          variant={variant}
           onClick={() => {
             navigator.clipboard.writeText(textToCopy);
             setIsCopied(true);
@@ -31,48 +30,11 @@ export const CopyButton = ({
             }, 2000);
           }}
           disabled={disabled}
-          {...buttonProps}
         >
-          {isCopied ? <CopyCheckIcon className="size-4" /> : <CopyIcon className="size-4" />}
-          {children}
+          {isCopied ? <CopyCheckIcon /> : <CopyIcon />}
         </Button>
       </TooltipTrigger>
       <TooltipContent>Copy to clipboard</TooltipContent>
     </Tooltip>
-  );
-};
-
-export const CopyButtonIcon = ({
-  textToCopy,
-  disabled,
-  wrapperClassName,
-}: {
-  textToCopy: string;
-  disabled?: boolean;
-  wrapperClassName?: string;
-}) => {
-  const [isCopied, setIsCopied] = useState(false);
-  return (
-    <div className={cn(wrapperClassName)}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            size="iconXs"
-            variant="ghost"
-            onClick={() => {
-              navigator.clipboard.writeText(textToCopy);
-              setIsCopied(true);
-              setTimeout(() => {
-                setIsCopied(false);
-              }, 2000);
-            }}
-            disabled={disabled}
-          >
-            {isCopied ? <CopyCheckIcon className="size-3" /> : <CopyIcon className="size-3" />}
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>Copy to clipboard</TooltipContent>
-      </Tooltip>
-    </div>
   );
 };
