@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "composite": true,
+    "composite": false,
     "noEmit": true,
     "jsx": "react-jsx",
     "baseUrl": ".",
@@ -16,5 +16,5 @@
     }
   },
   "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }, { "path": "../../packages/shared" }]
+  "references": [{ "path": "./tsconfig.node.json" }]
 }
