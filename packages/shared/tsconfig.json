@@ -1,21 +1,10 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "composite": true,
-    "outDir": "./dist",
-    "declaration": true,
-    "noEmit": false,
-    "allowImportingTsExtensions": false,
-    "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@protocols/ui": ["../../packages/ui/src"],
-      "@protocols/ui/*": ["../../packages/ui/src/*"]
+      "@protocols/ui": ["../ui/src"]
     }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"],
-  "references": [
-    { "path": "../ui" }
-  ]
+  "include": ["src"]
 }

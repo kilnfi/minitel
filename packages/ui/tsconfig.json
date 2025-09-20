@@ -1,12 +1,6 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "composite": true,
-    "declaration": true,
-    "outDir": "dist",
-    "noEmit": false,
-    "allowImportingTsExtensions": false,
-    "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
       "#/*": ["src/*"],
