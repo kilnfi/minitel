@@ -4,6 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
   Badge,
+  Button,
   Card,
   CardContent,
   CardHeader,
@@ -16,7 +17,15 @@ import {
   SelectValue,
   TransactionDecoderTabs,
 } from '@protocols/ui';
-import { CodeIcon, InfoIcon, KeyRoundIcon, ListChecksIcon, ListIcon, ListIndentDecreaseIcon } from 'lucide-react';
+import {
+  CodeIcon,
+  InfoIcon,
+  KeyRoundIcon,
+  ListChecksIcon,
+  ListIcon,
+  ListIndentDecreaseIcon,
+  XIcon,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '#/components/ui/tooltip';
 import { useIsDarkMode } from '#/hooks/useIsDarkMode';
@@ -278,7 +287,7 @@ const renderStepByStep = (steps: StepByStepItem[]) => {
   );
 };
 
-export const SolanaPlaybook = ({ playground }: { playground: boolean }) => {
+export const SolanaPlaybook = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const isDarkMode = useIsDarkMode();
   const [selectedOperation, setSelectedOperation] = useState<string>(OPERATIONS[0].value);
   const { decodedTransaction, decodeTransaction, hash } = useTransactionDecoder();
@@ -293,13 +302,25 @@ export const SolanaPlaybook = ({ playground }: { playground: boolean }) => {
   return (
     <div
       className={cn(
-        'fixed right-0 top-0 bottom-0 border-l bg-secondary transition-all duration-300 ease-in-out overflow-auto',
-        playground ? 'w-[40%]' : 'w-0',
+        'fixed right-0 top-0 bottom-0 border-l bg-secondary transition-all duration-300 ease-in-out overflow-auto z-50',
+        isOpen ? 'w-full md:w-[40%]' : 'w-0',
       )}
     >
-      <div className="px-4 pt-7 flex flex-col gap-4">
+      <div className="px-4 py-7 flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <h2 className="text-xl font-medium">Solana decode playbook</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-medium">Solana decode playbook</h2>
+            <Button
+              variant="ghost"
+              type="button"
+              size="icon"
+              onClick={onClose}
+              className="md:hidden"
+              aria-label="Close playbook"
+            >
+              <XIcon className="size-5" />
+            </Button>
+          </div>
           <span className="flex items-center gap-2 text-sm text-muted-foreground">
             <Tooltip>
               <TooltipTrigger>

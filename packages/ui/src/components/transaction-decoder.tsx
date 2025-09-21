@@ -39,6 +39,7 @@ export interface TransactionDecoderProps<T = unknown> {
 
 export function TransactionDecoder<T = unknown>({
   title = 'Transaction decoder',
+  subtitle = 'Decode and analyze transactions',
   rawTransaction,
   onRawTransactionChange,
   onDecode,
@@ -58,8 +59,11 @@ export function TransactionDecoder<T = unknown>({
   return (
     <div className="relative flex flex-col gap-4 items-center justify-center px-4 w-full">
       <div className="flex flex-col items-center gap-y-8 py-8 w-full">
-        <div className="gap-4 text-foreground flex flex-col items-center justify-center">
-          <h1 className="text-4xl font-extrabold">{title}</h1>
+        <div className="gap-4 text-foreground flex flex-col items-center justify-center text-center">
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold leading-tight tracking-tight">
+            {title}
+          </h1>
+          <p className="text-sm text-muted-foreground">{subtitle}</p>
         </div>
         <div className="flex flex-col gap-4 max-w-5xl w-full mx-auto">
           <Card>
@@ -116,7 +120,12 @@ export function TransactionDecoder<T = unknown>({
               </div>
             </CardContent>
             <CardFooter className="flex justify-end">
-              <Button disabled={!rawTransaction} size="lg" onClick={onDecode}>
+              <Button
+                className="transition-transform active:scale-95 active:opacity-80"
+                disabled={!rawTransaction}
+                size="lg"
+                onClick={onDecode}
+              >
                 <ZapIcon /> Run
               </Button>
             </CardFooter>

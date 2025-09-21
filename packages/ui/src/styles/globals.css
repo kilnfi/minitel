@@ -118,6 +118,39 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.ray {
+  --stripes: repeating-linear-gradient(100deg, #fff 0%, #fff 7%, transparent 10%, transparent 12%, #fff 16%);
+  --stripesDark: repeating-linear-gradient(100deg, #000 0%, #000 7%, transparent 10%, transparent 12%, #000 16%);
+  --rainbow: repeating-linear-gradient(100deg, #60a5fa 10%, #e879f9 16%, #5eead4 22%, #60a5fa 30%);
+  contain: strict;
+  contain-intrinsic-size: 100vw 40vh;
+  background-image: var(--stripes), var(--rainbow);
+  height: inherit;
+  -webkit-perspective: 1000px;
+  -webkit-backface-visibility: hidden;
+  pointer-events: none;
+  background-position: 50%, 50%;
+  background-size: 300%, 200%;
+  -webkit-transform: translateZ(0);
+  -webkit-mask-image: radial-gradient(at 100% 0, #000 40%, #0000 70%);
+  mask-image: radial-gradient(at 100% 0, #000 40%, #0000 70%);
+  animation: ray-move 80s linear infinite;
+}
+
+.dark .ray {
+  background-image: var(--stripesDark), var(--rainbow);
+  filter: opacity(40%) saturate(200%);
+}
+
+@keyframes ray-move {
+  0% {
+    background-position: 0% 50%, 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%, 100% 50%;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

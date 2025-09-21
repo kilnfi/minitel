@@ -1,5 +1,5 @@
 import { getCurrentProtocol, protocols } from '@protocols/shared';
-import { Background, Header, TransactionDecoder } from '@protocols/ui';
+import { Background, Header, type Protocol, TransactionDecoder } from '@protocols/ui';
 import { useState } from 'react';
 import { cn } from '#/lib/utils';
 import { SolanaPlaybook } from '@/components/SolanaPlaybook';
@@ -17,7 +17,7 @@ function App() {
     defaultValue: '',
   });
   const { decodedTransaction, warnings, hash, error, decodeTransaction } = useTransactionDecoder();
-  const [playground, setPlayground] = useState<boolean>(false);
+  const [playbook, setPlaybook] = useState<boolean>(false);
 
   const handleDecode = async () => {
     await decodeTransaction(rawTransaction);
@@ -29,19 +29,25 @@ function App() {
     </>
   );
 
-  const togglePlayground = () => {
-    setPlayground(!playground);
+  const togglePlaybook = () => {
+    setPlaybook(!playbook);
+  };
+
+  const onChangeProtocol = (protocol: Protocol) => {
+    const protocolUrl = import.meta.env.DEV ? protocol.localUrl : protocol.url;
+    window.open(protocolUrl, '_blank', 'noopener,noreferrer');
   };
 
   return (
     <div className="relative flex min-h-screen">
-      <Background />
-      <div className={cn('w-full transition-all duration-300 ease-in-out', playground ? 'pr-[40%]' : 'pr-0')}>
+      <div className={cn('relative w-full transition-all duration-300 ease-in-out', playbook ? 'md:mr-[40%] mr-0' : 'pr-0')}>
+        <Background />
         <Header
           protocols={protocols}
           currentProtocol={currentProtocol}
-          togglePlayground={togglePlayground}
-          isPlaygroundOpen={playground}
+          onChangeProtocol={onChangeProtocol}
+          togglePlaybook={togglePlaybook}
+          isPlaybookOpen={playbook}
         />
         <TransactionDecoder
           title="Solana raw transaction decoder"
@@ -58,7 +64,7 @@ function App() {
           error={error}
         />
       </div>
-      <SolanaPlaybook playground={playground} />
+      <SolanaPlaybook isOpen={playbook} onClose={() => setPlaybook(false)} />
     </div>
   );
 }

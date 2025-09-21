@@ -1,5 +1,5 @@
 import { getCurrentProtocol, protocols } from '@protocols/shared';
-import { Background, Header, TransactionDecoder } from '@protocols/ui';
+import { Background, Header, type Protocol, TransactionDecoder } from '@protocols/ui';
 import { useState } from 'react';
 import { formatEther } from 'viem';
 import { TransactionSummary } from '@/components/TransactionSummary';
@@ -44,10 +44,15 @@ function App() {
     ? [{ message: getActionDescription(decodedTransaction).warning }, { message: highValueWarning }]
     : [];
 
+  const onChangeProtocol = (protocol: Protocol) => {
+    const protocolUrl = import.meta.env.DEV ? protocol.localUrl : protocol.url;
+    window.open(protocolUrl, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <div className="relative flex flex-col min-h-screen">
       <Background />
-      <Header protocols={protocols} currentProtocol={currentProtocol} />
+      <Header protocols={protocols} currentProtocol={currentProtocol} onChangeProtocol={onChangeProtocol} />
       <TransactionDecoder
         title="Ethereum raw transaction decoder"
         subtitle="Decode and analyze ethereum transactions"
@@ -69,17 +74,19 @@ function App() {
 export default App;
 
 // const stakeTransaction = {
-//   to: '0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852' as `0x${string}`,
+//   to: '0xCA8F5dbC4c90678763B291217e6ddDfcA00341d0' as `0x${string}`,
 //   nonce: 1,
 //   maxPriorityFeePerGas: 2000000000n, // 2 Gwei
 //   maxFeePerGas: 383687469748n,
-//   gas: 140244n,
-//   value: 32000000000000000000n, // 32 ETH
-//   data: '0xca0bfcce0000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000001a000000000000000000000000000000000000000000000000000000000000002600000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000309696c02ec4dbb99f714e26ff1acdf6b258d36dcbad7b8b549553bc99b94ea639cd247f31683564995afd48568c1b6edd00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020010000000000000000000000bc86717bad3f8ccf86d2882a6bc351c94580a994000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000060a3869da2ed5cc558f016d59fc5ceb0cac28e58743836aa3cf146221f1ef0b959e3cc5c589e05e171f1473596aadf36411767ad92edaae421ba0291bd7568267b3faabc3ab6ed9ddfc048ea6640370977f16f4f626a0e567a11ba25acdc520bb000000000000000000000000000000000000000000000000000000000000000012dd65914dda46639df6344701de54ac3ebe34a4b230262d3017fcd6c29954452' as `0x${string}`,
-//   chainId: 1,
-// };
+//   gas: 692134n,
+//   value: 0n,
+//   data: '0x6e553f650000000000000000000000000000000000000000000000000000000000000005000000000000000000000000ca5c9efb78f0d608f9562c0ae5352a61e417ee2d' as `0x${string}`,
+//   chainId: 42161,
+//   authorizationList: [],
+// } as TransactionSerializable;
 
 // const serializedTransaction = serializeTransaction({
 //   ...stakeTransaction,
-//   authorizationList: [],
 // });
+
+// console.log(serializedTransaction);
