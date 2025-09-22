@@ -7,7 +7,6 @@ import { Summary } from '@/components/Summary';
 import { useTransactionDecoder } from '@/hooks/useTransactionDecoder';
 import { useUrlParam } from '@/hooks/useUrlParam';
 import type { ParseSolTxResult } from '@/parser';
-import { sampleTransaction } from '@/utils';
 
 const currentProtocol = getCurrentProtocol();
 
@@ -39,32 +38,38 @@ function App() {
   };
 
   return (
-    <div className="relative flex min-h-screen">
-      <div className={cn('relative w-full transition-all duration-300 ease-in-out', playbook ? 'md:mr-[40%] mr-0' : 'pr-0')}>
-        <Background />
-        <Header
-          protocols={protocols}
-          currentProtocol={currentProtocol}
-          onChangeProtocol={onChangeProtocol}
-          togglePlaybook={togglePlaybook}
-          isPlaybookOpen={playbook}
-        />
-        <TransactionDecoder
-          title="Solana raw transaction decoder"
-          subtitle="Decode and analyze Solana transactions"
-          rawTransaction={rawTransaction}
-          onRawTransactionChange={setRawTransaction}
-          onDecode={handleDecode}
-          decodedTransaction={decodedTransaction}
-          hash={hash}
-          sampleTransaction={sampleTransaction}
-          warnings={warnings}
-          renderSummary={renderSummary}
-          placeholder="Paste your transaction as hex or Fireblocks message JSON"
-          error={error}
-        />
+    <div className="relative flex flex-col min-h-screen">
+      <div className="flex">
+        <div
+          className={cn(
+            'relative w-full transition-all duration-300 ease-in-out',
+            playbook ? 'md:mr-[40%] mr-0' : 'pr-0',
+          )}
+        >
+          <Background />
+          <Header
+            protocols={protocols}
+            currentProtocol={currentProtocol}
+            onChangeProtocol={onChangeProtocol}
+            togglePlaybook={togglePlaybook}
+            isPlaybookOpen={playbook}
+          />
+          <TransactionDecoder
+            title="Solana raw transaction decoder"
+            subtitle="Decode and analyze Solana transactions"
+            rawTransaction={rawTransaction}
+            onRawTransactionChange={setRawTransaction}
+            onDecode={handleDecode}
+            decodedTransaction={decodedTransaction}
+            hash={hash}
+            warnings={warnings}
+            renderSummary={renderSummary}
+            placeholder="Paste your transaction as hex or Fireblocks message JSON"
+            error={error}
+          />
+        </div>
+        <SolanaPlaybook isOpen={playbook} onClose={() => setPlaybook(false)} />
       </div>
-      <SolanaPlaybook isOpen={playbook} onClose={() => setPlaybook(false)} />
     </div>
   );
 }

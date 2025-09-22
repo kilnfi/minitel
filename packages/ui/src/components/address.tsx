@@ -41,7 +41,7 @@ export const Address = ({ address, explorerLink, className = '', showCopy = true
       )}
       {showCopy && (
         <Tooltip>
-          <TooltipTrigger>{copyButton}</TooltipTrigger>
+          <TooltipTrigger asChild>{copyButton}</TooltipTrigger>
           <TooltipContent>
             <p>Copy to clipboard</p>
           </TooltipContent>

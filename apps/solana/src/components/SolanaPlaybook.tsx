@@ -26,12 +26,13 @@ import {
   ListIndentDecreaseIcon,
   XIcon,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '#/components/ui/tooltip';
 import { useIsDarkMode } from '#/hooks/useIsDarkMode';
 import { cn } from '#/lib/utils';
 import { Summary } from '@/components/Summary';
 import { useTransactionDecoder } from '@/hooks/useTransactionDecoder';
+import { sampleTransaction } from '@/utils';
 
 type OperationOverviewItem = {
   type: 'text';
@@ -58,37 +59,47 @@ const OPERATIONS: Operation[] = [
     label: 'Create a stake',
     value: 'create-stake',
     description: 'Create a stake',
-    rawTransaction: `0300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000063b2b5ef76d483b695bc3b954d9a372ca5f744e00279c8578bc4268d570b701a037fac575ae16bb3ba5702b8d5bd9930953453e2d628368f83a11ab5896d20bbcae0b4a119860afd99da20f3462ba15d8bd1528d73724b83e8cc4cee00787df28a181783c264113ef1870bae5a90987fc5cfcdffaddf23c7dcfd7585c13d10b0301080c373c6f8e84c6822a9f87035f65cccf899eef3fcdee61077041a93e1805bab24e1bb5f70b4d3ae65feb6d20587f62ccc8d5e720e99abe3d4415972bbf74a8a88a51f5f3871e65b84cc393458d0f23a413184cf2bb7093ae4e2c99d55b39a575c5f98e3135fcb53e71e6fafcb4da3a3cc36af1c76a1a7e72aa12eae1346d724c6c00000000000000000000000000000000000000000000000000000000000000004792650d1e9a4fe99721617c7d47c8712c14c20a76bf043368c6528c9090531a06a1d8179137542a983437bdfe2a7ab2557f535c8a78722b68a49dc00000000006a1d817a502050b680791e6ce6db88e1e5b7150f61fc6790a4eb4d10000000006a7d51718c774c928566398691d5eb68b5eb8a39b4b6d5c73555b210000000006a7d517192c568ee08a845f73d29788cf035c3145b21ab344d8062ea940000006a7d517192c5c51218cc94c3d4af17f58daee089ba1fd44e3dbd98a0000000006a7d517193584d0feed9bb3431d13206be544281b57b8566cc5375ff4000000f0973e76495f3ffc65798a529de5cba4ec7f47f17669c9fa256923f099a1cda304040303090204040000000402000134000000000080c6a47e8d0300c80000000000000006a1d8179137542a983437bdfe2a7ab2557f535c8a78722b68a49dc0000000000602010a7400000000373c6f8e84c6822a9f87035f65cccf899eef3fcdee61077041a93e1805bab24e373c6f8e84c6822a9f87035f65cccf899eef3fcdee61077041a93e1805bab24e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006060105080b07000402000000`,
+    rawTransaction: `03000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005f6f5dec93785de5b8ffbfe9d27d493bc793dee148f7d066b80d265e709c3f756a89da06b2866e823533b1b25d4328b9ede28ffa43cfdb886f51508d23126c0f660187441080219f6a4f8164d4f1cf762b451e5448f5887fc8ae03dc0d5d9dd6508b08e03adae6e77d559f630b5e6185162b22d7a0e5d00a973f9d5e1c176f0f0301090dc36b1a5da2e60d1fd5d3a6b46f7399eb26571457f3272f3c978bc9527ad2335f6cd1475b985d2ec56a0ca68fded600e6567552d79002d6b081055d4afe37cf8fc8049a6d5db05491ef846800fa7afef819d9be2f67273bf551d5c779eb73999e420f7c14c17ce83dc2a5f6e8f609f01bb8c337c35bf171b6a38d74274a17123400000000000000000000000000000000000000000000000000000000000000000306466fe5211732ffecadba72c39be7bc8ce5bbc5f7126b2c439b3a40000000ddf42a04800a54de2e583f94f17b089725b772d1333526271241532776d2ffc606a1d8179137542a983437bdfe2a7ab2557f535c8a78722b68a49dc00000000006a1d817a502050b680791e6ce6db88e1e5b7150f61fc6790a4eb4d10000000006a7d51718c774c928566398691d5eb68b5eb8a39b4b6d5c73555b210000000006a7d517192c568ee08a845f73d29788cf035c3145b21ab344d8062ea940000006a7d517192c5c51218cc94c3d4af17f58daee089ba1fd44e3dbd98a0000000006a7d517193584d0feed9bb3431d13206be544281b57b8566cc5375ff4000000780424502b8e69ed59476234d4ff518e77a69e03570bdefd2017dc4389fc9643060403030a02040400000004020001340000000081d5220000000000c80000000000000006a1d8179137542a983437bdfe2a7ab2557f535c8a78722b68a49dc0000000000702010b7400000000c36b1a5da2e60d1fd5d3a6b46f7399eb26571457f3272f3c978bc9527ad2335fc36b1a5da2e60d1fd5d3a6b46f7399eb26571457f3272f3c978bc9527ad2335f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007060106090c080004020000000500050276900000050009030000000000000000`,
     operationOverview: [
       {
         type: 'text',
         content:
-          'This transaction uses a durable nonce, then: Creates a new stake account (2sAw…qdPX) funded with 1,000,000 SOL (1e15 lamports) Initializes it (staker & withdrawer = 4ics…zvA9, no lockup) Delegates it to validator vote account 5pPR…HzSm',
+          'This transaction advances a nonce account, creates a new stake account with 2282881 lamports, initializes it with staker and withdrawer authorities, and delegates it to a validator. It also sets compute unit parameters.',
       },
     ],
     stepByStep: [
       {
         title: 'AdvanceNonceAccount',
-        program: 'System program',
-        description:
-          'Consumes the current nonce (the value shown in recentBlockhash) and advances the nonce account to a new, unique nonce.',
+        program: 'System Program',
+        description: 'Advances nonce account 5SsbxnyF...Rsjm2T by authority ETncRJhQ...48Zhc1',
       },
       {
         title: 'Create',
-        program: 'System program',
+        program: 'System Program',
         description:
-          'Allocates and funds the stake account. (The new account must sign, which is why 2sAw…qdPX is in the signatures array.)',
+          'Creates account 8Kn7smBs...o1FDVQ funded by E9qDxpwu...bAevuC with 2282881 lamports (200 bytes, owned by Stake Program)',
       },
       {
         title: 'Initialize',
-        program: 'Stake program',
+        program: 'Stake Program',
         description:
-          'Turns the allocated account into a valid stake account with 4ics…zvA9 as both staker & withdrawer. No lockup restrictions.',
+          'Initializes stake account 8Kn7smBs...o1FDVQ with E9qDxpwu...bAevuC as both staker and withdrawer authority',
       },
       {
         title: 'Delegate',
-        program: 'Stake program',
-        description: "Delegates the stake to the validator's vote account 5pPR...HzSm.",
+        program: 'Stake Program',
+        description:
+          'Delegates stake account 8Kn7smBs...o1FDVQ to validator FwR3PbjS...XtT59f by authority E9qDxpwu...bAevuC',
+      },
+      {
+        title: 'SetComputeUnitLimit',
+        program: 'Compute Budget Program',
+        description: 'Sets transaction-wide compute unit limit to 36982 units',
+      },
+      {
+        title: 'SetComputeUnitPrice',
+        program: 'Compute Budget Program',
+        description: 'Sets transaction compute unit price to 0 microlamports for prioritization fees',
       },
     ],
   },
@@ -96,26 +107,42 @@ const OPERATIONS: Operation[] = [
     label: 'Split a stake',
     value: 'split-stake',
     description: 'Split a stake',
-    rawTransaction: `02000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000205813957546062ab61afbd54af1f479f88594eff8aa350542f768967632821bf8b88f1ffa3a2dfe617bdc4e3573251a322e3fcae81e5a457390e64751c00a465e2372869b8f0211d21ce9a5e7ca5b9a0a93d1eab5caef186a0365a86ed13037ceb000000000000000000000000000000000000000000000000000000000000000006a1d8179137542a983437bdfe2a7ab2557f535c8a78722b68a49dc000000000e15eca55fb618985657f116c78d7f626321a9a6579707b7c1313bdc29854b7160203020001340000000080d5220000000000c80000000000000006a1d8179137542a983437bdfe2a7ab2557f535c8a78722b68a49dc00000000004030201000c0300000040420f0000000000`,
+    rawTransaction: `03000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000087af2559608bdd7d9aa5e02ba7ec7f3d60bdbffb6d8a90ff209ef5f6b70a52ed32d08fee6ead39144c8d1c35db42620360501ce26bc2a646f745588f829f600d03010409f4f508da6f36cfb48764d88b2f49638326de40822a623c361188042750ab0d26a4c21effcb7f70952fc218f6d20a8728514bdfd108cc1513f3af91400ba68174c8049a6d5db05491ef846800fa7afef819d9be2f67273bf551d5c779eb73999e32ef666b1886346c22d83c273b07fc6b2759635912d8ab1c08827d40a323ffc6bffdb05f6fae1cddadcf50e12449dda2a4728476351ab6c2364e61befaef4e1900000000000000000000000000000000000000000000000000000000000000000306466fe5211732ffecadba72c39be7bc8ce5bbc5f7126b2c439b3a4000000006a1d8179137542a983437bdfe2a7ab2557f535c8a78722b68a49dc00000000006a7d517192c568ee08a845f73d29788cf035c3145b21ab344d8062ea940000072c8c598b2889136d7022b8250fd641349cd256293475f3ce32b183dc013c78d050503040802040400000005020001340000000080d5220000000000c80000000000000006a1d8179137542a983437bdfe2a7ab2557f535c8a78722b68a49dc00000000007030301000c0300000040420f000000000006000502c0d4010006000903a086010000000000`,
     operationOverview: [
       {
         type: 'text',
         content:
-          'This transaction is composed of two instructions that: Create a new stake account ADaU…S49 (funded with rent-exempt reserve, owned by the Stake program), then Splits 1,000,000 lamports (0.001 SOL) from source stake 4iKA…nZG into that new account. Both stakes end up with the same authorities/lockup and (if the source was delegated) the same delegation/state.',
+          'This transaction consists of five instructions that: Advance a nonce account for transaction uniqueness, create a new stake account (funded with rent-exempt reserve), split stake from an existing account, and configure compute settings for transaction execution. The split moves 1,000,000 lamports from the source stake account into the newly created stake account.',
       },
     ],
     stepByStep: [
       {
-        title: 'Create',
-        program: 'System program',
+        title: 'Advance Nonce',
+        program: 'System Program',
         description:
-          'Allocates and funds a new account owned by the stake program. This creates an uninitialized stake account shell that is rent-exempt, ready to receive stake via split.',
+          'Advances the nonce account to ensure transaction uniqueness, authorized by the nonce account authority.',
+      },
+      {
+        title: 'Create',
+        program: 'System Program',
+        description:
+          'Creates a new stake account with 2,282,880 lamports for rent exemption (200 bytes), owned by the Stake program.',
       },
       {
         title: 'Split',
-        program: 'Stake program',
+        program: 'Stake Program',
         description:
-          "Moves 1,000,000 lamports of stake from the source into the new destination stake account. The destination inherits the source's staker/withdrawer authorities and lockup; if the source was delegated/active, the destination gets the same delegation and state as of the split.",
+          'Splits 1,000,000 lamports from the source stake account into the newly created stake account. The new stake account inherits the authorities and delegation state of the source account.',
+      },
+      {
+        title: 'Set Compute Unit Limit',
+        program: 'Compute Budget Program',
+        description: 'Sets a transaction-wide compute unit limit of 120,000 units.',
+      },
+      {
+        title: 'Set Compute Unit Price',
+        program: 'Compute Budget Program',
+        description: 'Sets the compute unit price to 100,000 microlamports for transaction prioritization.',
       },
     ],
   },
@@ -123,20 +150,36 @@ const OPERATIONS: Operation[] = [
     label: 'Withdraw a stake',
     value: 'withdraw-stake',
     description: 'Withdraw a stake',
-    rawTransaction: `010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000306813957546062ab61afbd54af1f479f88594eff8aa350542f768967632821bf8bd5bc428a6dceea70c3d243e29e0660dbfdb4fadd85c5f7d210afdcedef7ccc75813957546062ab61afbd54af1f479f88594eff8aa350542f768967632821bf8b06a1d8179137542a983437bdfe2a7ab2557f535c8a78722b68a49dc00000000006a7d51718c774c928566398691d5eb68b5eb8a39b4b6d5c73555b210000000006a7d517193584d0feed9bb3431d13206be544281b57b8566cc5375ff4000000e15eca55fb618985657f116c78d7f626321a9a6579707b7c1313bdc29854b71601030501000004050c04000000ad19230000000000`,
+    rawTransaction: `0200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e3bb3580eab9c078dddf949fc53541da557cce54233bae4f20d60733c03e2e9be0a217b073773d6879dcb95b5b3b0bdc463962d1a30e8dcaa27b915c4f07e7060201060ac36b1a5da2e60d1fd5d3a6b46f7399eb26571457f3272f3c978bc9527ad2335fc8049a6d5db05491ef846800fa7afef819d9be2f67273bf551d5c779eb73999e32ef666b1886346c22d83c273b07fc6b2759635912d8ab1c08827d40a323ffc60267c9719a63a3dd78d725164a88b0739d151afbec5c2c9cb0d8539389767ece00000000000000000000000000000000000000000000000000000000000000000306466fe5211732ffecadba72c39be7bc8ce5bbc5f7126b2c439b3a4000000006a1d8179137542a983437bdfe2a7ab2557f535c8a78722b68a49dc00000000006a7d51718c774c928566398691d5eb68b5eb8a39b4b6d5c73555b210000000006a7d517192c568ee08a845f73d29788cf035c3145b21ab344d8062ea940000006a7d517193584d0feed9bb3431d13206be544281b57b8566cc5375ff40000007819830bc88aff2b950d2e1faf0e6313096a32a1fe71f3f86d9758c333ea25550404030308010404000000060502000709000c0400000040420f000000000005000502c0d4010005000903a086010000000000`,
     operationOverview: [
       {
         type: 'text',
         content:
-          'This transaction withdraws 2,300,333 lamports (≈ 0.002300333 SOL) from stake account FPLL…UwyN to the fee payer 9hSJ…fNz.',
+          'This transaction consists of four instructions that: Advance a nonce account for transaction uniqueness, withdraw 1,000,000 lamports (0.001 SOL) from a stake account, and configure compute settings for transaction execution.',
       },
     ],
     stepByStep: [
       {
-        title: 'Withdraw',
-        program: 'Stake program',
+        title: 'Advance Nonce',
+        program: 'System Program',
         description:
-          'Moves 2,300,333 lamports from the stake account into the recipient system account 9hSJ…fNz, authorized by the withdraw authority.',
+          'Advances the nonce account to ensure transaction uniqueness, authorized by the nonce account authority.',
+      },
+      {
+        title: 'Withdraw',
+        program: 'Stake Program',
+        description:
+          'Withdraws 1,000,000 lamports from the stake account to the recipient account, authorized by the withdraw authority.',
+      },
+      {
+        title: 'Set Compute Unit Limit',
+        program: 'Compute Budget Program',
+        description: 'Sets a transaction-wide compute unit limit of 120,000 units.',
+      },
+      {
+        title: 'Set Compute Unit Price',
+        program: 'Compute Budget Program',
+        description: 'Sets the compute unit price to 100,000 microlamports for transaction prioritization.',
       },
     ],
   },
@@ -144,18 +187,36 @@ const OPERATIONS: Operation[] = [
     label: 'Deactivate a stake',
     value: 'deactivate-stake',
     description: 'Deactivate a stake',
-    rawTransaction: `010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000204813957546062ab61afbd54af1f479f88594eff8aa350542f768967632821bf8b372869b8f0211d21ce9a5e7ca5b9a0a93d1eab5caef186a0365a86ed13037ceb06a1d8179137542a983437bdfe2a7ab2557f535c8a78722b68a49dc00000000006a7d51718c774c928566398691d5eb68b5eb8a39b4b6d5c73555b2100000000e15eca55fb618985657f116c78d7f626321a9a6579707b7c1313bdc29854b7160102030103000405000000`,
+    rawTransaction: `0200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e5fa1c1f2773ac59621a16178adef20f6d057e12fe431bc3bf98b00418d3700f640a002c01b86c16bbcee318393db2ce9f668518c64feba418b83b221cc3dd0d02010509c36b1a5da2e60d1fd5d3a6b46f7399eb26571457f3272f3c978bc9527ad2335fc8049a6d5db05491ef846800fa7afef819d9be2f67273bf551d5c779eb73999e32ef666b1886346c22d83c273b07fc6b2759635912d8ab1c08827d40a323ffc60267c9719a63a3dd78d725164a88b0739d151afbec5c2c9cb0d8539389767ece00000000000000000000000000000000000000000000000000000000000000000306466fe5211732ffecadba72c39be7bc8ce5bbc5f7126b2c439b3a4000000006a1d8179137542a983437bdfe2a7ab2557f535c8a78722b68a49dc00000000006a7d51718c774c928566398691d5eb68b5eb8a39b4b6d5c73555b210000000006a7d517192c568ee08a845f73d29788cf035c3145b21ab344d8062ea94000007819830bc88aff2b950d2e1faf0e6313096a32a1fe71f3f86d9758c333ea255504040303080104040000000603020700040500000005000502c0d4010005000903a086010000000000`,
     operationOverview: [
       {
         type: 'text',
-        content: 'This transaction deactivates the stake account 4iKA…nZG.',
+        content:
+          'This transaction consists of four instructions that: Advance a nonce account for transaction uniqueness, deactivate a stake account to begin the undelegation process, and configure compute settings for transaction execution.',
       },
     ],
     stepByStep: [
       {
+        title: 'Advance Nonce',
+        program: 'System Program',
+        description:
+          'Advances the nonce account to ensure transaction uniqueness, authorized by the nonce account authority.',
+      },
+      {
         title: 'Deactivate',
-        program: 'Stake program',
-        description: 'Signals the network to undelegate this stake.',
+        program: 'Stake Program',
+        description:
+          'Initiates the deactivation of the stake account, authorized by the stake authority. This begins the undelegation process.',
+      },
+      {
+        title: 'Set Compute Unit Limit',
+        program: 'Compute Budget Program',
+        description: 'Sets a transaction-wide compute unit limit of 120,000 units.',
+      },
+      {
+        title: 'Set Compute Unit Price',
+        program: 'Compute Budget Program',
+        description: 'Sets the compute unit price to 100,000 microlamports for transaction prioritization.',
       },
     ],
   },
@@ -163,84 +224,89 @@ const OPERATIONS: Operation[] = [
     label: 'Merge stakes',
     value: 'merge-stakes',
     description: 'Merge stakes',
-    rawTransaction: `010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000306813957546062ab61afbd54af1f479f88594eff8aa350542f768967632821bf8b372869b8f0211d21ce9a5e7ca5b9a0a93d1eab5caef186a0365a86ed13037cebd5bc428a6dceea70c3d243e29e0660dbfdb4fadd85c5f7d210afdcedef7ccc7506a1d8179137542a983437bdfe2a7ab2557f535c8a78722b68a49dc00000000006a7d51718c774c928566398691d5eb68b5eb8a39b4b6d5c73555b210000000006a7d517193584d0feed9bb3431d13206be544281b57b8566cc5375ff4000000e15eca55fb618985657f116c78d7f626321a9a6579707b7c1313bdc29854b71601030501020004050407000000`,
-    operationOverview: [
-      {
-        type: 'text',
-        content: 'This transaction merges stake account FPLL…UwyN into 4iKA…nZG.',
-      },
-    ],
-    stepByStep: [
-      {
-        title: 'Merge',
-        program: 'Stake program',
-        description:
-          "Combine the source's stake into the destination. After a successful merge, the destination carries the total lamports; the source is emptied and deallocated.",
-      },
-    ],
-  },
-  {
-    label: '⚠️ Malicious stake authority change',
-    value: 'malicious-stake-authority',
-    description: 'Malicious stake authority change example',
-    rawTransaction: `0200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a23a6609a1fb1c53713baa3126c49d67bc0e25c1abe8fe117e9308e220f4807ce6f5b3ece93801a9cb70754021aadde065b485b406d38de2da52cf10919df90402010310367c028c53021ed2a144b3e0d46dd06216a989dec748a24b3fefbecec65628f051f5f3871e65b84cc393458d0f23a413184cf2bb7093ae4e2c99d55b39a575c545a2d07a42915e1ac8ea972643827eb8fef8c121d74a555afa1e31506abce33646e1a1bb9419fdb9e9cfb6f43bd2ee131a47e08965b356941b17946dfc068f3f5649b1ea61af5a48b4c4cc3bffd8507587c7bda7204275f06e19c9b3f13719155ae4b64986d565b08719e6395ec5781ae297fbfbe3dd4dc192ea6007a6ce46816b6ce5ff737271e8a765a2c395e6db84301d7a6f6db9d11f0577fc78b3f45fa981f3e54c80d7f57c30e8b5a2f8af29add5fff2b5ccefec0de69db730ac8897b28acd6b78eea3aa40dd9b23706be03f64c65a2da13d86ac49a2b3154aa83c3d6e9da44be35733abbb4b4e2c4c623a439970b13197b793f87186b0b58d695f3a5dba3a6283a4e688218964d2d3aad7f3bed9c190ab0d268c2e4a20192240a0a7baecb32973b9d627f80dfbe9f84f9284c037d7b7869e1dbe56e9c3b97bbffb5f3806a7d51718c774c928566398691d5eb68b5eb8a39b4b6d5c73555b2100000000000000000000000000000000000000000000000000000000000000000000000006a1d8179137542a983437bdfe2a7ab2557f535c8a78722b68a49dc00000000006a7d517192c568ee08a845f73d29788cf035c3145b21ab344d8062ea9400000ecb1dbeda3c9b33b1aa2ed8a8392544b28cd5a5a985c507b59eb794c6492ec360a0d03040f0104040000000e03020c0004050000000e030a0c00280100000006cc6f84306e580d107e04f0b24ff68df16ed7c31a9d379b1cc325998dae0f9c010000000e03070c00280100000006cc6f84306e580d107e04f0b24ff68df16ed7c31a9d379b1cc325998dae0f9c010000000e030b0c00280100000006cc6f84306e580d107e04f0b24ff68df16ed7c31a9d379b1cc325998dae0f9c010000000e03050c00280100000006cc6f84306e580d107e04f0b24ff68df16ed7c31a9d379b1cc325998dae0f9c010000000e03080c00280100000006cc6f84306e580d107e04f0b24ff68df16ed7c31a9d379b1cc325998dae0f9c010000000e03030c00280100000006cc6f84306e580d107e04f0b24ff68df16ed7c31a9d379b1cc325998dae0f9c010000000e03090c00280100000006cc6f84306e580d107e04f0b24ff68df16ed7c31a9d379b1cc325998dae0f9c010000000e03060c00280100000006cc6f84306e580d107e04f0b24ff68df16ed7c31a9d379b1cc325998dae0f9c01000000`,
+    rawTransaction: `0200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a0621e9ee482265dc89be9d2b09187c357e65958c762545b06f065679beea68064becf14b0802a594c77bb66b85d08660017319442c08e90f3ad1d577eccfa080201060b285c1a6d9160afb383452ca35c7119cabac84df611944a44bebd577b5c314de7c8049a6d5db05491ef846800fa7afef819d9be2f67273bf551d5c779eb73999e32ef666b1886346c22d83c273b07fc6b2759635912d8ab1c08827d40a323ffc66acae2200af9026c48e8169d52766baf6cec40f997f92acf66f01f6b24e444ab9c821ee8465c407ae87cecac26646ecd0d1ef4cb2ed658803c7734f31dfdac8100000000000000000000000000000000000000000000000000000000000000000306466fe5211732ffecadba72c39be7bc8ce5bbc5f7126b2c439b3a4000000006a1d8179137542a983437bdfe2a7ab2557f535c8a78722b68a49dc00000000006a7d51718c774c928566398691d5eb68b5eb8a39b4b6d5c73555b210000000006a7d517192c568ee08a845f73d29788cf035c3145b21ab344d8062ea940000006a7d517193584d0feed9bb3431d13206be544281b57b8566cc5375ff400000072c8c598b2889136d7022b8250fd641349cd256293475f3ce32b183dc013c78d040503040901040400000007050302080a00040700000006000502c0d4010006000903a086010000000000`,
     operationOverview: [
       {
         type: 'text',
         content:
-          '⚠️ WARNING: This malicious transaction attempts to modify stake account authorities for 8 different stake accounts. It includes an advance nonce operation followed by a deactivation and 8 separate authorize instructions that change the withdrawer authority to a potentially malicious address.',
+          'This transaction consists of four instructions that: Advance a nonce account for transaction uniqueness, merge a source stake account into a destination stake account, and configure compute settings for transaction execution.',
+      },
+    ],
+    stepByStep: [
+      {
+        title: 'Advance Nonce',
+        program: 'System Program',
+        description:
+          'Advances the nonce account to ensure transaction uniqueness, authorized by the nonce account authority.',
+      },
+      {
+        title: 'Merge',
+        program: 'Stake Program',
+        description:
+          'Combines the source stake account into the destination stake account, authorized by the stake authority. After the merge, the destination account holds the combined stake while the source account is emptied and deallocated.',
+      },
+      {
+        title: 'Set Compute Unit Limit',
+        program: 'Compute Budget Program',
+        description: 'Sets a transaction-wide compute unit limit of 120,000 units.',
+      },
+      {
+        title: 'Set Compute Unit Price',
+        program: 'Compute Budget Program',
+        description: 'Sets the compute unit price to 100,000 microlamports for transaction prioritization.',
+      },
+    ],
+  },
+  {
+    label: '⚠️ Malicious Stake Authority Transfer',
+    value: 'stake-authority-transfer',
+    description: 'Example of stake account creation and authority transfer',
+    rawTransaction: sampleTransaction,
+    operationOverview: [
+      {
+        type: 'text',
+        content:
+          '⚠️ WARNING: This transaction creates a new stake account and transfers its staker authority to a different address. It includes an advance nonce operation, account creation, stake initialization, delegation, and authority transfer.',
       },
     ],
     stepByStep: [
       {
         title: 'AdvanceNonceAccount',
         program: 'System Program',
-        description: 'Advance nonce account 6oqE...cp by authority 6WwY...68',
+        description: 'Advance nonce account APc6Nusd...H4DPiV by authority ETncRJhQ...48Zhc1',
       },
       {
-        title: 'Deactivate',
-        program: 'Stake Program',
-        description: 'Deactivate stake account 5gq8...ZX by authority 4fgh...x7',
+        title: 'Create',
+        program: 'System Program',
+        description: 'Create account 9e9pyeeP...rrXz8u funded by E9qDxpwu...bAevuC with 2282881 lamports',
       },
       {
-        title: 'Authorize (1/8)',
+        title: 'Initialize',
         program: 'Stake Program',
-        description: 'Set Withdrawer authority from 4fgh...x7 to TYFW...K1 on stake account DXxU...XX',
+        description:
+          'Initialize stake account 9e9pyeeP...rrXz8u with staker and withdrawer authority E9qDxpwu...bAevuC',
       },
       {
-        title: 'Authorize (2/8)',
+        title: 'Delegate',
         program: 'Stake Program',
-        description: 'Set Withdrawer authority from 4fgh...x7 to TYFW...K1 on stake account 9kHJ...CV',
+        description:
+          'Delegate stake account 9e9pyeeP...rrXz8u to validator FwR3PbjS...XtT59f by authority E9qDxpwu...bAevuC',
       },
       {
-        title: 'Authorize (3/8)',
+        title: 'Authorize',
         program: 'Stake Program',
-        description: 'Set Withdrawer authority from 4fgh...x7 to TYFW...K1 on stake account Gvyf...D5',
+        description:
+          'Set Staker authority from E9qDxpwu...bAevuC to 2383vwQj...vCrucr on stake account 9e9pyeeP...rrXz8u',
       },
       {
-        title: 'Authorize (4/8)',
-        program: 'Stake Program',
-        description: 'Set Withdrawer authority from 4fgh...x7 to TYFW...K1 on stake account 77oy...SY',
+        title: 'SetComputeUnitLimit',
+        program: 'Compute Budget Program',
+        description: 'Transaction-wide compute unit limit: 55444 units',
       },
       {
-        title: 'Authorize (5/8)',
-        program: 'Stake Program',
-        description: 'Set Withdrawer authority from 4fgh...x7 to TYFW...K1 on stake account ALpw...cZ',
-      },
-      {
-        title: 'Authorize (6/8)',
-        program: 'Stake Program',
-        description: 'Set Withdrawer authority from 4fgh...x7 to TYFW...K1 on stake account 5mh6...34',
-      },
-      {
-        title: 'Authorize (7/8)',
-        program: 'Stake Program',
-        description: 'Set Withdrawer authority from 4fgh...x7 to TYFW...K1 on stake account BcNK...Gx',
-      },
-      {
-        title: 'Authorize (8/8)',
-        program: 'Stake Program',
-        description: 'Set Withdrawer authority from 4fgh...x7 to TYFW...K1 on stake account 8ELw...Ki',
+        title: 'SetComputeUnitPrice',
+        program: 'Compute Budget Program',
+        description: 'Transaction compute unit price: 0 microlamports',
       },
     ],
   },
@@ -289,9 +355,12 @@ const renderStepByStep = (steps: StepByStepItem[]) => {
 
 export const SolanaPlaybook = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const isDarkMode = useIsDarkMode();
+  const playbookRef = useRef<HTMLDivElement>(null);
+  const decodedTransactionRef = useRef<HTMLDivElement>(null);
   const [selectedOperation, setSelectedOperation] = useState<string>(OPERATIONS[0].value);
   const { decodedTransaction, decodeTransaction, hash } = useTransactionDecoder();
-
+  const operationOverviewRef = useRef<HTMLDivElement>(null);
+  const stepByStepRef = useRef<HTMLDivElement>(null);
   const selectedOperationData = OPERATIONS.find((operation) => operation.value === selectedOperation);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: <can ignore safely>
@@ -301,6 +370,7 @@ export const SolanaPlaybook = ({ isOpen, onClose }: { isOpen: boolean; onClose: 
 
   return (
     <div
+      ref={playbookRef}
       className={cn(
         'fixed right-0 top-0 bottom-0 border-l bg-secondary transition-all duration-300 ease-in-out overflow-auto z-50',
         isOpen ? 'w-full md:w-[40%]' : 'w-0',
@@ -389,7 +459,32 @@ export const SolanaPlaybook = ({ isOpen, onClose }: { isOpen: boolean; onClose: 
             <CardTitle>Playbook output breakdown</CardTitle>
           </CardHeader>
           <CardContent>
-            <Accordion type="single" collapsible className="w-full">
+            <Accordion
+              type="single"
+              collapsible
+              className="w-full"
+              onValueChange={(value) => {
+                if (!value) return;
+                setTimeout(() => {
+                  if (value === 'operation-overview') {
+                    playbookRef.current?.scrollTo({
+                      top: (operationOverviewRef.current?.offsetTop ?? 0) - 100,
+                      behavior: 'smooth',
+                    });
+                  } else if (value === 'step-by-step') {
+                    playbookRef.current?.scrollTo({
+                      top: (stepByStepRef.current?.offsetTop ?? 0) - 100,
+                      behavior: 'smooth',
+                    });
+                  } else {
+                    playbookRef.current?.scrollTo({
+                      top: Math.max((decodedTransactionRef.current?.offsetTop ?? 0) - 100, 0),
+                      behavior: 'smooth',
+                    });
+                  }
+                }, 200);
+              }}
+            >
               <AccordionItem value="decoded-data">
                 <AccordionTrigger>
                   <div className="flex items-center gap-4">
@@ -398,6 +493,7 @@ export const SolanaPlaybook = ({ isOpen, onClose }: { isOpen: boolean; onClose: 
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
+                  <div ref={decodedTransactionRef} />
                   <TransactionDecoderTabs
                     renderSummary={() =>
                       decodedTransaction ? <Summary instructions={decodedTransaction.instructions} /> : null
@@ -416,6 +512,7 @@ export const SolanaPlaybook = ({ isOpen, onClose }: { isOpen: boolean; onClose: 
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
+                  <div ref={operationOverviewRef} />
                   {selectedOperationData?.operationOverview &&
                     renderOperationOverview(selectedOperationData.operationOverview)}
                 </AccordionContent>
@@ -429,6 +526,7 @@ export const SolanaPlaybook = ({ isOpen, onClose }: { isOpen: boolean; onClose: 
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
+                  <div ref={stepByStepRef} />
                   {selectedOperationData?.stepByStep && renderStepByStep(selectedOperationData.stepByStep)}
                 </AccordionContent>
               </AccordionItem>

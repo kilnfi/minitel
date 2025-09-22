@@ -4,6 +4,7 @@ import { vscodeTheme } from '@uiw/react-json-view/vscode';
 import { DownloadIcon, InboxIcon, InfoIcon, TriangleAlertIcon, ZapIcon } from 'lucide-react';
 import { useId, useRef } from 'react';
 import { CopyButtonIcon } from '#/components/copy-button';
+import { Footer } from '#/components/footer';
 import { Alert, AlertDescription, AlertTitle } from '#/components/ui/alert';
 import { Button } from '#/components/ui/button';
 import { Card, CardContent, CardFooter } from '#/components/ui/card';
@@ -30,7 +31,6 @@ export interface TransactionDecoderProps<T = unknown> {
   onDecode: () => void;
   decodedTransaction: T | null;
   hash?: string;
-  sampleTransaction?: string;
   warnings?: Array<{ message: string }>;
   renderSummary?: (data: T) => React.ReactNode;
   placeholder?: string;
@@ -45,7 +45,6 @@ export function TransactionDecoder<T = unknown>({
   onDecode,
   decodedTransaction,
   hash,
-  sampleTransaction,
   warnings = [],
   renderSummary,
   placeholder = 'Paste your transaction as hex or JSON',
@@ -63,7 +62,7 @@ export function TransactionDecoder<T = unknown>({
           <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold leading-tight tracking-tight">
             {title}
           </h1>
-          <p className="text-sm text-muted-foreground">{subtitle}</p>
+          <p className="text-muted-foreground">{subtitle}</p>
         </div>
         <div className="flex flex-col gap-4 max-w-5xl w-full mx-auto">
           <Card>
@@ -71,20 +70,6 @@ export function TransactionDecoder<T = unknown>({
               <div className="flex items-center justify-between">
                 <span className="text-xl font-semibold">Paste your raw transaction</span>
                 <div className="flex items-center gap-2">
-                  {sampleTransaction && (
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        onRawTransactionChange(sampleTransaction);
-                        setTimeout(() => {
-                          textAreaRef.current?.focus();
-                          textAreaRef.current?.select();
-                        }, 0);
-                      }}
-                    >
-                      Try Sample
-                    </Button>
-                  )}
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button size="icon" variant="outline">
@@ -108,7 +93,6 @@ export function TransactionDecoder<T = unknown>({
                 </div>
               </div>
               <div className="grid w-full gap-3">
-                {/* <Label htmlFor="transaction">Raw transaction</Label> */}
                 <Textarea
                   className="h-20 overflow-auto resize-y"
                   placeholder={placeholder}
@@ -126,13 +110,13 @@ export function TransactionDecoder<T = unknown>({
                 size="lg"
                 onClick={onDecode}
               >
-                <ZapIcon /> Run
+                <ZapIcon className="w-4 h-4" /> Run
               </Button>
             </CardFooter>
           </Card>
           <Card>
             <CardContent className="flex flex-col gap-4">
-              <div className="flex items-center w-full justify-between">
+              <div className="flex gap-4 items-center w-full justify-between">
                 <span className="text-xl font-semibold">Output</span>
                 <div className="flex items-center justify-between gap-2 overflow-hidden">
                   <div
@@ -196,6 +180,7 @@ export function TransactionDecoder<T = unknown>({
           </Card>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
@@ -261,7 +246,6 @@ export function TransactionDecoderTabs<T = unknown>({
     </div>
   );
 }
-
 export function TransactionDecoderEmptyState() {
   return (
     <div className="border border-border rounded-md flex flex-col items-center justify-center text-muted-foreground h-40 gap-2">

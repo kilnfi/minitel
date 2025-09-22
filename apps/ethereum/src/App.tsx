@@ -6,7 +6,7 @@ import { TransactionSummary } from '@/components/TransactionSummary';
 import { useUrlParam } from '@/hooks/useUrlParam';
 import { hashEthTx, parseEthTx } from '@/parser';
 import type { AugmentedTransaction } from '@/utils';
-import { getActionDescription, sampleTransaction } from '@/utils';
+import { getActionDescription } from '@/utils';
 
 const currentProtocol = getCurrentProtocol();
 
@@ -41,7 +41,10 @@ function App() {
   const highValueWarning = isHighValue ? `High value transaction: ${ethAmount} ETH` : '';
 
   const warnings = decodedTransaction
-    ? [{ message: getActionDescription(decodedTransaction).warning }, { message: highValueWarning }]
+    ? [
+        { message: getActionDescription(decodedTransaction).warning },
+        ...(highValueWarning ? [{ message: highValueWarning }] : []),
+      ]
     : [];
 
   const onChangeProtocol = (protocol: Protocol) => {
@@ -61,7 +64,6 @@ function App() {
         onDecode={handleDecode}
         decodedTransaction={decodedTransaction}
         hash={hash}
-        sampleTransaction={sampleTransaction}
         warnings={warnings}
         renderSummary={renderSummary}
         placeholder="Paste your transaction as hex or Fireblocks message JSON"
