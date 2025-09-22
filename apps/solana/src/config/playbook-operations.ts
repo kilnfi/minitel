@@ -242,8 +242,7 @@ export const SOLANA_PLAYBOOK_OPERATIONS: PlaybookOperation[] = [
       {
         title: 'Authorize',
         program: 'Stake Program',
-        description:
-          'Set Staker authority from E9qDxpwu...bAevuC to 2383vwQj...vCrucr on stake account 9e9pyeeP...rrXz8u',
+        description: `Set Staker authority from E9qDxpwu...bAevuC to 2383vwQj...vCrucr on stake account 9e9pyeeP...rrXz8u \n ⚠️ Not standard instruction for stake transaction`,
       },
       {
         title: 'SetComputeUnitLimit',
