@@ -4,13 +4,13 @@ export const protocols: Protocol[] = [
   {
     name: 'Ethereum',
     icon: <EthereumIcon className="size-5" />,
-    url: 'https://eth.minitel.wtf',
+    url: 'https://eth.minitel.app',
     localUrl: 'http://localhost:3000',
   },
   {
     name: 'Solana',
     icon: <SolanaIcon className="size-5" />,
-    url: 'https://sol.minitel.wtf',
+    url: 'https://sol.minitel.app',
     localUrl: 'http://localhost:3001',
   },
 ];
