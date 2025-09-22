@@ -73,13 +73,19 @@ export const hashEthTx = (txRaw: string): string => {
 };
 
 export const parseEthTx = async (txRaw: string): Promise<AugmentedTransaction> => {
-  const hex = normalizeHex(txRaw);
-  const tx = parseTransaction(hex) as AugmentedTransaction;
+  try {
+    const hex = normalizeHex(txRaw);
+    const tx = parseTransaction(hex) as AugmentedTransaction;
 
-  const inputData = await tryDecodeInputData(tx);
-  if (inputData) {
-    (tx as AugmentedTransactionWithFunction).inputData = inputData;
+    const inputData = await tryDecodeInputData(tx);
+    if (inputData) {
+      (tx as AugmentedTransactionWithFunction).inputData = inputData;
+    }
+
+    return convertBigIntToString(tx);
+  } catch (error) {
+    throw new Error(
+      `Failed to parse Ethereum transaction: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
   }
-
-  return convertBigIntToString(tx);
 };

@@ -1,94 +1,52 @@
 import { getCurrentProtocol, protocols } from '@protocols/shared';
-import { Background, Header, type Protocol, TransactionDecoder } from '@protocols/ui';
+import { Background, cn, Header, type Protocol, ProtocolTransactionDecoder, TransactionPlaybook } from '@protocols/ui';
 import { useState } from 'react';
-import { formatEther } from 'viem';
-import { TransactionSummary } from '@/components/TransactionSummary';
-import { useUrlParam } from '@/hooks/useUrlParam';
-import { hashEthTx, parseEthTx } from '@/parser';
-import type { AugmentedTransaction } from '@/utils';
-import { getActionDescription } from '@/utils';
+import { ETHEREUM_PLAYBOOK_OPERATIONS } from '@/config/playbook-operations';
+import { ethereumAdapter } from '@/ethereum-adapter';
 
 const currentProtocol = getCurrentProtocol();
 
 function App() {
-  const [rawTransaction, setRawTransaction] = useUrlParam({
-    paramName: 'tx',
-    defaultValue: '',
-  });
-  const [decodedTransaction, setDecodedTransaction] = useState<AugmentedTransaction | null>(null);
-  const [hash, setHash] = useState('');
-  const [error, setError] = useState<string | undefined>(undefined);
+  const [playbook, setPlaybook] = useState<boolean>(false);
 
-  const handleDecode = async () => {
-    try {
-      setError(undefined);
-      const decoded_tx = await parseEthTx(rawTransaction);
-      const hashHex = hashEthTx(rawTransaction);
-      setHash(hashHex);
-      setDecodedTransaction(decoded_tx);
-    } catch (error) {
-      console.error(error);
-      setError(error instanceof Error ? error.message : 'Unknown error');
-      setDecodedTransaction(null);
-    }
+  const togglePlaybook = () => {
+    setPlaybook(!playbook);
   };
-
-  const renderSummary = (data: AugmentedTransaction) => <TransactionSummary transaction={data} hash={hash} />;
-
-  const valueWei = decodedTransaction?.value ?? 0n;
-  const ethAmount = formatEther(valueWei);
-  const isHighValue = Number(ethAmount) > 1;
-  const highValueWarning = isHighValue ? `High value transaction: ${ethAmount} ETH` : '';
-
-  const warnings = decodedTransaction
-    ? [
-        { message: getActionDescription(decodedTransaction).warning },
-        ...(highValueWarning ? [{ message: highValueWarning }] : []),
-      ]
-    : [];
 
   const onChangeProtocol = (protocol: Protocol) => {
     const protocolUrl = import.meta.env.DEV ? protocol.localUrl : protocol.url;
     window.open(protocolUrl, '_blank', 'noopener,noreferrer');
   };
 
+  const playbookConfig = {
+    protocolName: 'Ethereum',
+    operations: ETHEREUM_PLAYBOOK_OPERATIONS,
+    adapter: ethereumAdapter,
+  };
+
   return (
     <div className="relative flex flex-col min-h-screen">
-      <Background />
-      <Header protocols={protocols} currentProtocol={currentProtocol} onChangeProtocol={onChangeProtocol} />
-      <TransactionDecoder
-        title="Ethereum raw transaction decoder"
-        subtitle="Decode and analyze ethereum transactions"
-        rawTransaction={rawTransaction}
-        onRawTransactionChange={setRawTransaction}
-        onDecode={handleDecode}
-        decodedTransaction={decodedTransaction}
-        hash={hash}
-        warnings={warnings}
-        renderSummary={renderSummary}
-        placeholder="Paste your transaction as hex or Fireblocks message JSON"
-        error={error}
-      />
+      <div className="flex">
+        <div
+          className={cn(
+            'relative w-full transition-all duration-300 ease-in-out',
+            playbook ? 'md:mr-[40%] mr-0' : 'pr-0',
+          )}
+        >
+          <Background />
+          <Header
+            protocols={protocols}
+            currentProtocol={currentProtocol}
+            onChangeProtocol={onChangeProtocol}
+            togglePlaybook={togglePlaybook}
+            isPlaybookOpen={playbook}
+          />
+          <ProtocolTransactionDecoder adapter={ethereumAdapter} />
+        </div>
+        <TransactionPlaybook config={playbookConfig} isOpen={playbook} onClose={() => setPlaybook(false)} />
+      </div>
     </div>
   );
 }
 
 export default App;
-
-// const stakeTransaction = {
-//   to: '0xCA8F5dbC4c90678763B291217e6ddDfcA00341d0' as `0x${string}`,
-//   nonce: 1,
-//   maxPriorityFeePerGas: 2000000000n, // 2 Gwei
-//   maxFeePerGas: 383687469748n,
-//   gas: 692134n,
-//   value: 0n,
-//   data: '0x6e553f650000000000000000000000000000000000000000000000000000000000000005000000000000000000000000ca5c9efb78f0d608f9562c0ae5352a61e417ee2d' as `0x${string}`,
-//   chainId: 42161,
-//   authorizationList: [],
-// } as TransactionSerializable;
-
-// const serializedTransaction = serializeTransaction({
-//   ...stakeTransaction,
-// });
-
-// console.log(serializedTransaction);

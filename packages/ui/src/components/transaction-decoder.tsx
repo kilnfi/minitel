@@ -23,7 +23,7 @@ import { cn } from '#/lib/utils';
 import { Badge } from '#/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '#/ui/tooltip';
 
-export interface TransactionDecoderProps<T = unknown> {
+export interface TransactionDecoderProps<T> {
   title?: string;
   subtitle?: string;
   rawTransaction: string;
@@ -32,12 +32,12 @@ export interface TransactionDecoderProps<T = unknown> {
   decodedTransaction: T | null;
   hash?: string;
   warnings?: Array<{ message: string }>;
-  renderSummary?: (data: T) => React.ReactNode;
+  renderSummary: (data: T) => React.ReactNode;
   placeholder?: string;
   error?: string;
 }
 
-export function TransactionDecoder<T = unknown>({
+export function TransactionDecoder<T>({
   title = 'Transaction decoder',
   subtitle = 'Decode and analyze transactions',
   rawTransaction,
@@ -185,31 +185,30 @@ export function TransactionDecoder<T = unknown>({
   );
 }
 
-export type TransactionDecoderTabsProps<T = unknown> = {
-  renderSummary?: (data: T) => React.ReactNode;
+export type TransactionDecoderTabsProps<T> = {
+  renderSummary: (data: T) => React.ReactNode;
   decodedTransaction: T | null;
   isDarkMode: boolean;
 };
 
-export function TransactionDecoderTabs<T = unknown>({
+export function TransactionDecoderTabs<T>({
   renderSummary,
   decodedTransaction,
   isDarkMode,
 }: TransactionDecoderTabsProps<T>) {
   return (
     <div className="w-full">
-      <Tabs className="w-full gap-6" defaultValue={renderSummary ? 'summary' : 'json'}>
+      <Tabs className="w-full gap-6" defaultValue="summary">
         <TabsList className="w-full">
-          {renderSummary && <TabsTrigger value="summary">Summary</TabsTrigger>}
+          <TabsTrigger value="summary">Summary</TabsTrigger>
           <TabsTrigger value="json">JSON</TabsTrigger>
         </TabsList>
         {decodedTransaction ? (
           <>
-            {renderSummary && (
-              <TabsContent className="space-y-6 overflow-y-auto" value="summary">
-                <div className="space-y-3">{decodedTransaction && renderSummary(decodedTransaction)}</div>
-              </TabsContent>
-            )}
+            <TabsContent className="space-y-6 overflow-y-auto" value="summary">
+              <div className="space-y-3">{decodedTransaction && renderSummary(decodedTransaction)}</div>
+            </TabsContent>
+
             <TabsContent value="json" className="max-h-96 overflow-y-auto border-border border rounded-md p-2 relative">
               <div className="flex items-center sticky right-0 top-0 justify-end gap-2 z-10">
                 <CopyButtonIcon

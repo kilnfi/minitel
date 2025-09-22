@@ -11,6 +11,5 @@
     "noEmit": true,
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true
-  },
-  "files": []
+  }
 }

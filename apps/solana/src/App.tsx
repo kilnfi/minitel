@@ -1,32 +1,13 @@
 import { getCurrentProtocol, protocols } from '@protocols/shared';
-import { Background, Header, type Protocol, TransactionDecoder } from '@protocols/ui';
+import { Background, cn, Header, type Protocol, ProtocolTransactionDecoder, TransactionPlaybook } from '@protocols/ui';
 import { useState } from 'react';
-import { cn } from '#/lib/utils';
-import { SolanaPlaybook } from '@/components/SolanaPlaybook';
-import { Summary } from '@/components/Summary';
-import { useTransactionDecoder } from '@/hooks/useTransactionDecoder';
-import { useUrlParam } from '@/hooks/useUrlParam';
-import type { ParseSolTxResult } from '@/parser';
+import { SOLANA_PLAYBOOK_OPERATIONS } from '@/config/playbook-operations';
+import { solanaAdapter } from '@/solana-adapter';
 
 const currentProtocol = getCurrentProtocol();
 
 function App() {
-  const [rawTransaction, setRawTransaction] = useUrlParam({
-    paramName: 'tx',
-    defaultValue: '',
-  });
-  const { decodedTransaction, warnings, hash, error, decodeTransaction } = useTransactionDecoder();
   const [playbook, setPlaybook] = useState<boolean>(false);
-
-  const handleDecode = async () => {
-    await decodeTransaction(rawTransaction);
-  };
-
-  const renderSummary = (data: ParseSolTxResult) => (
-    <>
-      <Summary instructions={data.instructions} />
-    </>
-  );
 
   const togglePlaybook = () => {
     setPlaybook(!playbook);
@@ -35,6 +16,12 @@ function App() {
   const onChangeProtocol = (protocol: Protocol) => {
     const protocolUrl = import.meta.env.DEV ? protocol.localUrl : protocol.url;
     window.open(protocolUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  const playbookConfig = {
+    protocolName: 'Solana',
+    operations: SOLANA_PLAYBOOK_OPERATIONS,
+    adapter: solanaAdapter,
   };
 
   return (
@@ -54,21 +41,9 @@ function App() {
             togglePlaybook={togglePlaybook}
             isPlaybookOpen={playbook}
           />
-          <TransactionDecoder
-            title="Solana raw transaction decoder"
-            subtitle="Decode and analyze Solana transactions"
-            rawTransaction={rawTransaction}
-            onRawTransactionChange={setRawTransaction}
-            onDecode={handleDecode}
-            decodedTransaction={decodedTransaction}
-            hash={hash}
-            warnings={warnings}
-            renderSummary={renderSummary}
-            placeholder="Paste your transaction as hex or Fireblocks message JSON"
-            error={error}
-          />
+          <ProtocolTransactionDecoder adapter={solanaAdapter} />
         </div>
-        <SolanaPlaybook isOpen={playbook} onClose={() => setPlaybook(false)} />
+        <TransactionPlaybook config={playbookConfig} isOpen={playbook} onClose={() => setPlaybook(false)} />
       </div>
     </div>
   );

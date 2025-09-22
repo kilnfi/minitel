@@ -47,6 +47,18 @@
             }
         }
     },
+    "overrides": [
+        {
+            "includes": ["packages/*/src/**"],
+            "linter": {
+                "rules": {
+                    "style": {
+                        "noRestrictedImports": "off"
+                    }
+                }
+            }
+        }
+    ],
     "javascript": {
         "formatter": {
             "quoteStyle": "single"

@@ -1,6 +1,6 @@
 export const Footer = () => (
   <div className="flex items-center justify-center p-6 text-sm font-medium text-muted-foreground">
-    powered by{' '}
+    Powered by{' '}
     <a
       href="https://kiln.fi/"
       className="underline flex items-center gap-1 ml-1"

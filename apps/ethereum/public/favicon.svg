@@ -1,19 +1,14 @@
-<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g clip-path="url(#clip0_315_6380)">
-<rect width="16" height="16" fill="white"/>
-<rect x="-2.25586" y="-1.94482" width="20.5115" height="19.8899" fill="url(#pattern0_315_6380)"/>
-<path d="M10.3061 1.84723L9.67536 1.26101L8.7667 3.30799L7.62891 6.84544H8.7667L10.3061 1.84723Z" fill="black"/>
-<path d="M4.47721 9.20678L3.78831 8.67215L6.62754 8.00634L8.82597 7.64924L8.86663 8.81646L4.47721 9.20678Z" fill="black"/>
-<path d="M11.9994 6.89234L11.6251 6.22775L9.99171 8.01468L5.55439 13.5344L6.09795 14.1525L11.9994 6.89234Z" fill="black"/>
-<path d="M3.99902 8.56567L9.70946 1.38623L8.13321 6.52243L11.4148 6.33498L5.65265 13.5519L7.22884 8.34071L3.99902 8.56567Z" fill="white" stroke="black" stroke-width="0.166939"/>
+<svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_315_6353)">
+<rect width="24" height="25" fill="black"/>
+<path d="M15.7664 3.24351L14.8006 2.25195L14.6411 2.46888L14.5506 2.7189L14.3651 3.12523L13.9941 3.93789L13.252 5.56322L11.3936 11.1808H13.252L15.7664 3.24351Z" stroke="white" stroke-width="0.277671"/>
+<path d="M6.44552 15.0757L5.28151 14.1387L5.77938 13.5644L6.47862 13.9135L7.60572 13.6376L9.85993 13.0859L13.3509 12.4941L13.4156 14.429L6.44552 15.0757Z" stroke="white" stroke-width="0.163336"/>
+<path d="M18.444 11.4969L17.8284 10.4229L15.1755 13.3006L8.20996 22.0951L8.86498 23.1916L18.444 11.4969Z" stroke="white" stroke-width="0.277671"/>
+<path d="M5.46484 13.9903L14.792 2.26367L12.2175 10.6529L17.5775 10.3468L8.16581 22.1345L10.7403 13.6228L5.46484 13.9903Z" fill="white" stroke="white" stroke-width="0.272672"/>
 </g>
 <defs>
-<pattern id="pattern0_315_6380" patternContentUnits="objectBoundingBox" width="1" height="1">
-<use xlink:href="#image0_315_6380" transform="scale(0.030303 0.03125)"/>
-</pattern>
-<clipPath id="clip0_315_6380">
-<rect width="16" height="16" fill="white"/>
+<clipPath id="clip0_315_6353">
+<rect width="24" height="25" fill="white"/>
 </clipPath>
-<image id="image0_315_6380" width="33" height="32" preserveAspectRatio="none" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACEAAAAgCAYAAACcuBHKAAAACXBIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAM9SURBVHgBpVeLcuQgDLOY/c/7tfvOm9n4An7JJJu2UzrZJARsWRaGQs727/3+C8gfPZ/nNX90/d00jdscBFG1jnmb16H2Yje1/hsT8Od5f0VnTgoH1M8vZcAcrL4NSNqhOR0EW3EQh4885mRcmQh2EFGE4aOcr/lSLEgAEo5iB2JtgXjrsZCpR6d6ZQNsR4NIpfRskecnvWVjWXATzkREoOtZmz/dnBMgGqjElJJHvRVW/2ZMHGYh9BA0KotgDgHMWQ0wUAmkhBrMfqcZEzMdp4PFgmoXY4Tn0OdQ04V9hFK0Wil8pOAOxIUBnk8pOLbJFisMpwsBQemHZmxqeydN1L0vITPMOX8sIF803Ria7yOmWyqEVoV6tJHbeFcSAQNAXZAftRdBqkcaYExI/opD6YFnBemr6ZttMXFYuUqDIABRdEDMwB5yVMxrrz8Fweb2PQMDG7QivoHij78BcdemcABPC7pDBgA0VXxsANqdQIyPLDaDys6RlbMclzDxEBTfCcTXLIbTywU0UAkGfbt+ar46jsehexLmNXw1dKUoPZ1Shja2uCl5fMlDy+iU3Z/0KelB0cZT4bZvELnuIfAdVOtQY1m5U4XjhTtVG1np6BzpBiSrR5ZqZDTBVoIYOYUrZcQmJT4tUY6mAaFdJJY6nKSgEbQRFpDZnelYY+5y59Ev6jDOVKCxEoCV0nJkCAZNPQClwsYpfglFE4xEAW4FCc6EAx3Zj+ZAxRZ8sJH2UbA8R12YqYhImVZKwjmLkXWRbAB5zohAogIHuAiIpFEgJs1z2hGKRW3dmX8YkLEij1WDZoxN59572s7Db98QHDwxEfSoiyNO3SvaYMPWW4Gr0lBASPmUBR/niSo199UR2NUB5YKiNNSy7HtGAxIK3xerdw+3zStkgXgNk+EhdeyHp4UjZ1air7Eg7l/qKBTegXKKbVIJEz5RQUXQPBYTyCp4SYOLiDhKJ7Vj1pkkp51/BgKWkCNoy4iM3hRi6CRypUKy7/JMGL58MUavW56TafkVyHYbOiB5/I4zAOVRFJvoPrRgh5Z9adN+SZh1L7+1VAm+wWaGO9tPeG47qWIig8rgZhT179WmQPl9c3v/Abpa8oetJez6AAAAAElFTkSuQmCC"/>
 </defs>
 </svg>

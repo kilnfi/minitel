@@ -18,8 +18,8 @@ export function TransactionSummary({ transaction, hash }: TransactionSummaryProp
 
   return (
     <Card className="p-6 space-y-4">
-      <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-3">
+      <CardContent className="flex flex-wrap gap-4">
+        <div className="space-y-3 flex-1 min-w-[300px]">
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">Risk Level</div>
             <Badge variant={riskLevel === 'high' ? 'destructive' : riskLevel === 'medium' ? 'warning' : 'success'}>
@@ -47,7 +47,7 @@ export function TransactionSummary({ transaction, hash }: TransactionSummaryProp
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-3 flex-1 min-w-[300px]">
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">To Address</div>
             <div className="font-mono text-sm">

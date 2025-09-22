@@ -3,7 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@protocols/ui": ["../ui/src"]
+      "@protocols/ui": ["../ui/src"],
+      "@shared/*": ["src/*"],
+      "@protocols/shared": ["src"]
     }
   },
   "include": ["src"]
