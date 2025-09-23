@@ -4,6 +4,8 @@ apps/*/build/
 
 node_modules
 **/node_modules
+**/.bun/
+**/node_modules/**/*
 
 .env
 .env.*
@@ -23,19 +25,13 @@ node_modules
 **/.vite/deps/_metadata.json
 *.local
 
-apps/*/node_modules/*
-
 coverage/
 .nyc_output/
 
 .cache/
 .temp/
 
-apps/ethereum/dist/assets/
-apps/solana/dist/
-apps/*/node_modules/
-
-packages/ui/dist/
-packages/*/node_modules/
-
-packages/shared/dist/
+# Build outputs
+apps/*/dist/
+apps/*/dist/assets/
+packages/*/dist/
