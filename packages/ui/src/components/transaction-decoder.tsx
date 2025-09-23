@@ -19,7 +19,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '#/components/ui/tabs';
 import { Textarea } from '#/components/ui/textarea';
 import { useIsDarkMode } from '#/hooks/useIsDarkMode';
-import { cn } from '#/lib/utils';
+import { cn, convertBigIntToString } from '#/lib/utils';
 import { Badge } from '#/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '#/ui/tooltip';
 
@@ -214,7 +214,7 @@ export function TransactionDecoderTabs<T>({
                 <CopyButtonIcon
                   variant="outline"
                   size="icon"
-                  textToCopy={JSON.stringify(decodedTransaction)}
+                  textToCopy={JSON.stringify(convertBigIntToString(decodedTransaction ?? {}))}
                   disabled={!decodedTransaction}
                 />
                 <Button
@@ -222,7 +222,7 @@ export function TransactionDecoderTabs<T>({
                   size="icon"
                   variant="outline"
                   onClick={() => {
-                    const blob = new Blob([JSON.stringify(decodedTransaction)], {
+                    const blob = new Blob([JSON.stringify(convertBigIntToString(decodedTransaction ?? {}))], {
                       type: 'application/json',
                     });
                     const url = URL.createObjectURL(blob);
@@ -235,7 +235,10 @@ export function TransactionDecoderTabs<T>({
                   <DownloadIcon />
                 </Button>
               </div>
-              <JsonView value={decodedTransaction ?? {}} style={isDarkMode ? vscodeTheme : githubLightTheme} />
+              <JsonView
+                value={convertBigIntToString(decodedTransaction ?? {})}
+                style={isDarkMode ? vscodeTheme : githubLightTheme}
+              />
             </TabsContent>
           </>
         ) : (

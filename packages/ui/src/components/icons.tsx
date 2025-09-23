@@ -1,6 +1,11 @@
-import { forwardRef } from 'react';
+import * as React from 'react';
 
-export const EthereumIcon = forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>(function EthereumIcon(props, ref) {
+export function EthereumIcon({
+  ref,
+  ...props
+}: React.SVGProps<SVGSVGElement> & {
+  ref?: React.Ref<SVGSVGElement>;
+}) {
   return (
     <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" {...props} ref={ref}>
       <rect width="100%" height="100%" rx="24" fill="#4680F7" />
@@ -8,9 +13,14 @@ export const EthereumIcon = forwardRef<SVGSVGElement, React.SVGProps<SVGSVGEleme
       <path d="M23.999 35.6665L31.2941 25.5737L23.999 29.8057L16.7083 25.5737L23.999 35.6665Z" fill="white" />
     </svg>
   );
-});
+}
 
-export const SolanaIcon = forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>(function SolanaIcon(props, ref) {
+export function SolanaIcon({
+  ref,
+  ...props
+}: React.SVGProps<SVGSVGElement> & {
+  ref?: React.Ref<SVGSVGElement>;
+}) {
   return (
     <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" {...props} ref={ref}>
       <rect width="100%" height="100%" rx="24" fill="#9945FF" />
@@ -22,4 +32,4 @@ export const SolanaIcon = forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement
       />
     </svg>
   );
-});
+}

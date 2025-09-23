@@ -1,6 +1,19 @@
-import { Address, Badge, Card, CardContent, CopyButtonIcon } from '@protocols/ui';
+import {
+  Address,
+  Badge,
+  Card,
+  CardContent,
+  CopyButtonIcon,
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@protocols/ui';
 import { formatEther, formatGwei } from 'viem';
-import type { AugmentedTransaction } from '@/utils';
+import type { AugmentedTransaction } from '@/types';
 import { ethExplorerLink, getActionDescription } from '@/utils';
 
 interface TransactionSummaryProps {
@@ -93,6 +106,27 @@ export function TransactionSummary({ transaction, hash }: TransactionSummaryProp
             </pre>
           </CardContent>
         </Card>
+      )}
+      {'inputData' in transaction && transaction.inputData?.typedArgs && transaction.inputData.typedArgs.length > 0 && (
+        <Table>
+          <TableCaption>Input Data</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Name</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead className="text-right">Value</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {transaction.inputData.typedArgs.map((arg, index) => (
+              <TableRow key={index}>
+                <TableCell className="font-medium">{arg.name}</TableCell>
+                <TableCell>{arg.type}</TableCell>
+                <TableCell className="text-right break-all">{arg.value}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       )}
     </Card>
   );

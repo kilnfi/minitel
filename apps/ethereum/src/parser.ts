@@ -11,12 +11,8 @@ import {
 } from 'viem';
 import { formatAbiItem } from 'viem/utils';
 import { ABIS, type ContractAbi } from '@/constant';
-import {
-  type AugmentedTransaction,
-  type AugmentedTransactionWithFunction,
-  convertBigIntToString,
-  normalizeHex,
-} from '@/utils';
+import type { AugmentedTransaction, AugmentedTransactionWithFunction } from '@/types';
+import { normalizeHex } from '@/utils';
 
 const tryDecodeWithAbi = async (tx: AugmentedTransaction, abi: ContractAbi) => {
   if (!tx.data) {
@@ -25,9 +21,21 @@ const tryDecodeWithAbi = async (tx: AugmentedTransaction, abi: ContractAbi) => {
 
   try {
     const { functionName, args } = decodeFunctionData({ abi, data: tx.data });
+
+    const functionAbi = abi.find((item) => item.type === 'function' && item.name === functionName);
+
+    const typedArgs = functionAbi?.inputs
+      ? functionAbi.inputs.map((input, index) => ({
+          name: input.name || `arg${index}`,
+          type: input.type,
+          value: String(args[index]),
+        }))
+      : [];
+
     return {
       functionName,
       args,
+      typedArgs,
       functionSignature: formatAbiItem(
         abi.find((item) => item.type === 'function' && item.name === functionName) as AbiItem,
       ),
@@ -68,13 +76,13 @@ const tryDecodeInputData = async (tx: AugmentedTransaction) => {
 };
 
 export const hashEthTx = (txRaw: string): string => {
-  const hex = normalizeHex(txRaw);
+  const hex = normalizeHex(txRaw.trim());
   return keccak256(serializeTransaction(parseTransaction(hex)));
 };
 
 export const parseEthTx = async (txRaw: string): Promise<AugmentedTransaction> => {
   try {
-    const hex = normalizeHex(txRaw);
+    const hex = normalizeHex(txRaw.trim());
     const tx = parseTransaction(hex) as AugmentedTransaction;
 
     const inputData = await tryDecodeInputData(tx);
@@ -82,7 +90,7 @@ export const parseEthTx = async (txRaw: string): Promise<AugmentedTransaction> =
       (tx as AugmentedTransactionWithFunction).inputData = inputData;
     }
 
-    return convertBigIntToString(tx);
+    return tx;
   } catch (error) {
     throw new Error(
       `Failed to parse Ethereum transaction: ${error instanceof Error ? error.message : 'Unknown error'}`,

@@ -1,63 +1,14 @@
 import { Address as AddressComponent } from '@protocols/ui';
 import type { ReactNode } from 'react';
-import {
-  type Abi,
-  type Address,
-  type ContractFunctionArgs,
-  type ContractFunctionName,
-  type erc20Abi,
-  formatEther,
-  type Hash,
-  type TransactionSerializableEIP7702,
-  type TransactionSerializableLegacy,
-} from 'viem';
+import { type Address, type erc20Abi, formatEther, type Hash } from 'viem';
 import type { ETH_DEPOSIT_CONTRACT_ABI } from '@/abi/ETH_DEPOSIT_CONTRACT_ABI';
 import type { ETH_EXIT_CONTRACT_ABI } from '@/abi/ETH_EXIT_CONTRACT_ABI';
 import type { MATIC_STAKE_MANAGER_CONTRACT_ABI } from '@/abi/MATIC_STAKE_MANAGER_CONTRACT_ABI';
 import type { FunctionNameToAbiMap } from '@/constant';
-
-type Transaction = TransactionSerializableLegacy | TransactionSerializableEIP7702;
-
-export type AugmentedTransactionWithFunction<TFunctionName extends string = string> = Transaction & {
-  inputData: {
-    functionName: TFunctionName;
-    functionSignature: string;
-    args: readonly unknown[];
-  };
-};
-
-type ExtractArgs<TAbi extends Abi, TFunctionName extends ContractFunctionName<TAbi>> = ContractFunctionArgs<
-  TAbi,
-  'payable' | 'nonpayable',
-  TFunctionName
->;
-
-export type AugmentedTransaction = Transaction | AugmentedTransactionWithFunction;
+import type { AugmentedTransaction, AugmentedTransactionWithFunction, ExtractArgs } from '@/types';
 
 export const normalizeHex = (txRaw: string): `0x${string}` => {
   return (txRaw.startsWith('0x') ? txRaw : `0x${txRaw}`) as `0x${string}`;
-};
-
-// biome-ignore lint/suspicious/noExplicitAny: <not necessary>
-export const convertBigIntToString = (obj: any): any => {
-  if (typeof obj === 'bigint') {
-    return obj.toString();
-  }
-
-  if (Array.isArray(obj)) {
-    return obj.map(convertBigIntToString);
-  }
-
-  if (obj !== null && typeof obj === 'object') {
-    // biome-ignore lint/suspicious/noExplicitAny: <not necessary>
-    const converted: any = {};
-    for (const key in obj) {
-      converted[key] = convertBigIntToString(obj[key]);
-    }
-    return converted;
-  }
-
-  return obj;
 };
 
 export function ethExplorerLink(
@@ -381,7 +332,6 @@ function isTransactionWithInputData(tx: AugmentedTransaction): tx is AugmentedTr
 }
 
 export function getActionDescription(tx: AugmentedTransaction): DetailsResult {
-  // No recipient? bail early.
   if (!tx.to)
     return {
       description: 'Unknown transaction',
@@ -395,7 +345,6 @@ export function getActionDescription(tx: AugmentedTransaction): DetailsResult {
   const hasEthValue = BigInt(valueWei) > 0n;
   const isHighValue = parseFloat(ethAmount) > 1;
 
-  // No input data => plain ETH transfer or a raw call
   if (!isTransactionWithInputData(tx)) {
     if (hasEthValue) {
       return {

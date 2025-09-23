@@ -2,13 +2,13 @@ import type { ProtocolAdapter } from '@protocols/shared';
 import { formatEther } from 'viem';
 import { TransactionSummary } from '@/components/TransactionSummary';
 import { hashEthTx, parseEthTx } from '@/parser';
-import type { AugmentedTransaction } from '@/utils';
+import type { AugmentedTransaction } from '@/types';
 import { getActionDescription } from '@/utils';
 
 export const ethereumAdapter: ProtocolAdapter<AugmentedTransaction> = {
   name: 'ethereum',
   displayName: 'Ethereum',
-  placeholder: 'Paste your transaction as hex or Fireblocks message JSON',
+  placeholder: 'Paste your transaction as hex',
   parseTransaction: parseEthTx,
   computeHash: hashEthTx,
 
