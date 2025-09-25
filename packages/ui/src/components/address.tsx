@@ -32,11 +32,11 @@ export const Address = ({ address, explorerLink, className = '', showCopy = true
     <div className="flex items-center gap-1 px-1">
       {explorerLink ? (
         <a href={explorerLink} target="_blank" rel="noreferrer" className={twMerge('underline', className)}>
-          {address.slice(0, 8)}...${address.slice(-6)}
+          {address.slice(0, 8)}...{address.slice(-6)}
         </a>
       ) : (
         <>
-          {address.slice(0, 8)}...${address.slice(-6)}
+          {address.slice(0, 8)}...{address.slice(-6)}
         </>
       )}
       {showCopy && (

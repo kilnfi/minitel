@@ -16,7 +16,7 @@ import bs58 from 'bs58';
 import type { DecodedInstruction, StakeInstructionParams, SystemInstructionParams } from '@/types';
 import { COMPUTE_BUDGET_PROGRAM_ID, STAKE_PROGRAM_ID, SYSTEM_PROGRAM_ID } from '@/utils';
 
-type MessageLike = {
+export type MessageLike = {
   header: {
     numRequiredSignatures: number;
     numReadonlySignedAccounts: number;
@@ -29,12 +29,12 @@ type MessageLike = {
 
 const isHex = (s: string) => /^[0-9a-fA-F]+$/.test(s) && s.length % 2 === 0;
 
-const looksLikeMessage = (obj: unknown): obj is MessageLike => {
+export const looksLikeMessage = (obj: unknown): obj is MessageLike => {
   const msg = obj as Record<string, unknown>;
   return !!msg.header && !!msg.recentBlockhash && !!msg.accountKeys && !!msg.instructions;
 };
 
-const convertToMessage = (rawMsg: MessageLike): Message => {
+export const convertToMessage = (rawMsg: MessageLike): Message => {
   const accountKeys = rawMsg.accountKeys.map((key) => new PublicKey(key));
 
   const messageArgs = {

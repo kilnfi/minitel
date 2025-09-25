@@ -1,16 +1,38 @@
 import type { ProtocolAdapter } from '@protocols/shared';
 import { Summary } from '@/components/Summary';
-import { type ParseSolTxResult, parseSolTx } from '@/parser';
+import { convertToMessage, looksLikeMessage, type MessageLike, type ParseSolTxResult, parseSolTx } from '@/parser';
 import type { DecodedInstruction } from '@/types';
 
 const computeSolanaHash = async (rawTx: string): Promise<string> => {
   try {
-    const transactionUint8Array = new Uint8Array(rawTx.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || []);
+    const input = rawTx.trim();
+
+    // If input is a JSON message, handle it directly
+    if (input.startsWith('{') || input.startsWith('[')) {
+      try {
+        const obj = JSON.parse(input);
+        const msg = (obj.message ?? obj) as MessageLike;
+        if (looksLikeMessage(msg)) {
+          const message = convertToMessage(msg);
+          const messageBytes = message.serialize();
+          const hexString = messageBytes.toString('hex');
+
+          const transactionUint8Array = new Uint8Array(
+            hexString.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || [],
+          );
+          const hashBuffer = await crypto.subtle.digest('SHA-256', transactionUint8Array);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+        }
+      } catch {}
+    }
+
+    const transactionUint8Array = new Uint8Array(input.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || []);
     const hashBuffer = await crypto.subtle.digest('SHA-256', transactionUint8Array);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-  } catch (_error) {
-    return '';
+  } catch {
+    throw new Error('Failed to compute Solana hash');
   }
 };
 
