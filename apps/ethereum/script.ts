@@ -1,7 +1,6 @@
 import type { TransactionSerializable } from 'viem';
 import { serializeTransaction } from 'viem';
 
-// Approve transaction
 const approveTransaction = {
   to: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831' as `0x${string}`,
   nonce: 54,
