@@ -1,6 +1,6 @@
 {
     "installCommand": "bun install --cwd ../../",
     "buildCommand": "bun --cwd ../../ --filter @protocols/ethereum build",
-    "outputDirectory": "dist",
+    "outputDirectory": "apps/ethereum/dist",
     "framework": null
 }

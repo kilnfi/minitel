@@ -1,6 +1,6 @@
 {
     "installCommand": "bun install --cwd ../../",
     "buildCommand": "bun --cwd ../../ --filter @protocols/solana build",
-    "outputDirectory": "dist",
+    "outputDirectory": "apps/solana/dist",
     "framework": null
 }
