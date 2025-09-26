@@ -25,7 +25,7 @@ function App() {
   };
 
   return (
-    <div className="relative flex flex-col min-h-screen">
+    <div className="relative flex flex-col w-full min-h-screen">
       <div className="flex">
         <div
           className={cn(
