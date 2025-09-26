@@ -7,7 +7,7 @@ const computeSolanaHash = async (rawTx: string): Promise<string> => {
   try {
     const input = rawTx.trim();
 
-    // If input is a JSON message, handle it directly
+    // If input is a JSON message
     if (input.startsWith('{') || input.startsWith('[')) {
       try {
         const obj = JSON.parse(input);
