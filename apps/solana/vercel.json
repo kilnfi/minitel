@@ -1,6 +1,6 @@
 {
-    "installCommand": "bun install",
-    "buildCommand": "bun run build",
+    "installCommand": "cd ../.. && bun install",
+    "buildCommand": "cd ../.. && bun --filter @protocols/solana build",
     "outputDirectory": "dist",
     "framework": null
 }
