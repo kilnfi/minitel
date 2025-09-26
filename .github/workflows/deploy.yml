@@ -1,0 +1,39 @@
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'apps/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [ethereum, solana]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build ${{ matrix.app }}
+        run: cd apps/${{ matrix.app }} && bun run build
+
+      - name: Deploy ${{ matrix.app }} to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || secrets.VERCEL_PROJECT_ID_SOLANA }}
+          working-directory: ./apps/${{ matrix.app }}
+          vercel-args: '--prod'

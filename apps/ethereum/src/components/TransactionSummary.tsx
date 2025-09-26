@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@protocols/ui';
+import { ArrowLeftRightIcon, FuelIcon, ShrinkIcon, TriangleAlertIcon } from 'lucide-react';
 import { formatEther, formatGwei } from 'viem';
 import type { AugmentedTransaction } from '@/types';
 import { ethExplorerLink, getActionDescription } from '@/utils';
@@ -129,5 +130,91 @@ export function TransactionSummary({ transaction, hash }: TransactionSummaryProp
         </Table>
       )}
     </Card>
+  );
+}
+
+export function TransactionSummaryNew({ transaction, hash }: TransactionSummaryProps) {
+  if (!transaction) return null;
+
+  const actionDetails = getActionDescription(transaction);
+  const riskLevel = actionDetails.riskLevel;
+  const ethValue = formatEther(transaction.value ?? 0n);
+  const maxFeeGwei = formatGwei(transaction.maxFeePerGas ?? 0n);
+  return (
+    <div className="flex flex-col gap-7">
+      <div className="flex items-center">
+        <div className="flex flex-col gap-2 flex-1">
+          <span className="text-muted-foreground text-sm">ETH Amount</span>
+          <span className="text-2xl">{ethValue} ETH</span>
+        </div>
+        <div className="w-[1px] h-16 bg-gray-200 mx-10" />
+        <div className="flex flex-col gap-2 flex-1">
+          <span className="text-muted-foreground text-sm">To Address</span>
+          <span className="text-2xl">
+            <Address
+              address={transaction.to ?? '0x0000000000000000000000000000000000000000'}
+              explorerLink={ethExplorerLink(transaction.to ?? '', 'address')}
+            />
+          </span>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col">
+          <div className="rounded-t-lg overflow-hidden border flex">
+            <div className="flex flex-1 bg-gray-50 justify-between items-center p-3 text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <TriangleAlertIcon className="size-4" />
+                <span className="text-sm text-muted-foreground">Risk level</span>
+              </div>
+              <span className="text-sm text-muted-foreground">-</span>
+            </div>
+            <div className="p-3 border-l flex-1 bg-white">
+              <Badge variant="destructive">{riskLevel.toUpperCase()} RISK</Badge>
+            </div>
+          </div>
+          <div className="rounded-b-lg overflow-hidden border flex">
+            <div className="flex flex-1 bg-gray-50 justify-between items-center p-3 text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <ArrowLeftRightIcon className="size-4" />
+                <span className="text-sm">Transaction type</span>
+              </div>
+              <span className="text-sm">-</span>
+            </div>
+            <div className="p-3 border-l flex-1 bg-white">
+              <Badge variant="success">Approval</Badge>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col">
+          <div className="rounded-t-lg overflow-hidden border flex">
+            <div className="flex flex-1 bg-gray-50 justify-between items-center p-3 text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <ShrinkIcon className="size-4" />
+                <span className="text-sm text-muted-foreground">Action</span>
+              </div>
+              <span className="text-sm text-muted-foreground">-</span>
+            </div>
+            <div className="p-3 border-l min-w-1/2 flex-1 bg-white">
+              <span className="text-sm text-nowrap truncate">{actionDetails.description}</span>
+            </div>
+          </div>
+          <div className="rounded-b-lg overflow-hidden border flex">
+            <div className="flex flex-1 bg-gray-50 justify-between items-center p-3 text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <FuelIcon className="size-4" />
+                <span className="text-sm">Max fee</span>
+              </div>
+              <span className="text-sm">-</span>
+            </div>
+            <div className="p-3 border-l flex-1 bg-white">
+              <Badge variant="success">{maxFeeGwei} Gwei</Badge>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col items-center gap-2">
+        <span className="font-medium uppercase">technical details</span>
+      </div>
+    </div>
   );
 }
