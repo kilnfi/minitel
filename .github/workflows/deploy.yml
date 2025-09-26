@@ -8,7 +8,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: fixed-egress-4c-16g
     strategy:
       matrix:
         app: [ethereum, solana]
