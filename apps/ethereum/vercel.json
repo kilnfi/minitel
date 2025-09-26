@@ -1,7 +1,6 @@
 {
-    "build": {
-        "env": {},
-        "command": "bun install && bun build",
-        "outputDirectory": "dist"
-    }
+    "installCommand": "bun install",
+    "buildCommand": "bun run build",
+    "outputDirectory": "dist",
+    "framework": null
 }
