@@ -1,5 +1,15 @@
 # minitelv2
 
+## ⚠️  Disclaimer
+
+* Kiln is a non-custodial staking provider. As the customer and ultimate owner of your assets, it is your sole responsibility to review, check, and verify all transactions before signing and broadcasting them.
+* Kiln may provide certain tooling (such as web applications, APIs, or scripts) to facilitate interaction with supported protocols. These tools are provided for convenience only. They do not constitute advice, nor do they alter the fact that you remain solely responsible for the transactions you generate, sign, and broadcast.
+* Kiln does not have access to your private keys and cannot execute, reverse, or validate transactions on your behalf. Kiln disclaims any responsibility or liability for the use of these scripts, including (without limitation) for missed staking rewards, slashing penalties, opportunity costs, or other losses (as defined in your agreement with Kiln).
+* This repository and the associated code are provided “AS IS” and “AS AVAILABLE,” without warranties of any kind, express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, or non-infringement.
+* In no event shall Kiln, its affiliates, or its contributors be liable for any claim, damages, or other liability, whether in contract, tort, or otherwise, arising from, out of, or in connection with the use of this repository or the transactions you execute based on it.
+* By using these tools, you acknowledge and agree that you are acting on your own responsibility and at your own risk.
+
+
 A multi-chain transaction decoder monorepo built with Bun workspaces, Vite, React, Tailwind v4, and shadcn/ui. Decode and inspect raw transactions across different blockchain networks with a unified interface.
 
 ## Structure
