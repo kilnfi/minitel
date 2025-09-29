@@ -23,7 +23,7 @@ import { cn, convertBigIntToString } from '#/lib/utils';
 import { Badge } from '#/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '#/ui/tooltip';
 
-export interface TransactionDecoderProps<T> {
+export type TransactionDecoderProps<T> = {
   title?: string;
   subtitle?: string;
   rawTransaction: string;
@@ -35,7 +35,7 @@ export interface TransactionDecoderProps<T> {
   renderSummary: (data: T) => React.ReactNode;
   placeholder?: string;
   error?: string;
-}
+};
 
 export function TransactionDecoder<T>({
   title = 'Transaction decoder',

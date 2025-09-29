@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-export interface ProtocolAdapter<TDecodedTransaction> {
+export type ProtocolAdapter<TDecodedTransaction> = {
   name: string;
   displayName: string;
 
@@ -11,4 +11,4 @@ export interface ProtocolAdapter<TDecodedTransaction> {
 
   generateWarnings: (data: TDecodedTransaction) => Array<{ message: string }>;
   placeholder?: string;
-}
+};

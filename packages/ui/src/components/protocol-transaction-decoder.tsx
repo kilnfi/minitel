@@ -3,9 +3,9 @@ import { TransactionDecoder } from '#/components/transaction-decoder';
 import { useTransactionDecoder } from '#/hooks/useTransactionDecoder';
 import { useUrlParam } from '#/hooks/useUrlParam';
 
-interface ProtocolTransactionDecoderProps<T> {
+type ProtocolTransactionDecoderProps<T> = {
   adapter: ProtocolAdapter<T>;
-}
+};
 
 export function ProtocolTransactionDecoder<T>({ adapter }: ProtocolTransactionDecoderProps<T>) {
   const [rawTransaction, setRawTransaction] = useUrlParam({

@@ -21,11 +21,11 @@ import { useIsDarkMode } from '#/hooks/useIsDarkMode';
 import { useTransactionDecoder } from '#/hooks/useTransactionDecoder';
 import { cn } from '#/lib/utils';
 
-interface TransactionPlaybookProps<T> {
+type TransactionPlaybookProps<T> = {
   config: PlaybookConfig<T>;
   isOpen: boolean;
   onClose: () => void;
-}
+};
 
 const renderOperationOverview = (items: PlaybookOperationOverviewItem[]) => {
   return (

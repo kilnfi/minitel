@@ -1,14 +1,14 @@
 import type { ProtocolAdapter } from '@protocols/shared';
 import { useCallback, useState } from 'react';
 
-export interface UseTransactionDecoderResult<T> {
+export type UseTransactionDecoderResult<T> = {
   decodedTransaction: T | null;
   hash: string;
   error?: string;
   warnings: Array<{ message: string }>;
   decodeTransaction: (rawTx: string) => Promise<void>;
   isLoading: boolean;
-}
+};
 
 export function useTransactionDecoder<T>(adapter: ProtocolAdapter<T>): UseTransactionDecoderResult<T> {
   const [decodedTransaction, setDecodedTransaction] = useState<T | null>(null);
