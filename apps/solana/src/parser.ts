@@ -13,8 +13,12 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 import bs58 from 'bs58';
-import type { DecodedInstruction, StakeInstructionParams, SystemInstructionParams } from '@/types';
-import { COMPUTE_BUDGET_PROGRAM_ID, STAKE_PROGRAM_ID, SYSTEM_PROGRAM_ID } from '@/utils';
+import {
+  type DecodedInstruction,
+  KNOWN_PROGRAMS,
+  type StakeInstructionParams,
+  type SystemInstructionParams,
+} from '@/types';
 
 export type MessageLike = {
   header: {
@@ -63,7 +67,23 @@ function buildInstructionsFromMessage(rawMsg: MessageLike): TransactionInstructi
 
 function decodeOne(instruction: TransactionInstruction): DecodedInstruction {
   try {
-    if (instruction.programId.equals(COMPUTE_BUDGET_PROGRAM_ID)) {
+    if (instruction.programId.equals(KNOWN_PROGRAMS.Memo.id)) {
+      const type = 'Memo';
+      return {
+        programId: instruction.programId,
+        type,
+        data: {
+          memo: instruction.data.toString('utf-8'),
+        },
+        accounts: instruction.keys.map((key) => ({
+          pubkey: key.pubkey.toString(),
+          isSigner: key.isSigner,
+          isWritable: key.isWritable,
+        })),
+      };
+    }
+
+    if (instruction.programId.equals(KNOWN_PROGRAMS.ComputeBudget.id)) {
       const type = ComputeBudgetInstruction.decodeInstructionType(instruction);
       let data: SetComputeUnitLimitParams | SetComputeUnitPriceParams | RequestUnitsParams | RequestHeapFrameParams;
 
@@ -86,7 +106,7 @@ function decodeOne(instruction: TransactionInstruction): DecodedInstruction {
       }
 
       return {
-        programId: instruction.programId.toString(),
+        programId: instruction.programId,
         type,
         data,
         accounts: instruction.keys.map((key) => ({
@@ -97,7 +117,7 @@ function decodeOne(instruction: TransactionInstruction): DecodedInstruction {
       };
     }
 
-    if (instruction.programId.equals(SYSTEM_PROGRAM_ID)) {
+    if (instruction.programId.equals(KNOWN_PROGRAMS.System.id)) {
       const type = SystemInstruction.decodeInstructionType(instruction);
       let data: SystemInstructionParams | Record<string, unknown>;
 
@@ -148,7 +168,7 @@ function decodeOne(instruction: TransactionInstruction): DecodedInstruction {
       }
 
       return {
-        programId: instruction.programId.toString(),
+        programId: instruction.programId,
         type,
         data,
         accounts: instruction.keys.map((key) => ({
@@ -162,7 +182,7 @@ function decodeOne(instruction: TransactionInstruction): DecodedInstruction {
       };
     }
 
-    if (instruction.programId.equals(STAKE_PROGRAM_ID)) {
+    if (instruction.programId.equals(KNOWN_PROGRAMS.Stake.id)) {
       const type = StakeInstruction.decodeInstructionType(instruction);
       let data: StakeInstructionParams | Record<string, unknown>;
 
@@ -194,7 +214,7 @@ function decodeOne(instruction: TransactionInstruction): DecodedInstruction {
       }
 
       return {
-        programId: instruction.programId.toString(),
+        programId: instruction.programId,
         type,
         data,
         accounts: instruction.keys.map((key) => ({
@@ -221,7 +241,7 @@ function decodeOne(instruction: TransactionInstruction): DecodedInstruction {
     }
 
     return {
-      programId: instruction.programId.toString(),
+      programId: instruction.programId,
       type: 'unknown',
       data: {},
       accounts: [],
@@ -236,7 +256,7 @@ function decodeOne(instruction: TransactionInstruction): DecodedInstruction {
     };
   } catch (err) {
     return {
-      programId: instruction.programId.toString(),
+      programId: instruction.programId,
       type: 'error',
       data: {},
       accounts: [],
@@ -258,7 +278,7 @@ function safeDecode(ix: TransactionInstruction): DecodedInstruction {
     return decodeOne(ix);
   } catch (err) {
     return {
-      programId: ix.programId.toString(),
+      programId: ix.programId,
       type: 'error',
       data: {},
       accounts: [],
