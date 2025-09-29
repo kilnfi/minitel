@@ -1,12 +1,10 @@
 export const Footer = () => (
-  <div className="flex items-center justify-center p-6 text-sm font-medium text-muted-foreground">
-    Powered by{' '}
-    <a
-      href="https://kiln.fi/"
-      className="underline flex items-center gap-1 ml-1"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
+  <div className="flex gap-1 items-center justify-center p-6 text-sm font-medium text-muted-foreground">
+    <a href="https://github.com/kilnfi/minitel" target="_blank" rel="noopener noreferrer" className="underline">
+      Open source project
+    </a>
+    <span>developed by</span>
+    <a href="https://kiln.fi/" className="underline flex items-center gap-1" target="_blank" rel="noopener noreferrer">
       Kiln
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 38" fill="none" className="w-5 h-5">
         <path
