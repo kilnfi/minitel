@@ -1,27 +1,27 @@
 import type { ProtocolAdapter } from './protocol-adapter';
 
-export interface PlaybookOperationOverviewItem {
+export type PlaybookOperationOverviewItem = {
   type: 'text';
   content: string;
-}
+};
 
-export interface PlaybookStepByStepItem {
+export type PlaybookStepByStepItem = {
   title: string;
   program: string;
   description: string;
-}
+};
 
-export interface PlaybookOperation {
+export type PlaybookOperation = {
   label: string;
   value: string;
   description: string;
   rawTransaction: string;
   operationOverview: PlaybookOperationOverviewItem[];
   stepByStep?: PlaybookStepByStepItem[];
-}
+};
 
-export interface PlaybookConfig<T> {
+export type PlaybookConfig<T> = {
   protocolName: string;
   operations: PlaybookOperation[];
   adapter: ProtocolAdapter<T>;
-}
+};

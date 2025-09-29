@@ -120,12 +120,12 @@ The project uses a standardized protocol adapter pattern that makes adding new c
    };
    ```
 
-### Protocol Adapter Interface
+### Protocol Adapter Type
 
-The `ProtocolAdapter<T, W>` interface provides a standardized contract:
+The `ProtocolAdapter<T, W>` type provides a standardized contract:
 
 ```typescript
-interface ProtocolAdapter<TDecodedTransaction, TWarning = ProtocolWarning> {
+type ProtocolAdapter<TDecodedTransaction, TWarning = ProtocolWarning> = {
   // Basic info
   name: string;              // 'ethereum', 'solana', 'near'
   displayName: string;       // 'Ethereum', 'Solana', 'NEAR'

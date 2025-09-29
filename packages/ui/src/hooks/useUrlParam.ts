@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 
-interface UseUrlParamOptions {
+type UseUrlParamOptions = {
   paramName: string;
   defaultValue?: string;
   replaceState?: boolean;
-}
+};
 
 export function useUrlParam({ paramName, defaultValue = '', replaceState = true }: UseUrlParamOptions) {
   const [value, setValue] = useState(defaultValue);
