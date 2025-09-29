@@ -17,6 +17,7 @@ import {
   type InitializeNonceParams,
   type InitializeStakeParams,
   type MergeStakeParams,
+  PublicKey,
   type RequestHeapFrameParams,
   type RequestUnitsParams,
   type SetComputeUnitLimitParams,
@@ -54,28 +55,36 @@ export type StakeInstructionParams =
   | SplitStakeParams
   | WithdrawStakeParams;
 
+export type MemoInstructionParams = {
+  memo: string;
+};
+
 export const KNOWN_PROGRAMS = {
   System: {
-    id: SystemProgram.programId.toString(),
+    id: SystemProgram.programId,
     name: 'System Program',
   },
   Stake: {
-    id: StakeProgram.programId.toString(),
+    id: StakeProgram.programId,
     name: 'Stake Program',
   },
   ComputeBudget: {
-    id: ComputeBudgetProgram.programId.toString(),
+    id: ComputeBudgetProgram.programId,
     name: 'Compute Budget Program',
   },
-} as const;
+  Memo: {
+    id: new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr'),
+    name: 'Memo Program',
+  },
+};
 
 export type ProgramKey = keyof typeof KNOWN_PROGRAMS;
 
-export function getProgramKeyFromId(programId: string): ProgramKey | undefined {
-  return Object.entries(KNOWN_PROGRAMS).find(([_, value]) => value.id === programId)?.[0] as ProgramKey | undefined;
+export function getProgramKeyFromId(programId: PublicKey): ProgramKey | undefined {
+  return Object.entries(KNOWN_PROGRAMS).find(([_, value]) => value.id.equals(programId))?.[0] as ProgramKey | undefined;
 }
 
-export function getProgramName(programId: string): string {
+export function getProgramName(programId: PublicKey): string {
   const key = getProgramKeyFromId(programId);
   return key ? KNOWN_PROGRAMS[key].name : 'Unknown Program';
 }
@@ -88,7 +97,8 @@ export type InstructionType =
   | 'SetComputeUnitLimit'
   | 'SetComputeUnitPrice'
   | 'RequestUnits'
-  | 'RequestHeapFrame';
+  | 'RequestHeapFrame'
+  | 'Memo';
 
 export type InstructionParams =
   | SystemInstructionParams
@@ -97,10 +107,11 @@ export type InstructionParams =
   | SetComputeUnitPriceParams
   | RequestUnitsParams
   | RequestHeapFrameParams
+  | MemoInstructionParams
   | Record<string, unknown>;
 
 export type DecodedInstruction = {
-  programId: string;
+  programId: PublicKey;
   type: InstructionType;
   data: InstructionParams;
   error?: string;

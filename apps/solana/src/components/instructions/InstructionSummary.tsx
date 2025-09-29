@@ -38,8 +38,8 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
       <>
         Unknown instruction from{' '}
         <Address
-          explorerLink={solExplorerLink(instruction.programId, 'address')}
-          address={instruction.programId}
+          explorerLink={solExplorerLink(instruction.programId.toString(), 'address')}
+          address={instruction.programId.toString()}
           className="text-blue-600 hover:text-blue-800 underline"
         />
       </>
@@ -48,6 +48,11 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
 
   try {
     switch (type) {
+      case 'Memo': {
+        const memoData = data as Record<string, unknown>;
+        return <>Memo: {memoData.memo ?? 'unknown'}</>;
+      }
+
       // Compute Budget Program Instructions
       case 'SetComputeUnitLimit': {
         const computeBudgetData = data as SetComputeUnitLimitParams;
@@ -70,14 +75,14 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Advance nonce account{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.noncePubkey?.toString() ?? '', 'address')}
-              address={systemData.noncePubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.noncePubkey.toString(), 'address')}
+              address={systemData.noncePubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             by authority{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.authorizedPubkey?.toString() ?? '', 'address')}
-              address={systemData.authorizedPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.authorizedPubkey.toString(), 'address')}
+              address={systemData.authorizedPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
           </>
@@ -89,8 +94,8 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Allocate {systemData.space ?? 'unknown'} bytes to account{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.accountPubkey?.toString() ?? '', 'address')}
-              address={systemData.accountPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.accountPubkey.toString(), 'address')}
+              address={systemData.accountPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
           </>
@@ -102,14 +107,14 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Allocate {systemData.space ?? 'unknown'} bytes to account{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.accountPubkey?.toString() ?? '', 'address')}
-              address={systemData.accountPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.accountPubkey.toString(), 'address')}
+              address={systemData.accountPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             (derived from base{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.basePubkey?.toString() ?? '', 'address')}
-              address={systemData.basePubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.basePubkey.toString(), 'address')}
+              address={systemData.basePubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             with seed "{systemData.seed}")
@@ -122,14 +127,14 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Assign account{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.accountPubkey?.toString() ?? '', 'address')}
-              address={systemData.accountPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.accountPubkey.toString(), 'address')}
+              address={systemData.accountPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             to program{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.programId?.toString() ?? '', 'address')}
-              address={systemData.programId?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.programId.toString(), 'address')}
+              address={systemData.programId.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
           </>
@@ -141,20 +146,20 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Assign account{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.accountPubkey?.toString() ?? '', 'address')}
-              address={systemData.accountPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.accountPubkey.toString(), 'address')}
+              address={systemData.accountPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             (derived from base{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.basePubkey?.toString() ?? '', 'address')}
-              address={systemData.basePubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.basePubkey.toString(), 'address')}
+              address={systemData.basePubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             with seed "{systemData.seed}") to program{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.programId?.toString() ?? '', 'address')}
-              address={systemData.programId?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.programId.toString(), 'address')}
+              address={systemData.programId.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
           </>
@@ -166,20 +171,20 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Change nonce authority from{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.authorizedPubkey?.toString() ?? '', 'address')}
-              address={systemData.authorizedPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.authorizedPubkey.toString(), 'address')}
+              address={systemData.authorizedPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             to{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.newAuthorizedPubkey?.toString() ?? '', 'address')}
-              address={systemData.newAuthorizedPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.newAuthorizedPubkey.toString(), 'address')}
+              address={systemData.newAuthorizedPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             on nonce account{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.noncePubkey?.toString() ?? '', 'address')}
-              address={systemData.noncePubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.noncePubkey.toString(), 'address')}
+              address={systemData.noncePubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
           </>
@@ -191,20 +196,20 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Create account{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.newAccountPubkey?.toString() ?? '', 'address')}
-              address={systemData.newAccountPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.newAccountPubkey.toString(), 'address')}
+              address={systemData.newAccountPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             funded by{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.fromPubkey?.toString() ?? '', 'address')}
-              address={systemData.fromPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.fromPubkey.toString(), 'address')}
+              address={systemData.fromPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             with {systemData.lamports ?? 'unknown'} lamports ({systemData.space ?? 'unknown'} bytes, owned by{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.programId?.toString() ?? '', 'address')}
-              address={systemData.programId?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.programId.toString(), 'address')}
+              address={systemData.programId.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
             )
@@ -217,20 +222,20 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Create account{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.newAccountPubkey?.toString() ?? '', 'address')}
-              address={systemData.newAccountPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.newAccountPubkey.toString(), 'address')}
+              address={systemData.newAccountPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             (derived from base{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.basePubkey?.toString() ?? '', 'address')}
-              address={systemData.basePubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.basePubkey.toString(), 'address')}
+              address={systemData.basePubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             with seed "{systemData.seed}") funded by{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.fromPubkey?.toString() ?? '', 'address')}
-              address={systemData.fromPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.fromPubkey.toString(), 'address')}
+              address={systemData.fromPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             with {systemData.lamports ?? 'unknown'} lamports
@@ -243,14 +248,14 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Initialize nonce account{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.noncePubkey?.toString() ?? '', 'address')}
-              address={systemData.noncePubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.noncePubkey.toString(), 'address')}
+              address={systemData.noncePubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             with authority{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.authorizedPubkey?.toString() ?? '', 'address')}
-              address={systemData.authorizedPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.authorizedPubkey.toString(), 'address')}
+              address={systemData.authorizedPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
           </>
@@ -263,14 +268,14 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Transfer {lamports ?? 'unknown'} lamports from{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.fromPubkey?.toString() ?? '', 'address')}
-              address={systemData.fromPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.fromPubkey.toString(), 'address')}
+              address={systemData.fromPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             to{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.toPubkey?.toString() ?? '', 'address')}
-              address={systemData.toPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.toPubkey.toString(), 'address')}
+              address={systemData.toPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
           </>
@@ -283,20 +288,20 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Transfer {lamports ?? 'unknown'} lamports from{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.fromPubkey?.toString() ?? '', 'address')}
-              address={systemData.fromPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.fromPubkey.toString(), 'address')}
+              address={systemData.fromPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             (derived from base{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.basePubkey?.toString() ?? '', 'address')}
-              address={systemData.basePubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.basePubkey.toString(), 'address')}
+              address={systemData.basePubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             with seed "{systemData.seed}") to{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.toPubkey?.toString() ?? '', 'address')}
-              address={systemData.toPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.toPubkey.toString(), 'address')}
+              address={systemData.toPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
           </>
@@ -308,20 +313,20 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Withdraw {systemData.lamports ?? 'unknown'} lamports from nonce account{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.noncePubkey?.toString() ?? '', 'address')}
-              address={systemData.noncePubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.noncePubkey.toString(), 'address')}
+              address={systemData.noncePubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             to{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.toPubkey?.toString() ?? '', 'address')}
-              address={systemData.toPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.toPubkey.toString(), 'address')}
+              address={systemData.toPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             by authority{' '}
             <Address
-              explorerLink={solExplorerLink(systemData.authorizedPubkey?.toString() ?? '', 'address')}
-              address={systemData.authorizedPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(systemData.authorizedPubkey.toString(), 'address')}
+              address={systemData.authorizedPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
           </>
@@ -344,20 +349,20 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Set {authType} authority from{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.authorizedPubkey?.toString() ?? '', 'address')}
-              address={stakeData.authorizedPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.authorizedPubkey.toString(), 'address')}
+              address={stakeData.authorizedPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             to{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.newAuthorizedPubkey?.toString() ?? '', 'address')}
-              address={stakeData.newAuthorizedPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.newAuthorizedPubkey.toString(), 'address')}
+              address={stakeData.newAuthorizedPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             on stake account{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.stakePubkey?.toString() ?? '', 'address')}
-              address={stakeData.stakePubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.stakePubkey.toString(), 'address')}
+              address={stakeData.stakePubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
           </>
@@ -375,20 +380,20 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Set {authType} authority using seed-derived key (base:{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.authorityBase?.toString() ?? '', 'address')}
-              address={stakeData.authorityBase?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.authorityBase.toString(), 'address')}
+              address={stakeData.authorityBase.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
             , seed: "{stakeData.authoritySeed}") to{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.newAuthorizedPubkey?.toString() ?? '', 'address')}
-              address={stakeData.newAuthorizedPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.newAuthorizedPubkey.toString(), 'address')}
+              address={stakeData.newAuthorizedPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             on stake account{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.stakePubkey?.toString() ?? '', 'address')}
-              address={stakeData.stakePubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.stakePubkey.toString(), 'address')}
+              address={stakeData.stakePubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
           </>
@@ -400,14 +405,14 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Deactivate stake account{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.stakePubkey?.toString() ?? '', 'address')}
-              address={stakeData.stakePubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.stakePubkey.toString(), 'address')}
+              address={stakeData.stakePubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             by authority{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.authorizedPubkey?.toString() ?? '', 'address')}
-              address={stakeData.authorizedPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.authorizedPubkey.toString(), 'address')}
+              address={stakeData.authorizedPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
           </>
@@ -419,20 +424,20 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Delegate stake account{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.stakePubkey?.toString() ?? '', 'address')}
-              address={stakeData.stakePubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.stakePubkey.toString(), 'address')}
+              address={stakeData.stakePubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             to validator{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.votePubkey?.toString() ?? '', 'address')}
-              address={stakeData.votePubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.votePubkey.toString(), 'address')}
+              address={stakeData.votePubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             by authority{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.authorizedPubkey?.toString() ?? '', 'address')}
-              address={stakeData.authorizedPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.authorizedPubkey.toString(), 'address')}
+              address={stakeData.authorizedPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
           </>
@@ -444,20 +449,20 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Initialize stake account{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.stakePubkey?.toString() ?? '', 'address')}
-              address={stakeData.stakePubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.stakePubkey.toString(), 'address')}
+              address={stakeData.stakePubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             with staker authority{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.authorized?.staker?.toString() ?? '', 'address')}
-              address={stakeData.authorized?.staker?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.authorized?.staker.toString(), 'address')}
+              address={stakeData.authorized?.staker.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             and withdrawer authority{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.authorized?.withdrawer?.toString() ?? '', 'address')}
-              address={stakeData.authorized?.withdrawer?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.authorized?.withdrawer.toString(), 'address')}
+              address={stakeData.authorized?.withdrawer.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
           </>
@@ -469,20 +474,20 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Merge stake account{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.sourceStakePubKey?.toString() ?? '', 'address')}
-              address={stakeData.sourceStakePubKey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.sourceStakePubKey.toString(), 'address')}
+              address={stakeData.sourceStakePubKey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             into{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.stakePubkey?.toString() ?? '', 'address')}
-              address={stakeData.stakePubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.stakePubkey.toString(), 'address')}
+              address={stakeData.stakePubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             by authority{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.authorizedPubkey?.toString() ?? '', 'address')}
-              address={stakeData.authorizedPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.authorizedPubkey.toString(), 'address')}
+              address={stakeData.authorizedPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
           </>
@@ -494,20 +499,20 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Split {stakeData.lamports ?? 'unknown'} lamports from stake account{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.stakePubkey?.toString() ?? '', 'address')}
-              address={stakeData.stakePubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.stakePubkey.toString(), 'address')}
+              address={stakeData.stakePubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             into new account{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.splitStakePubkey?.toString() ?? '', 'address')}
-              address={stakeData.splitStakePubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.splitStakePubkey.toString(), 'address')}
+              address={stakeData.splitStakePubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             by authority{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.authorizedPubkey?.toString() ?? '', 'address')}
-              address={stakeData.authorizedPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.authorizedPubkey.toString(), 'address')}
+              address={stakeData.authorizedPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
           </>
@@ -519,20 +524,20 @@ export function InstructionSummary({ instruction, index }: { instruction: Decode
           <>
             Withdraw {stakeData.lamports ?? 'unknown'} lamports from stake account{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.stakePubkey?.toString() ?? '', 'address')}
-              address={stakeData.stakePubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.stakePubkey.toString(), 'address')}
+              address={stakeData.stakePubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             to{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.toPubkey?.toString() ?? '', 'address')}
-              address={stakeData.toPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.toPubkey.toString(), 'address')}
+              address={stakeData.toPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />{' '}
             by authority{' '}
             <Address
-              explorerLink={solExplorerLink(stakeData.authorizedPubkey?.toString() ?? '', 'address')}
-              address={stakeData.authorizedPubkey?.toString() ?? ''}
+              explorerLink={solExplorerLink(stakeData.authorizedPubkey.toString(), 'address')}
+              address={stakeData.authorizedPubkey.toString()}
               className="text-blue-600 hover:text-blue-800 underline"
             />
           </>
