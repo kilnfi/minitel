@@ -11,8 +11,7 @@ export const ethereumAdapter: ProtocolAdapter<AugmentedTransaction> = {
   placeholder: 'Paste your transaction as hex',
   parseTransaction: parseEthTx,
   computeHash: hashEthTx,
-
-  renderSummary: (data, hash) => <TransactionSummary transaction={data} hash={hash ?? ''} />,
+  renderSummary: (data) => <TransactionSummary transaction={data} />,
 
   generateWarnings: (data) => {
     const valueWei = data.value ?? 0n;
