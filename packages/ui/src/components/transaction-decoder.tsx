@@ -32,7 +32,7 @@ export type TransactionDecoderProps<T> = {
   decodedTransaction: T | null;
   hash?: string;
   warnings?: Array<{ message: string }>;
-  renderSummary: (data: T) => React.ReactNode;
+  renderSummary?: (data: T) => React.ReactNode;
   placeholder?: string;
   error?: string;
 };
@@ -186,7 +186,7 @@ export function TransactionDecoder<T>({
 }
 
 export type TransactionDecoderTabsProps<T> = {
-  renderSummary: (data: T) => React.ReactNode;
+  renderSummary?: (data: T) => React.ReactNode;
   decodedTransaction: T | null;
   isDarkMode: boolean;
 };
@@ -198,15 +198,17 @@ export function TransactionDecoderTabs<T>({
 }: TransactionDecoderTabsProps<T>) {
   return (
     <div className="w-full">
-      <Tabs className="w-full gap-6" defaultValue="summary">
+      <Tabs className="w-full gap-6" defaultValue={renderSummary ? 'summary' : 'json'}>
         <TabsList className="w-full">
-          <TabsTrigger value="summary">Summary</TabsTrigger>
+          {renderSummary && <TabsTrigger value="summary">Summary</TabsTrigger>}
           <TabsTrigger value="json">JSON</TabsTrigger>
         </TabsList>
         {decodedTransaction ? (
           <>
             <TabsContent className="space-y-6 overflow-y-auto" value="summary">
-              <div className="space-y-3">{decodedTransaction && renderSummary(decodedTransaction)}</div>
+              <div className="space-y-3">
+                {decodedTransaction && renderSummary && renderSummary(decodedTransaction)}
+              </div>
             </TabsContent>
 
             <TabsContent value="json" className="max-h-96 overflow-y-auto border-border border rounded-md p-2 relative">

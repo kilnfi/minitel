@@ -22,10 +22,4 @@ export const cosmosAdapter: ProtocolAdapter<DecodedTxRaw> = {
 
   parseTransaction: async (rawTx) => parseCosmosTx(rawTx),
   computeHash: computeCosmosHash,
-
-  renderSummary: (_data) => <></>,
-
-  generateWarnings: (_data) => {
-    return [];
-  },
 };
