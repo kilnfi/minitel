@@ -12,7 +12,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: fixed-egress-4c-16g
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         app: [ethereum, solana]
