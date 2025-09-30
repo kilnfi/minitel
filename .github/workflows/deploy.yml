@@ -57,7 +57,11 @@ jobs:
           VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || secrets.VERCEL_PROJECT_ID_NEAR }}
 
       - name: Deploy Project Artifacts to Vercel
-        run: vercel deploy --prebuilt ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+        id: deploy
+        run: |
+          DEPLOY_URL=$(vercel deploy --prebuilt ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          echo "🚀 Deployed ${{ matrix.app }} to: $DEPLOY_URL"
         working-directory: ./apps/${{ matrix.app }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
