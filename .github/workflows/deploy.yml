@@ -32,19 +32,8 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Determine environment
-        id: env
-        run: |
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "environment=production" >> $GITHUB_OUTPUT
-            echo "is_prod=true" >> $GITHUB_OUTPUT
-          else
-            echo "environment=staging" >> $GITHUB_OUTPUT
-            echo "is_prod=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Pull Vercel Environment Information (Production)
-        if: steps.env.outputs.is_prod == 'true'
+        if: github.ref == 'refs/heads/main'
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./apps/${{ matrix.app }}
         env:
@@ -52,7 +41,7 @@ jobs:
           VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || matrix.app == 'near' && secrets.VERCEL_PROJECT_ID_NEAR || secrets.VERCEL_PROJECT_ID_COSMOS }}
 
       - name: Pull Vercel Environment Information (Staging)
-        if: steps.env.outputs.is_prod == 'false'
+        if: github.ref != 'refs/heads/main'
         run: vercel pull --yes --environment=staging --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./apps/${{ matrix.app }}
         env:
@@ -60,7 +49,7 @@ jobs:
           VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || matrix.app == 'near' && secrets.VERCEL_PROJECT_ID_NEAR || secrets.VERCEL_PROJECT_ID_COSMOS }}
 
       - name: Build Project Artifacts
-        run: vercel build ${{ steps.env.outputs.is_prod == 'true' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./apps/${{ matrix.app }}
         timeout-minutes: 10
         env:
