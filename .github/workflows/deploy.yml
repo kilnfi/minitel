@@ -2,9 +2,13 @@ name: Deploy to Vercel
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - 'dev/**'
     paths:
       - 'apps/**'
+      - 'packages/**'
+      - '.github/workflows/deploy.yml'
 
 jobs:
   deploy:
@@ -28,24 +32,37 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Pull Vercel Environment Information
+      - name: Pull Vercel Environment Information (Production)
+        if: github.ref == 'refs/heads/main'
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./apps/${{ matrix.app }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || secrets.VERCEL_PROJECT_ID_SOLANA }}
+          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || secrets.VERCEL_PROJECT_ID_NEAR }}
+
+      - name: Pull Vercel Environment Information (Staging)
+        if: github.ref != 'refs/heads/main'
+        run: vercel pull --yes --environment=staging --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ./apps/${{ matrix.app }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || secrets.VERCEL_PROJECT_ID_NEAR }}
 
       - name: Build Project Artifacts
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./apps/${{ matrix.app }}
         timeout-minutes: 10
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || secrets.VERCEL_PROJECT_ID_SOLANA }}
+          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || secrets.VERCEL_PROJECT_ID_NEAR }}
 
       - name: Deploy Project Artifacts to Vercel
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        id: deploy
+        run: |
+          DEPLOY_URL=$(vercel deploy --prebuilt ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          echo "🚀 Deployed ${{ matrix.app }} to: $DEPLOY_URL"
         working-directory: ./apps/${{ matrix.app }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || secrets.VERCEL_PROJECT_ID_SOLANA }}
+          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || secrets.VERCEL_PROJECT_ID_NEAR }}
