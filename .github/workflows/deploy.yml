@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        app: [ethereum, solana]
+        app: [ethereum, solana, near, cosmos]
 
     steps:
       - name: Checkout
@@ -32,37 +32,59 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Determine environment
+        id: env
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+            echo "is_prod=true" >> $GITHUB_OUTPUT
+          else
+            echo "environment=development" >> $GITHUB_OUTPUT
+            echo "is_prod=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Pull Vercel Environment Information (Production)
-        if: github.ref == 'refs/heads/main'
+        if: steps.env.outputs.is_prod == 'true'
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./apps/${{ matrix.app }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || secrets.VERCEL_PROJECT_ID_NEAR }}
+          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || matrix.app == 'near' && secrets.VERCEL_PROJECT_ID_NEAR || secrets.VERCEL_PROJECT_ID_COSMOS }}
 
-      - name: Pull Vercel Environment Information (Staging)
-        if: github.ref != 'refs/heads/main'
-        run: vercel pull --yes --environment=staging --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Pull Vercel Environment Information (Development)
+        if: steps.env.outputs.is_prod == 'false'
+        run: vercel pull --yes --environment=development --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./apps/${{ matrix.app }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || secrets.VERCEL_PROJECT_ID_NEAR }}
+          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || matrix.app == 'near' && secrets.VERCEL_PROJECT_ID_NEAR || secrets.VERCEL_PROJECT_ID_COSMOS }}
 
       - name: Build Project Artifacts
-        run: vercel build ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build ${{ steps.env.outputs.is_prod == 'true' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./apps/${{ matrix.app }}
         timeout-minutes: 10
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || secrets.VERCEL_PROJECT_ID_NEAR }}
+          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || matrix.app == 'near' && secrets.VERCEL_PROJECT_ID_NEAR || secrets.VERCEL_PROJECT_ID_COSMOS }}
 
       - name: Deploy Project Artifacts to Vercel
         id: deploy
         run: |
-          DEPLOY_URL=$(vercel deploy --prebuilt ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }})
-          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
-          echo "🚀 Deployed ${{ matrix.app }} to: $DEPLOY_URL"
+          DEPLOYMENT_URL=$(vercel deploy --prebuilt ${{ steps.env.outputs.is_prod == 'true' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+          echo "🚀 Deployed ${{ matrix.app }} to: $DEPLOYMENT_URL"
         working-directory: ./apps/${{ matrix.app }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || secrets.VERCEL_PROJECT_ID_NEAR }}
+          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || matrix.app == 'near' && secrets.VERCEL_PROJECT_ID_NEAR || secrets.VERCEL_PROJECT_ID_COSMOS }}
+
+      - name: Assign custom domain alias (Development)
+        if: steps.env.outputs.is_prod == 'false'
+        run: |
+          DOMAIN="dev-${{ matrix.app }}.minitel.app"
+          vercel alias ${{ steps.deploy.outputs.url }} $DOMAIN --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+          echo "Development deployment aliased to: $DOMAIN"
+        working-directory: ./apps/${{ matrix.app }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || matrix.app == 'near' && secrets.VERCEL_PROJECT_ID_NEAR || secrets.VERCEL_PROJECT_ID_COSMOS }}

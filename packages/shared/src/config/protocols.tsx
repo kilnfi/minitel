@@ -1,4 +1,4 @@
-import { EthereumIcon, type Protocol, SolanaIcon } from '@protocols/ui';
+import { CosmosIcon, EthereumIcon, NearIcon, type Protocol, SolanaIcon } from '@protocols/ui';
 
 export const protocols: Protocol[] = [
   {
@@ -12,6 +12,18 @@ export const protocols: Protocol[] = [
     icon: <SolanaIcon className="size-5" />,
     url: 'https://sol.minitel.app',
     localUrl: 'http://localhost:3001',
+  },
+  {
+    name: 'Cosmos',
+    icon: <CosmosIcon className="size-5" />,
+    url: 'https://cosmos.minitel.app',
+    localUrl: 'http://localhost:3002',
+  },
+  {
+    name: 'Near',
+    icon: <NearIcon className="size-5" />,
+    url: 'https://near.minitel.app',
+    localUrl: 'http://localhost:3003',
   },
 ];
 

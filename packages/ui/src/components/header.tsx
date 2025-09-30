@@ -2,8 +2,10 @@ import { CheckIcon, ChevronsUpDownIcon, ExternalLinkIcon, PanelRightIcon } from 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '#/ui/dropdown-menu';
 import { Toggle } from '#/ui/toggle';
 
+type ProtocolName = 'Near' | 'Cosmos' | 'Solana' | 'Ethereum';
+
 export type Protocol = {
-  name: string;
+  name: ProtocolName;
   icon?: React.ReactNode;
   url: string;
   localUrl: string;

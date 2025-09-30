@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@protocols/ui": ["../../packages/ui/src"],
+      "@protocols/shared": ["../../packages/shared/src"],
+      "@shared/*": ["../../packages/shared/src/*"],
+      "#/*": ["../../packages/ui/src/*"],
+      "#/components/*": ["../../packages/ui/src/components/*"],
+      "#/lib/*": ["../../packages/ui/src/lib/*"],
+      "#/ui/*": ["../../packages/ui/src/components/ui/*"],
+      "#/hooks/*": ["../../packages/ui/src/hooks/*"]
+    }
+  },
+  "include": ["src"]
+}

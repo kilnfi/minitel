@@ -13,7 +13,7 @@ import {
 import { ArrowLeftRightIcon, FuelIcon, ShrinkIcon, TriangleAlertIcon } from 'lucide-react';
 import { formatEther, formatGwei } from 'viem';
 import type { AugmentedTransaction } from '@/types';
-import { ethExplorerLink, getActionDescription } from '@/utils';
+import { ethExplorerLink, getActionDetails } from '@/utils';
 
 type TransactionSummaryProps = {
   transaction: AugmentedTransaction;
@@ -22,10 +22,11 @@ type TransactionSummaryProps = {
 export function TransactionSummary({ transaction }: TransactionSummaryProps) {
   if (!transaction) return null;
 
-  const actionDetails = getActionDescription(transaction);
+  const actionDetails = getActionDetails(transaction);
   const riskLevel = actionDetails.riskLevel;
   const ethValue = formatEther(transaction.value ?? 0n);
   const maxFeeGwei = Number(formatGwei(transaction.maxFeePerGas ?? 0n)).toFixed(2);
+
   return (
     <div className="flex flex-col gap-7">
       <div className="flex items-center">
