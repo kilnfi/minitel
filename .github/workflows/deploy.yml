@@ -39,7 +39,7 @@ jobs:
             echo "environment=production" >> $GITHUB_OUTPUT
             echo "is_prod=true" >> $GITHUB_OUTPUT
           else
-            echo "environment=development" >> $GITHUB_OUTPUT
+            echo "environment=staging" >> $GITHUB_OUTPUT
             echo "is_prod=false" >> $GITHUB_OUTPUT
           fi
 
@@ -51,9 +51,9 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || matrix.app == 'near' && secrets.VERCEL_PROJECT_ID_NEAR || secrets.VERCEL_PROJECT_ID_COSMOS }}
 
-      - name: Pull Vercel Environment Information (Development)
+      - name: Pull Vercel Environment Information (Staging)
         if: steps.env.outputs.is_prod == 'false'
-        run: vercel pull --yes --environment=development --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=staging --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./apps/${{ matrix.app }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
