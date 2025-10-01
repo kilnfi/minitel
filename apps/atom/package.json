@@ -1,5 +1,5 @@
 {
-  "name": "@protocols/cosmos",
+  "name": "@protocols/atom",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,8 +11,8 @@
     "format": "biome check ./src --write --unsafe"
   },
   "dependencies": {
-    "@cosmjs/proto-signing": "^0.36.0",
     "@protocols/shared": "workspace:*",
+    "@protocols/cosmos-shared": "workspace:*",
     "@protocols/ui": "workspace:*",
     "@uiw/react-json-view": "^2.0.0-alpha.36",
     "react": "^19.1.1",

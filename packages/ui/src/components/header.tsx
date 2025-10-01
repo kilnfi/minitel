@@ -1,15 +1,7 @@
+import type { Protocol } from '@protocols/shared';
 import { CheckIcon, ChevronsUpDownIcon, ExternalLinkIcon, PanelRightIcon } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '#/ui/dropdown-menu';
-import { Toggle } from '#/ui/toggle';
-
-type ProtocolName = 'Near' | 'Cosmos' | 'Solana' | 'Ethereum';
-
-export type Protocol = {
-  name: ProtocolName;
-  icon?: React.ReactNode;
-  url: string;
-  localUrl: string;
-};
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
+import { Toggle } from './ui/toggle';
 
 type HeaderProps = {
   protocols: Protocol[];

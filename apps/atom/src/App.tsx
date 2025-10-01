@@ -1,6 +1,6 @@
-import { getCurrentProtocol, protocols } from '@protocols/shared';
-import { Background, cn, Header, type Protocol, ProtocolTransactionDecoder } from '@protocols/ui';
-import { cosmosAdapter } from '@/cosmos-adapter';
+import { cosmosAdapter } from '@protocols/cosmos-shared';
+import { getCurrentProtocol, type Protocol, protocols } from '@protocols/shared';
+import { Background, cn, Header, ProtocolTransactionDecoder } from '@protocols/ui';
 
 const currentProtocol = getCurrentProtocol();
 

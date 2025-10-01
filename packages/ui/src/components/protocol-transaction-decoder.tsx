@@ -1,7 +1,7 @@
 import type { ProtocolAdapter } from '@protocols/shared';
-import { TransactionDecoder } from '#/components/transaction-decoder';
-import { useTransactionDecoder } from '#/hooks/useTransactionDecoder';
-import { useUrlParam } from '#/hooks/useUrlParam';
+import { useTransactionDecoder } from '../hooks/useTransactionDecoder';
+import { useUrlParam } from '../hooks/useUrlParam';
+import { TransactionDecoder } from './transaction-decoder';
 
 type ProtocolTransactionDecoderProps<T> = {
   adapter: ProtocolAdapter<T>;

@@ -1,6 +1,6 @@
 import type { DecodedTxRaw } from '@cosmjs/proto-signing';
 import type { ProtocolAdapter } from '@protocols/shared';
-import { parseCosmosTx } from '@/parser';
+import { parseCosmosTx } from './parser';
 
 const computeCosmosHash = async (rawTx: string): Promise<string> => {
   try {

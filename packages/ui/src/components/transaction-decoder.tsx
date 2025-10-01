@@ -3,25 +3,18 @@ import { githubLightTheme } from '@uiw/react-json-view/githubLight';
 import { vscodeTheme } from '@uiw/react-json-view/vscode';
 import { DownloadIcon, InboxIcon, InfoIcon, TriangleAlertIcon, ZapIcon } from 'lucide-react';
 import { useId, useRef } from 'react';
-import { CopyButtonIcon } from '#/components/copy-button';
-import { Footer } from '#/components/footer';
-import { Alert, AlertDescription, AlertTitle } from '#/components/ui/alert';
-import { Button } from '#/components/ui/button';
-import { Card, CardContent, CardFooter } from '#/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '#/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '#/components/ui/tabs';
-import { Textarea } from '#/components/ui/textarea';
-import { useIsDarkMode } from '#/hooks/useIsDarkMode';
-import { cn, convertBigIntToString } from '#/lib/utils';
-import { Badge } from '#/ui/badge';
-import { Tooltip, TooltipContent, TooltipTrigger } from '#/ui/tooltip';
+import { useIsDarkMode } from '../hooks/useIsDarkMode';
+import { cn, convertBigIntToString } from '../lib/utils';
+import { CopyButtonIcon } from './copy-button';
+import { Footer } from './footer';
+import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card, CardContent, CardFooter } from './ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Textarea } from './ui/textarea';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 export type TransactionDecoderProps<T> = {
   title?: string;

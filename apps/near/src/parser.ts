@@ -3,7 +3,14 @@ import { PublicKey } from '@near-js/crypto';
 import { type Action, Transaction } from '@near-js/transactions';
 
 export type DecodedAction =
-  | { type: 'functionCall'; methodName: string; args: Record<string, unknown>; gas: string; deposit: string; stakingOperation: 'stake' | 'unstake' | 'withdraw' | null }
+  | {
+      type: 'functionCall';
+      methodName: string;
+      args: Record<string, unknown>;
+      gas: string;
+      deposit: string;
+      stakingOperation: 'stake' | 'unstake' | 'withdraw' | null;
+    }
   | { type: 'transfer'; amount: string }
   | { type: 'createAccount' }
   | { type: 'deleteAccount'; beneficiaryId: string }
