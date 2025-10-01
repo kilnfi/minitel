@@ -95,7 +95,7 @@ export const protocols: Protocol[] = [
     token: 'INJ',
     name: 'Injective',
     icon: <InjectiveIcon className="size-5" />,
-    url: 'https://inj.minitel.app',
+    url: 'https://injective.minitel.app',
     localUrl: 'http://localhost:3009',
   },
   {
@@ -109,7 +109,7 @@ export const protocols: Protocol[] = [
     token: 'OM',
     name: 'Mantra',
     icon: <OmIcon className="size-5" />,
-    url: 'https://omni.minitel.app',
+    url: 'https://mantra.minitel.app',
     localUrl: 'http://localhost:3011',
   },
   {
