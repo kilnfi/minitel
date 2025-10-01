@@ -16,7 +16,7 @@ function App() {
         <div className={cn('relative w-full transition-all duration-300 ease-in-out')}>
           <Background />
           <Header protocols={protocols} currentProtocol={currentProtocol} onChangeProtocol={onChangeProtocol} />
-          <ProtocolTransactionDecoder adapter={createCosmosAdapter({ name: 'atom', displayName: 'Atom' })} />
+          <ProtocolTransactionDecoder adapter={createCosmosAdapter({ name: 'zeta', displayName: 'Zeta' })} />
         </div>
       </div>
     </div>

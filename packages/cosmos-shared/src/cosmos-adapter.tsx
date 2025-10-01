@@ -15,11 +15,18 @@ const computeCosmosHash = async (rawTx: string): Promise<string> => {
   }
 };
 
-export const cosmosAdapter: ProtocolAdapter<DecodedTxRaw> = {
-  name: 'cosmos',
-  displayName: 'Cosmos',
-  placeholder: 'Paste your transaction as hex',
-
-  parseTransaction: async (rawTx) => parseCosmosTx(rawTx),
-  computeHash: computeCosmosHash,
+export const createCosmosAdapter = ({
+  name,
+  displayName,
+}: {
+  name: string;
+  displayName: string;
+}): ProtocolAdapter<DecodedTxRaw> => {
+  return {
+    name,
+    displayName,
+    placeholder: 'Paste your transaction as hex',
+    parseTransaction: async (rawTx) => parseCosmosTx(rawTx),
+    computeHash: computeCosmosHash,
+  };
 };

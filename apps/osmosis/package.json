@@ -1,10 +1,10 @@
 {
-  "name": "@protocols/tia",
+  "name": "@protocols/osmosis",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 3012",
+    "dev": "vite --port 3013",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "tsc && biome check ./src",

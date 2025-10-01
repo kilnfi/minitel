@@ -107,7 +107,7 @@ export const protocols: Protocol[] = [
   },
   {
     token: 'OM',
-    name: 'Omni',
+    name: 'Mantra',
     icon: <OmIcon className="size-5" />,
     url: 'https://omni.minitel.app',
     localUrl: 'http://localhost:3011',

@@ -33,7 +33,7 @@ export const Header = ({
           </div>
           <ChevronsUpDownIcon className="w-4 h-4 text-muted-foreground" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="flex flex-col gap-2 w-60">
+        <DropdownMenuContent align="start" className="flex flex-col gap-2 w-60 max-h-96 overflow-y-auto">
           {protocols.map((protocol) => (
             <DropdownMenuItem
               className="p-2 text-sm justify-between"

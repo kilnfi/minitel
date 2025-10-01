@@ -1,4 +1,4 @@
-import { cosmosAdapter } from '@protocols/cosmos-shared';
+import { createCosmosAdapter } from '@protocols/cosmos-shared';
 import { getCurrentProtocol, type Protocol, protocols } from '@protocols/shared';
 import { Background, cn, Header, ProtocolTransactionDecoder } from '@protocols/ui';
 
@@ -16,7 +16,7 @@ function App() {
         <div className={cn('relative w-full transition-all duration-300 ease-in-out')}>
           <Background />
           <Header protocols={protocols} currentProtocol={currentProtocol} onChangeProtocol={onChangeProtocol} />
-          <ProtocolTransactionDecoder adapter={cosmosAdapter} />
+          <ProtocolTransactionDecoder adapter={createCosmosAdapter({ name: 'tia', displayName: 'Tia' })} />
         </div>
       </div>
     </div>

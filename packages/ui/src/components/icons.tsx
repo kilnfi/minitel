@@ -95,22 +95,27 @@ export const CronosIcon = (props: React.SVGProps<SVGSVGElement> & { ref?: React.
 
 export const DydxIcon = (props: React.SVGProps<SVGSVGElement> & { ref?: React.Ref<SVGSVGElement> }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" {...props}>
-      <rect width="100%" height="100%" fill="#101017" rx="24" />
-      <g clipPath="url(#a)">
-        <path
-          fill="#fff"
-          d="m28.629 14-13.96 19.998h4.286L32.987 14h-4.358ZM19.402 14l4.107 5.893-2.143 3.214L15.026 14h4.376Z"
-        />
-        <path fill="url(#b)" d="m29.045 34-4.554-6.518 2.143-3.125L33.33 34h-4.285Z" />
+    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <rect width="100%" height="100%" rx="24" fill="#101017" />
+      <g clipPath="url(#clip0_140_2864)">
+        <path d="M28.6287 14L14.6696 33.9983H18.9553L32.9867 14H28.6287Z" fill="white" />
+        <path d="M19.4018 14L23.5089 19.8929L21.3661 23.1071L15.0268 14H19.4018Z" fill="white" />
+        <path d="M29.0446 34L24.491 27.4823L26.6339 24.3572L33.3303 34H29.0446Z" fill="url(#paint0_linear_140_2864)" />
       </g>
       <defs>
-        <linearGradient id="b" x1={30.027} x2={22.803} y1={32.482} y2={22.744} gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="paint0_linear_140_2864"
+          x1="30.0268"
+          y1="32.4823"
+          x2="22.803"
+          y2="22.7438"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop stopColor="#6966FF" />
-          <stop offset={1} stopColor="#6966FF" stopOpacity={0.36} />
+          <stop offset="1" stopColor="#6966FF" stopOpacity="0.36" />
         </linearGradient>
-        <clipPath id="a">
-          <path fill="#fff" d="M14 14h20v20H14z" />
+        <clipPath id="clip0_140_2864">
+          <rect width="20" height="20" fill="white" transform="translate(14 14)" />
         </clipPath>
       </defs>
     </svg>
@@ -182,22 +187,32 @@ export const KavaIcon = (props: React.SVGProps<SVGSVGElement> & { ref?: React.Re
 
 export const OmIcon = (props: React.SVGProps<SVGSVGElement> & { ref?: React.Ref<SVGSVGElement> }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" {...props}>
-      <rect width="100%" height="100%" fill="#000" rx="24" />
-      <g clipPath="url(#a)">
-        <path fill="url(#b)" d="M24 48c13.255 0 24-10.745 24-24S37.255 0 24 0 0 10.745 0 24s10.745 24 24 24Z" />
+    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <rect width="100%" height="100%" rx="24" fill="black" />
+      <g clipPath="url(#clip0_140_3003)">
         <path
+          d="M24 48C37.2548 48 48 37.2548 48 24C48 10.7452 37.2548 0 24 0C10.7452 0 0 10.7452 0 24C0 37.2548 10.7452 48 24 48Z"
+          fill="url(#paint0_linear_140_3003)"
+        />
+        <path
+          d="M27.2909 18.4658L24.0043 15.168L20.7336 18.45L24.0202 21.7478L27.2909 18.4658ZM35.8896 18.3279L26.9465 27.0943C25.3206 28.6876 22.6771 28.6876 21.0512 27.0943L12.1097 18.3279L8.93848 21.5845L17.8817 30.3508C19.5691 32.0046 21.7844 32.8322 23.9996 32.8322C26.2148 32.8322 28.4317 32.0046 30.1176 30.3508L39.0608 21.5845L35.8896 18.3279Z"
           fill="#302E2D"
-          d="m27.29 18.466-3.286-3.298-3.27 3.282 3.286 3.298 3.27-3.282Zm8.6-.138-8.944 8.766c-1.625 1.594-4.269 1.594-5.895 0l-8.941-8.766-3.172 3.256 8.944 8.767A8.716 8.716 0 0 0 24 32.832a8.714 8.714 0 0 0 6.118-2.481l8.943-8.767-3.171-3.256Z"
         />
       </g>
       <defs>
-        <linearGradient id="b" x1={37.036} x2={-2.7} y1={3.689} y2={14.904} gradientUnits="userSpaceOnUse">
-          <stop offset={0.372} stopColor="#FF97D6" />
-          <stop offset={0.802} stopColor="#F8B994" />
+        <linearGradient
+          id="paint0_linear_140_3003"
+          x1="37.0356"
+          y1="3.68939"
+          x2="-2.69996"
+          y2="14.904"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0.372396" stopColor="#FF97D6" />
+          <stop offset="0.802083" stopColor="#F8B994" />
         </linearGradient>
-        <clipPath id="a">
-          <path fill="#fff" d="M0 0h48v48H0z" />
+        <clipPath id="clip0_140_3003">
+          <rect width="48" height="48" fill="white" />
         </clipPath>
       </defs>
     </svg>
