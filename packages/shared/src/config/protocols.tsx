@@ -46,7 +46,7 @@ export const protocols: Protocol[] = [
     token: 'ATOM',
     name: 'Cosmos',
     icon: <CosmosIcon className="size-5" />,
-    url: 'https://cosmos.minitel.app',
+    url: 'https://atom.minitel.app',
     localUrl: 'http://localhost:3002',
   },
   {
@@ -109,7 +109,7 @@ export const protocols: Protocol[] = [
     token: 'OM',
     name: 'Mantra',
     icon: <OmIcon className="size-5" />,
-    url: 'https://omni.minitel.app',
+    url: 'https://om.minitel.app',
     localUrl: 'http://localhost:3011',
   },
   {
@@ -123,7 +123,7 @@ export const protocols: Protocol[] = [
     token: 'OSMO',
     name: 'Osmosis',
     icon: <OsmosisIcon className="size-5" />,
-    url: 'https://osmosis.minitel.app',
+    url: 'https://osmo.minitel.app',
     localUrl: 'http://localhost:3013',
   },
 ];
