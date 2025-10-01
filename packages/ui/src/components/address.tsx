@@ -1,7 +1,7 @@
 import { CopyCheckIcon, CopyIcon } from 'lucide-react';
 import { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { Tooltip, TooltipContent, TooltipTrigger } from '#/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 type Props = {
   address: string;

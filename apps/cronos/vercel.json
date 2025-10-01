@@ -1,0 +1,6 @@
+{
+    "installCommand": "bun install --cwd ../../",
+    "buildCommand": "bun --cwd ../../ --filter @protocols/cronos build",
+    "outputDirectory": "dist",
+    "framework": null
+}

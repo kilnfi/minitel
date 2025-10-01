@@ -1,7 +1,7 @@
 import type { ProtocolAdapter } from '@protocols/shared';
-import { TransactionDecoder } from '#/components/transaction-decoder';
-import { useTransactionDecoder } from '#/hooks/useTransactionDecoder';
-import { useUrlParam } from '#/hooks/useUrlParam';
+import { useTransactionDecoder } from '../hooks/useTransactionDecoder';
+import { useUrlParam } from '../hooks/useUrlParam';
+import { TransactionDecoder } from './transaction-decoder';
 
 type ProtocolTransactionDecoderProps<T> = {
   adapter: ProtocolAdapter<T>;
@@ -29,7 +29,7 @@ export function ProtocolTransactionDecoder<T>({ adapter }: ProtocolTransactionDe
       decodedTransaction={decodedTransaction}
       hash={hash}
       warnings={warnings}
-      renderSummary={(data: T) => adapter.renderSummary(data, hash)}
+      renderSummary={adapter.renderSummary ? (data: T) => adapter.renderSummary?.(data, hash) : undefined}
       placeholder={adapter.placeholder ?? 'Paste your transaction'}
       error={error}
     />

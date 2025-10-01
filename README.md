@@ -192,7 +192,7 @@ apps/your-protocol/
 
 - **Consistent Interface**: All protocols use the same UI and interaction patterns
 - **Type Safety**: Full TypeScript support with generics
-- **Rapid Development**: New protocols can be added in minutes, not hours
+- **Rapid Development**: New protocols can be added in minutes,not hours
 - **Maintainable**: Shared UI logic reduces bugs and duplication
 - **Extensible**: Easy to add protocol-specific features while maintaining consistency
 

@@ -9,17 +9,17 @@ import {
   XIcon,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { TransactionDecoderTabs } from '#/components/transaction-decoder';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '#/components/ui/accordion';
-import { Badge } from '#/components/ui/badge';
-import { Button } from '#/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card';
-import { Label } from '#/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '#/components/ui/select';
-import { Tooltip, TooltipContent, TooltipTrigger } from '#/components/ui/tooltip';
-import { useIsDarkMode } from '#/hooks/useIsDarkMode';
-import { useTransactionDecoder } from '#/hooks/useTransactionDecoder';
-import { cn } from '#/lib/utils';
+import { useIsDarkMode } from '../hooks/useIsDarkMode';
+import { useTransactionDecoder } from '../hooks/useTransactionDecoder';
+import { cn } from '../lib/utils';
+import { TransactionDecoderTabs } from './transaction-decoder';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Label } from './ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 type TransactionPlaybookProps<T> = {
   config: PlaybookConfig<T>;
@@ -217,7 +217,11 @@ export function TransactionPlaybook<T>({ config, isOpen, onClose }: TransactionP
                   <AccordionContent>
                     <div ref={decodedTransactionRef} />
                     <TransactionDecoderTabs
-                      renderSummary={(data: T) => config.adapter.renderSummary(data, hash)}
+                      renderSummary={
+                        config.adapter.renderSummary
+                          ? (data: T) => config.adapter.renderSummary?.(data, hash)
+                          : undefined
+                      }
                       decodedTransaction={decodedTransaction}
                       isDarkMode={isDarkMode}
                     />

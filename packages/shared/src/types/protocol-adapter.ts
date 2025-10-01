@@ -7,8 +7,8 @@ export type ProtocolAdapter<TDecodedTransaction> = {
   parseTransaction: (rawTx: string) => Promise<TDecodedTransaction>;
   computeHash: (rawTx: string) => string | Promise<string>;
 
-  renderSummary: (data: TDecodedTransaction, hash?: string) => ReactNode;
+  renderSummary?: (data: TDecodedTransaction, hash?: string) => ReactNode;
 
-  generateWarnings: (data: TDecodedTransaction) => Array<{ message: string }>;
+  generateWarnings?: (data: TDecodedTransaction) => Array<{ message: string }>;
   placeholder?: string;
 };

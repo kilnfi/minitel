@@ -3,7 +3,7 @@ import { formatEther } from 'viem';
 import { TransactionSummary } from '@/components/TransactionSummary';
 import { hashEthTx, parseEthTx } from '@/parser';
 import type { AugmentedTransaction } from '@/types';
-import { getActionDescription } from '@/utils';
+import { getActionDetails } from '@/utils';
 
 export const ethereumAdapter: ProtocolAdapter<AugmentedTransaction> = {
   name: 'ethereum',
@@ -18,7 +18,7 @@ export const ethereumAdapter: ProtocolAdapter<AugmentedTransaction> = {
     const ethAmount = formatEther(valueWei);
     const isHighValue = Number(ethAmount) > 1;
     const warnings = [
-      { message: getActionDescription(data).warning },
+      { message: getActionDetails(data).warning },
       ...(isHighValue ? [{ message: `High value transaction: ${ethAmount} ETH` }] : []),
     ];
     return warnings;

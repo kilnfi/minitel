@@ -39,7 +39,7 @@ export function useTransactionDecoder<T>(adapter: ProtocolAdapter<T>): UseTransa
     [adapter],
   );
 
-  const warnings = decodedTransaction ? adapter.generateWarnings(decodedTransaction) : [];
+  const warnings = decodedTransaction ? (adapter.generateWarnings?.(decodedTransaction) ?? []) : [];
 
   return {
     decodedTransaction,

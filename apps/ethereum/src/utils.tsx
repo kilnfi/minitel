@@ -331,7 +331,7 @@ function isTransactionWithInputData(tx: AugmentedTransaction): tx is AugmentedTr
   return 'inputData' in tx;
 }
 
-export function getActionDescription(tx: AugmentedTransaction): DetailsResult {
+export function getActionDetails(tx: AugmentedTransaction): DetailsResult {
   if (!tx.to)
     return {
       description: 'Unknown transaction',

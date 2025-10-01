@@ -1,5 +1,5 @@
-import { getCurrentProtocol, protocols } from '@protocols/shared';
-import { Background, cn, Header, type Protocol, ProtocolTransactionDecoder, TransactionPlaybook } from '@protocols/ui';
+import { getCurrentProtocol, type Protocol, protocols } from '@protocols/shared';
+import { Background, cn, Header, ProtocolTransactionDecoder, TransactionPlaybook } from '@protocols/ui';
 import { useState } from 'react';
 import { ETHEREUM_PLAYBOOK_OPERATIONS } from '@/config/playbook-operations';
 import { ethereumAdapter } from '@/ethereum-adapter';

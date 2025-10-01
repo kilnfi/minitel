@@ -1,13 +1,7 @@
+import type { Protocol } from '@protocols/shared';
 import { CheckIcon, ChevronsUpDownIcon, ExternalLinkIcon, PanelRightIcon } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '#/ui/dropdown-menu';
-import { Toggle } from '#/ui/toggle';
-
-export type Protocol = {
-  name: string;
-  icon?: React.ReactNode;
-  url: string;
-  localUrl: string;
-};
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
+import { Toggle } from './ui/toggle';
 
 type HeaderProps = {
   protocols: Protocol[];
@@ -39,7 +33,7 @@ export const Header = ({
           </div>
           <ChevronsUpDownIcon className="w-4 h-4 text-muted-foreground" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="flex flex-col gap-2 w-60">
+        <DropdownMenuContent align="start" className="flex flex-col gap-2 w-60 max-h-96 overflow-y-auto">
           {protocols.map((protocol) => (
             <DropdownMenuItem
               className="p-2 text-sm justify-between"

@@ -1,8 +1,8 @@
 import type { VariantProps } from 'class-variance-authority';
 import { CopyCheckIcon, CopyIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Button, type buttonVariants } from '#/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '#/components/ui/tooltip';
+import { Button, type buttonVariants } from './ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 export const CopyButtonIcon = ({
   textToCopy,

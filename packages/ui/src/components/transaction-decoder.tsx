@@ -3,25 +3,18 @@ import { githubLightTheme } from '@uiw/react-json-view/githubLight';
 import { vscodeTheme } from '@uiw/react-json-view/vscode';
 import { DownloadIcon, InboxIcon, InfoIcon, TriangleAlertIcon, ZapIcon } from 'lucide-react';
 import { useId, useRef } from 'react';
-import { CopyButtonIcon } from '#/components/copy-button';
-import { Footer } from '#/components/footer';
-import { Alert, AlertDescription, AlertTitle } from '#/components/ui/alert';
-import { Button } from '#/components/ui/button';
-import { Card, CardContent, CardFooter } from '#/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '#/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '#/components/ui/tabs';
-import { Textarea } from '#/components/ui/textarea';
-import { useIsDarkMode } from '#/hooks/useIsDarkMode';
-import { cn, convertBigIntToString } from '#/lib/utils';
-import { Badge } from '#/ui/badge';
-import { Tooltip, TooltipContent, TooltipTrigger } from '#/ui/tooltip';
+import { useIsDarkMode } from '../hooks/useIsDarkMode';
+import { cn, convertBigIntToString } from '../lib/utils';
+import { CopyButtonIcon } from './copy-button';
+import { Footer } from './footer';
+import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card, CardContent, CardFooter } from './ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Textarea } from './ui/textarea';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 export type TransactionDecoderProps<T> = {
   title?: string;
@@ -32,7 +25,7 @@ export type TransactionDecoderProps<T> = {
   decodedTransaction: T | null;
   hash?: string;
   warnings?: Array<{ message: string }>;
-  renderSummary: (data: T) => React.ReactNode;
+  renderSummary?: (data: T) => React.ReactNode;
   placeholder?: string;
   error?: string;
 };
@@ -186,7 +179,7 @@ export function TransactionDecoder<T>({
 }
 
 export type TransactionDecoderTabsProps<T> = {
-  renderSummary: (data: T) => React.ReactNode;
+  renderSummary?: (data: T) => React.ReactNode;
   decodedTransaction: T | null;
   isDarkMode: boolean;
 };
@@ -198,15 +191,17 @@ export function TransactionDecoderTabs<T>({
 }: TransactionDecoderTabsProps<T>) {
   return (
     <div className="w-full">
-      <Tabs className="w-full gap-6" defaultValue="summary">
+      <Tabs className="w-full gap-6" defaultValue={renderSummary ? 'summary' : 'json'}>
         <TabsList className="w-full">
-          <TabsTrigger value="summary">Summary</TabsTrigger>
+          {renderSummary && <TabsTrigger value="summary">Summary</TabsTrigger>}
           <TabsTrigger value="json">JSON</TabsTrigger>
         </TabsList>
         {decodedTransaction ? (
           <>
             <TabsContent className="space-y-6 overflow-y-auto" value="summary">
-              <div className="space-y-3">{decodedTransaction && renderSummary(decodedTransaction)}</div>
+              <div className="space-y-3">
+                {decodedTransaction && renderSummary && renderSummary(decodedTransaction)}
+              </div>
             </TabsContent>
 
             <TabsContent value="json" className="max-h-96 overflow-y-auto border-border border rounded-md p-2 relative">

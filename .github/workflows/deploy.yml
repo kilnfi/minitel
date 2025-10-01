@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        app: [ethereum, solana]
+        app: [ethereum, solana, near, zeta, tia, sei, osmosis, mantra, injective, fetch, dydx, cronos, atom]
 
     steps:
       - name: Checkout
@@ -38,7 +38,7 @@ jobs:
         working-directory: ./apps/${{ matrix.app }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || secrets.VERCEL_PROJECT_ID_NEAR }}
+          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || matrix.app == 'near' && secrets.VERCEL_PROJECT_ID_NEAR || matrix.app == 'zeta' && secrets.VERCEL_PROJECT_ID_ZETA || matrix.app == 'tia' && secrets.VERCEL_PROJECT_ID_TIA || matrix.app == 'sei' && secrets.VERCEL_PROJECT_ID_SEI || matrix.app == 'osmosis' && secrets.VERCEL_PROJECT_ID_OSMOSIS || matrix.app == 'mantra' && secrets.VERCEL_PROJECT_ID_MANTRA || matrix.app == 'injective' && secrets.VERCEL_PROJECT_ID_INJECTIVE || matrix.app == 'fetch' && secrets.VERCEL_PROJECT_ID_FETCH || matrix.app == 'dydx' && secrets.VERCEL_PROJECT_ID_DYDX || matrix.app == 'cronos' && secrets.VERCEL_PROJECT_ID_CRONOS || secrets.VERCEL_PROJECT_ID_ATOM }}
 
       - name: Pull Vercel Environment Information (Staging)
         if: github.ref != 'refs/heads/main'
@@ -46,7 +46,7 @@ jobs:
         working-directory: ./apps/${{ matrix.app }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || secrets.VERCEL_PROJECT_ID_NEAR }}
+          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || matrix.app == 'near' && secrets.VERCEL_PROJECT_ID_NEAR || matrix.app == 'zeta' && secrets.VERCEL_PROJECT_ID_ZETA || matrix.app == 'tia' && secrets.VERCEL_PROJECT_ID_TIA || matrix.app == 'sei' && secrets.VERCEL_PROJECT_ID_SEI || matrix.app == 'osmosis' && secrets.VERCEL_PROJECT_ID_OSMOSIS || matrix.app == 'mantra' && secrets.VERCEL_PROJECT_ID_MANTRA || matrix.app == 'injective' && secrets.VERCEL_PROJECT_ID_INJECTIVE || matrix.app == 'fetch' && secrets.VERCEL_PROJECT_ID_FETCH || matrix.app == 'dydx' && secrets.VERCEL_PROJECT_ID_DYDX || matrix.app == 'cronos' && secrets.VERCEL_PROJECT_ID_CRONOS || secrets.VERCEL_PROJECT_ID_ATOM }}
 
       - name: Build Project Artifacts
         run: vercel build ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
@@ -54,15 +54,26 @@ jobs:
         timeout-minutes: 10
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || secrets.VERCEL_PROJECT_ID_NEAR }}
+          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || matrix.app == 'near' && secrets.VERCEL_PROJECT_ID_NEAR || matrix.app == 'zeta' && secrets.VERCEL_PROJECT_ID_ZETA || matrix.app == 'tia' && secrets.VERCEL_PROJECT_ID_TIA || matrix.app == 'sei' && secrets.VERCEL_PROJECT_ID_SEI || matrix.app == 'osmosis' && secrets.VERCEL_PROJECT_ID_OSMOSIS || matrix.app == 'mantra' && secrets.VERCEL_PROJECT_ID_MANTRA || matrix.app == 'injective' && secrets.VERCEL_PROJECT_ID_INJECTIVE || matrix.app == 'fetch' && secrets.VERCEL_PROJECT_ID_FETCH || matrix.app == 'dydx' && secrets.VERCEL_PROJECT_ID_DYDX || matrix.app == 'cronos' && secrets.VERCEL_PROJECT_ID_CRONOS || secrets.VERCEL_PROJECT_ID_ATOM }}
 
       - name: Deploy Project Artifacts to Vercel
         id: deploy
         run: |
-          DEPLOY_URL=$(vercel deploy --prebuilt ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }})
-          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
-          echo "🚀 Deployed ${{ matrix.app }} to: $DEPLOY_URL"
+          DEPLOYMENT_URL=$(vercel deploy --prebuilt ${{ steps.env.outputs.is_prod == 'true' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+          echo "🚀 Deployed ${{ matrix.app }} to: $DEPLOYMENT_URL"
         working-directory: ./apps/${{ matrix.app }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || secrets.VERCEL_PROJECT_ID_NEAR }}
+          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || matrix.app == 'near' && secrets.VERCEL_PROJECT_ID_NEAR || matrix.app == 'zeta' && secrets.VERCEL_PROJECT_ID_ZETA || matrix.app == 'tia' && secrets.VERCEL_PROJECT_ID_TIA || matrix.app == 'sei' && secrets.VERCEL_PROJECT_ID_SEI || matrix.app == 'osmosis' && secrets.VERCEL_PROJECT_ID_OSMOSIS || matrix.app == 'mantra' && secrets.VERCEL_PROJECT_ID_MANTRA || matrix.app == 'injective' && secrets.VERCEL_PROJECT_ID_INJECTIVE || matrix.app == 'fetch' && secrets.VERCEL_PROJECT_ID_FETCH || matrix.app == 'dydx' && secrets.VERCEL_PROJECT_ID_DYDX || matrix.app == 'cronos' && secrets.VERCEL_PROJECT_ID_CRONOS || secrets.VERCEL_PROJECT_ID_ATOM }}
+
+      - name: Assign custom domain alias (Development)
+        if: steps.env.outputs.is_prod == 'false'
+        run: |
+          DOMAIN="dev-${{ matrix.app }}.minitel.app"
+          vercel alias ${{ steps.deploy.outputs.url }} $DOMAIN --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+          echo "Development deployment aliased to: $DOMAIN"
+        working-directory: ./apps/${{ matrix.app }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ matrix.app == 'ethereum' && secrets.VERCEL_PROJECT_ID_ETHEREUM || matrix.app == 'solana' && secrets.VERCEL_PROJECT_ID_SOLANA || matrix.app == 'near' && secrets.VERCEL_PROJECT_ID_NEAR || matrix.app == 'zeta' && secrets.VERCEL_PROJECT_ID_ZETA || matrix.app == 'tia' && secrets.VERCEL_PROJECT_ID_TIA || matrix.app == 'sei' && secrets.VERCEL_PROJECT_ID_SEI || matrix.app == 'osmosis' && secrets.VERCEL_PROJECT_ID_OSMOSIS || matrix.app == 'mantra' && secrets.VERCEL_PROJECT_ID_MANTRA || matrix.app == 'injective' && secrets.VERCEL_PROJECT_ID_INJECTIVE || matrix.app == 'fetch' && secrets.VERCEL_PROJECT_ID_FETCH || matrix.app == 'dydx' && secrets.VERCEL_PROJECT_ID_DYDX || matrix.app == 'cronos' && secrets.VERCEL_PROJECT_ID_CRONOS || secrets.VERCEL_PROJECT_ID_ATOM }}
