@@ -132,7 +132,7 @@ export function TransactionPlaybook<T>({ config, isOpen, onClose }: TransactionP
               <Label>Operation</Label>
               <Select
                 value={selectedOperation}
-                onValueChange={(value) => {
+                onValueChange={(value: string) => {
                   setSelectedOperation(value);
                   const operation = config.operations.find((op) => op.value === value);
                   if (operation?.rawTransaction) {
@@ -185,7 +185,7 @@ export function TransactionPlaybook<T>({ config, isOpen, onClose }: TransactionP
                 type="single"
                 collapsible
                 className="w-full"
-                onValueChange={(value) => {
+                onValueChange={(value: string) => {
                   if (!value) return;
                   setTimeout(() => {
                     if (value === 'operation-overview') {

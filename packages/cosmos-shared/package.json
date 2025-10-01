@@ -14,13 +14,16 @@
     "lint": "biome check .",
     "format": "biome format --write ."
   },
+  "dependencies": {
+    "@cosmjs/proto-signing": "^0.36.0",
+    "@protocols/shared": "workspace:*"
+  },
   "devDependencies": {
     "typescript": "^5.0.0",
     "@biomejs/biome": "2.2.4",
-    "@types/react": "^18.0.0",
-    "@protocols/shared": "workspace:*"
+    "@types/react": "^19.0.0"
   },
   "peerDependencies": {
-    "react": "^18.0.0"
+    "react": "^19.0.0"
   }
 }

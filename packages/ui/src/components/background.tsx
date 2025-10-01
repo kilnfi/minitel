@@ -1,5 +1,5 @@
 /** biome-ignore-all lint/correctness/useUniqueElementIds: <id is static in that case> */
-export const Background = (props: React.SVGProps<SVGSVGElement>) => {
+export const Background = (props: Omit<React.SVGProps<SVGSVGElement>, 'ref'>) => {
   return (
     <div className="absolute inset-0 overflow-hidden">
       <div className="absolute flex flex-col z-[40] w-full !max-w-full items-center justify-center bg-transparent transition-bg overflow-hidden h-[60vh] -top-16 pointer-events-none opacity-[.35] dark:opacity-50">

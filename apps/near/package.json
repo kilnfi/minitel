@@ -11,6 +11,8 @@
     "format": "biome check ./src --write --unsafe"
   },
   "dependencies": {
+    "@near-js/crypto": "^2.3.2",
+    "@near-js/transactions": "^2.3.2",
     "@protocols/shared": "workspace:*",
     "@protocols/ui": "workspace:*",
     "@uiw/react-json-view": "^2.0.0-alpha.36",
