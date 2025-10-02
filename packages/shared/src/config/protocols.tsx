@@ -1,4 +1,5 @@
 import {
+  AdaIcon,
   CosmosIcon,
   CronosIcon,
   DydxIcon,
@@ -17,7 +18,7 @@ import {
 
 type CosmosToken = 'ATOM' | 'TIA' | 'ZETA' | 'OSMO' | 'DYDX' | 'FET' | 'INJ' | 'KAVA' | 'OM' | 'CRO' | 'SEI';
 
-export type Token = CosmosToken | 'ETH' | 'NEAR' | 'SOL';
+export type Token = CosmosToken | 'ETH' | 'NEAR' | 'SOL' | 'ADA';
 
 export type Protocol = {
   token: Token;
@@ -125,6 +126,13 @@ export const protocols: Protocol[] = [
     icon: <OsmosisIcon className="size-5" />,
     url: 'https://osmo.minitel.app',
     localUrl: 'http://localhost:3013',
+  },
+  {
+    token: 'ADA',
+    name: 'Ada',
+    icon: <AdaIcon className="size-5" />,
+    url: 'https://ada.minitel.app',
+    localUrl: 'http://localhost:3014',
   },
 ];
 
