@@ -310,7 +310,6 @@
         "typescript": "^5.0.0",
         "vite": "^7.0.0",
         "vite-plugin-node-polyfills": "^0.24.0",
-        "vite-plugin-wasm": "^3.5.0",
       },
     },
     "apps/tia": {
@@ -338,7 +337,6 @@
       "name": "@protocols/xtz",
       "version": "0.0.0",
       "dependencies": {
-        "@emurgo/cardano-serialization-lib-browser": "^15.0.1",
         "@protocols/shared": "workspace:*",
         "@protocols/ui": "workspace:*",
         "@taquito/local-forging": "^23.0.1",
@@ -354,7 +352,6 @@
         "typescript": "^5.0.0",
         "vite": "^7.0.0",
         "vite-plugin-node-polyfills": "^0.24.0",
-        "vite-plugin-wasm": "^3.5.0",
       },
     },
     "apps/zeta": {
