@@ -12,13 +12,14 @@ import {
   OsmosisIcon,
   SeiIcon,
   SolanaIcon,
+  SuiIcon,
   TiaIcon,
   ZetaIcon,
 } from '@protocols/ui';
 
 type CosmosToken = 'ATOM' | 'TIA' | 'ZETA' | 'OSMO' | 'DYDX' | 'FET' | 'INJ' | 'KAVA' | 'OM' | 'CRO' | 'SEI';
 
-export type Token = CosmosToken | 'ETH' | 'NEAR' | 'SOL' | 'ADA';
+export type Token = CosmosToken | 'ETH' | 'NEAR' | 'SOL' | 'ADA' | 'SUI';
 
 export type Protocol = {
   token: Token;
@@ -133,6 +134,13 @@ export const protocols: Protocol[] = [
     icon: <AdaIcon className="size-5" />,
     url: 'https://ada.minitel.app',
     localUrl: 'http://localhost:3014',
+  },
+  {
+    token: 'SUI',
+    name: 'Sui',
+    icon: <SuiIcon className="size-5" />,
+    url: 'https://sui.minitel.app',
+    localUrl: 'http://localhost:3015',
   },
 ];
 
