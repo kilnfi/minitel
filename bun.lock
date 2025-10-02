@@ -140,6 +140,27 @@
         "vite-plugin-node-polyfills": "^0.24.0",
       },
     },
+    "apps/kava": {
+      "name": "@protocols/kava",
+      "version": "0.0.0",
+      "dependencies": {
+        "@protocols/cosmos-shared": "workspace:*",
+        "@protocols/shared": "workspace:*",
+        "@protocols/ui": "workspace:*",
+        "@uiw/react-json-view": "^2.0.0-alpha.36",
+        "react": "^19.1.1",
+        "react-dom": "^19.1.1",
+      },
+      "devDependencies": {
+        "@tailwindcss/vite": "^4.1.13",
+        "@types/react": "^19.0.0",
+        "@types/react-dom": "^19.0.0",
+        "@vitejs/plugin-react": "^4.0.0",
+        "typescript": "^5.0.0",
+        "vite": "^7.0.0",
+        "vite-plugin-node-polyfills": "^0.24.0",
+      },
+    },
     "apps/mantra": {
       "name": "@protocols/mantra",
       "version": "0.0.0",
@@ -540,6 +561,8 @@
     "@protocols/fetch": ["@protocols/fetch@workspace:apps/fetch"],
 
     "@protocols/injective": ["@protocols/injective@workspace:apps/injective"],
+
+    "@protocols/kava": ["@protocols/kava@workspace:apps/kava"],
 
     "@protocols/mantra": ["@protocols/mantra@workspace:apps/mantra"],
 
