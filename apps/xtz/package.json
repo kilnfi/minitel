@@ -1,19 +1,19 @@
 {
-  "name": "@protocols/sui",
+  "name": "@protocols/xtz",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 3015",
+    "dev": "vite --port 3016",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "tsc && biome check ./src",
     "format": "biome check ./src --write --unsafe"
   },
   "dependencies": {
-    "@mysten/sui": "^1.39.0",
     "@protocols/shared": "workspace:*",
     "@protocols/ui": "workspace:*",
+    "@taquito/local-forging": "^23.0.1",
     "@uiw/react-json-view": "^2.0.0-alpha.36",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
