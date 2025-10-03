@@ -14,13 +14,14 @@ import {
   SolanaIcon,
   SuiIcon,
   TiaIcon,
+  TonIcon,
   XtzIcon,
   ZetaIcon,
 } from '@protocols/ui';
 
 type CosmosToken = 'ATOM' | 'TIA' | 'ZETA' | 'OSMO' | 'DYDX' | 'FET' | 'INJ' | 'KAVA' | 'OM' | 'CRO' | 'SEI';
 
-export type Token = CosmosToken | 'ETH' | 'NEAR' | 'SOL' | 'ADA' | 'SUI' | 'XTZ';
+export type Token = CosmosToken | 'ETH' | 'NEAR' | 'SOL' | 'ADA' | 'SUI' | 'XTZ' | 'TON';
 
 export type Protocol = {
   token: Token;
@@ -149,6 +150,13 @@ export const protocols: Protocol[] = [
     icon: <XtzIcon className="size-5" />,
     url: 'https://xtz.minitel.app',
     localUrl: 'http://localhost:3016',
+  },
+  {
+    token: 'TON',
+    name: 'Ton',
+    icon: <TonIcon className="size-5" />,
+    url: 'https://ton.minitel.app',
+    localUrl: 'http://localhost:3017',
   },
 ];
 
