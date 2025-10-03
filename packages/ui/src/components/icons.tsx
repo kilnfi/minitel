@@ -570,3 +570,15 @@ export const XtzIcon = (props: React.SVGProps<SVGSVGElement> & { ref?: React.Ref
     </svg>
   );
 };
+
+export const TonIcon = (props: React.SVGProps<SVGSVGElement> & { ref?: React.Ref<SVGSVGElement> }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" {...props}>
+      <rect width="100%" height="100%" fill="#0098EA" rx="24" />
+      <path
+        fill="#fff"
+        d="M31.428 12.5H16.571c-2.732 0-4.463 2.947-3.089 5.329l9.17 15.893a1.557 1.557 0 0 0 2.696 0l9.171-15.893c1.373-2.378-.359-5.329-3.089-5.329h-.002Zm-8.784 16.456-1.997-3.865-4.818-8.618a.842.842 0 0 1 .74-1.258h6.073v13.743l.002-.002Zm9.523-12.485-4.817 8.622-1.997 3.863V15.213h6.073a.842.842 0 0 1 .74 1.258Z"
+      />
+    </svg>
+  );
+};
