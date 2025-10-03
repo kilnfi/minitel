@@ -582,3 +582,15 @@ export const TonIcon = (props: React.SVGProps<SVGSVGElement> & { ref?: React.Ref
     </svg>
   );
 };
+
+export const TrxIcon = (props: React.SVGProps<SVGSVGElement> & { ref?: React.Ref<SVGSVGElement> }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" {...props}>
+      <rect width="100%" height="100%" fill="#FF4D50" rx="24" />
+      <path
+        fill="#fff"
+        d="M31.12 16.16 13.5 12.916l9.273 23.333 12.92-15.742-4.573-4.349Zm-.284 1.428 2.696 2.562-7.371 1.335 4.675-3.897Zm-6.277 3.63-7.77-6.444 12.7 2.336-4.93 4.107Zm-.553 1.14-1.268 10.475-6.83-17.194 8.098 6.717v.002Zm1.172.555 8.164-1.477-9.364 11.407 1.2-9.93Z"
+      />
+    </svg>
+  );
+};

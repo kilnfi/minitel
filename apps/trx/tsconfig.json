@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@protocols/ui": ["../../packages/ui/src"],
+      "@protocols/shared": ["../../packages/shared/src"],
+      "@protocols/cosmos-shared": ["../../packages/cosmos-shared/src"]
+    }
+  },
+  "include": ["src"]
+}
