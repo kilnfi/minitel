@@ -38,7 +38,8 @@ type DetailsResult = {
 
 const ACTION_HANDLERS = {
   batchDeposit: (tx) => {
-    const ethAmount = tx.value ? formatEther(tx.value) : '0';
+    const valueInWei = tx.value ? BigInt(tx.value) : 0n;
+    const ethAmount = formatEther(valueInWei);
     const args = tx.inputData.args as ExtractArgs<typeof ETH_DEPOSIT_CONTRACT_ABI, 'batchDeposit'>;
     const dataRoots = args[3];
     return {
@@ -52,7 +53,8 @@ const ACTION_HANDLERS = {
     };
   },
   batchDepositCustom: (tx) => {
-    const ethAmount = tx.value ? formatEther(tx.value) : '0';
+    const valueInWei = tx.value ? BigInt(tx.value) : 0n;
+    const ethAmount = formatEther(valueInWei);
     const args = tx.inputData.args as ExtractArgs<typeof ETH_DEPOSIT_CONTRACT_ABI, 'batchDepositCustom'>;
     const dataRoots = args[3];
     return {
@@ -213,7 +215,8 @@ const ACTION_HANDLERS = {
     };
   },
   stake: (tx) => {
-    const ethAmount = tx.value ? formatEther(tx.value) : '0';
+    const valueInWei = tx.value ? BigInt(tx.value) : 0n;
+    const ethAmount = formatEther(valueInWei);
     const to = tx.to ?? '0x';
     return {
       description: (
@@ -226,8 +229,9 @@ const ACTION_HANDLERS = {
     };
   },
   deposit: (tx) => {
-    const ethAmount = tx.value ? formatEther(tx.value) : '0';
-    const hasEthValue = BigInt(ethAmount) > 0n;
+    const valueInWei = tx.value ? BigInt(tx.value) : 0n;
+    const ethAmount = formatEther(valueInWei);
+    const hasEthValue = valueInWei > 0n;
     const to = tx.to ?? '0x';
     return {
       description: (
@@ -248,7 +252,8 @@ const ACTION_HANDLERS = {
     };
   },
   withdraw: (tx) => {
-    const ethAmount = tx.value ? formatEther(tx.value) : '0';
+    const valueInWei = tx.value ? BigInt(tx.value) : 0n;
+    const ethAmount = formatEther(valueInWei);
     const to = tx.to ?? '0x';
     return {
       description: (
@@ -276,7 +281,8 @@ const ACTION_HANDLERS = {
     };
   },
   bigBatchDeposit: (tx) => {
-    const ethAmount = tx.value ? formatEther(tx.value) : '0';
+    const valueInWei = tx.value ? BigInt(tx.value) : 0n;
+    const ethAmount = formatEther(valueInWei);
     const [validators] = tx.inputData.args as ExtractArgs<typeof ETH_DEPOSIT_CONTRACT_ABI, 'bigBatchDeposit'>;
     return {
       description: (
@@ -289,7 +295,8 @@ const ACTION_HANDLERS = {
     };
   },
   bigBatchDepositCustom: (tx) => {
-    const ethAmount = tx.value ? formatEther(tx.value) : '0';
+    const valueInWei = tx.value ? BigInt(tx.value) : 0n;
+    const ethAmount = formatEther(valueInWei);
     const [validators] = tx.inputData.args as ExtractArgs<typeof ETH_DEPOSIT_CONTRACT_ABI, 'bigBatchDepositCustom'>;
     return {
       description: (
@@ -340,9 +347,9 @@ export function getActionDetails(tx: AugmentedTransaction): DetailsResult {
     };
 
   const to = tx.to as `0x${string}`;
-  const valueWei = tx.value ?? 0n;
+  const valueWei = tx.value ? BigInt(tx.value) : 0n;
   const ethAmount = formatEther(valueWei);
-  const hasEthValue = BigInt(valueWei) > 0n;
+  const hasEthValue = valueWei > 0n;
   const isHighValue = parseFloat(ethAmount) > 1;
 
   if (!isTransactionWithInputData(tx)) {
