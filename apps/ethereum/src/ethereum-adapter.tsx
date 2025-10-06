@@ -1,4 +1,4 @@
-import type { ProtocolAdapter } from '@protocols/shared';
+import { ETH, type ProtocolAdapter } from '@protocols/shared';
 import { formatEther } from 'viem';
 import { TransactionSummary } from '@/components/TransactionSummary';
 import { hashEthTx, parseEthTx } from '@/parser';
@@ -6,6 +6,7 @@ import type { AugmentedTransaction } from '@/types';
 import { getActionDetails } from '@/utils';
 
 export const ethereumAdapter: ProtocolAdapter<AugmentedTransaction> = {
+  protocol: ETH,
   name: 'ethereum',
   displayName: 'Ethereum',
   placeholder: 'Paste your transaction as hex',

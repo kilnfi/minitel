@@ -32,145 +32,183 @@ export type Protocol = {
   localUrl: string;
 };
 
-export const protocols: Protocol[] = [
-  {
-    token: 'ETH',
-    name: 'Ethereum',
-    icon: <EthereumIcon className="size-5" />,
-    url: 'https://eth.minitel.app',
-    localUrl: 'http://localhost:3000',
-  },
-  {
-    token: 'SOL',
-    name: 'Solana',
-    icon: <SolanaIcon className="size-5" />,
-    url: 'https://sol.minitel.app',
-    localUrl: 'http://localhost:3001',
-  },
-  {
-    token: 'ATOM',
-    name: 'Cosmos',
-    icon: <CosmosIcon className="size-5" />,
-    url: 'https://atom.minitel.app',
-    localUrl: 'http://localhost:3002',
-  },
-  {
-    token: 'NEAR',
-    name: 'Near',
-    icon: <NearIcon className="size-5" />,
-    url: 'https://near.minitel.app',
-    localUrl: 'http://localhost:3003',
-  },
-  {
-    token: 'CRO',
-    name: 'Cronos',
-    icon: <CronosIcon className="size-5" />,
-    url: 'https://cro.minitel.app',
-    localUrl: 'http://localhost:3004',
-  },
-  {
-    token: 'SEI',
-    name: 'Sei',
-    icon: <SeiIcon className="size-5" />,
-    url: 'https://sei.minitel.app',
-    localUrl: 'http://localhost:3005',
-  },
-  {
-    token: 'ZETA',
-    name: 'Zeta',
-    icon: <ZetaIcon className="size-5" />,
-    url: 'https://zeta.minitel.app',
-    localUrl: 'http://localhost:3006',
-  },
-  {
-    token: 'DYDX',
-    name: 'Dydx',
-    icon: <DydxIcon className="size-5" />,
-    url: 'https://dydx.minitel.app',
-    localUrl: 'http://localhost:3007',
-  },
-  {
-    token: 'FET',
-    name: 'Fetch',
-    icon: <FetchIcon className="size-5" />,
-    url: 'https://fetch.minitel.app',
-    localUrl: 'http://localhost:3008',
-  },
-  {
-    token: 'INJ',
-    name: 'Injective',
-    icon: <InjectiveIcon className="size-5" />,
-    url: 'https://inj.minitel.app',
-    localUrl: 'http://localhost:3009',
-  },
-  {
-    token: 'KAVA',
-    name: 'Kava',
-    icon: <KavaIcon className="size-5" />,
-    url: 'https://kava.minitel.app',
-    localUrl: 'http://localhost:3010',
-  },
-  {
-    token: 'OM',
-    name: 'Mantra',
-    icon: <OmIcon className="size-5" />,
-    url: 'https://om.minitel.app',
-    localUrl: 'http://localhost:3011',
-  },
-  {
-    token: 'TIA',
-    name: 'Tia',
-    icon: <TiaIcon className="size-5" />,
-    url: 'https://tia.minitel.app',
-    localUrl: 'http://localhost:3012',
-  },
-  {
-    token: 'OSMO',
-    name: 'Osmosis',
-    icon: <OsmosisIcon className="size-5" />,
-    url: 'https://osmo.minitel.app',
-    localUrl: 'http://localhost:3013',
-  },
-  {
-    token: 'ADA',
-    name: 'Ada',
-    icon: <AdaIcon className="size-5" />,
-    url: 'https://ada.minitel.app',
-    localUrl: 'http://localhost:3014',
-  },
-  {
-    token: 'SUI',
-    name: 'Sui',
-    icon: <SuiIcon className="size-5" />,
-    url: 'https://sui.minitel.app',
-    localUrl: 'http://localhost:3015',
-  },
-  {
-    token: 'XTZ',
-    name: 'Xtz',
-    icon: <XtzIcon className="size-5" />,
-    url: 'https://xtz.minitel.app',
-    localUrl: 'http://localhost:3016',
-  },
-  {
-    token: 'TON',
-    name: 'Ton',
-    icon: <TonIcon className="size-5" />,
-    url: 'https://ton.minitel.app',
-    localUrl: 'http://localhost:3017',
-  },
-  {
-    token: 'TRX',
-    name: 'Trx',
-    icon: <TrxIcon className="size-5" />,
-    url: 'https://trx.minitel.app',
-    localUrl: 'http://localhost:3018',
-  },
+export const ETH = {
+  token: 'ETH',
+  name: 'Ethereum',
+  icon: <EthereumIcon className="size-5" />,
+  url: 'https://eth.minitel.app',
+  localUrl: 'http://localhost:3000',
+} satisfies Protocol;
+
+export const SOL = {
+  token: 'SOL',
+  name: 'Solana',
+  icon: <SolanaIcon className="size-5" />,
+  url: 'https://sol.minitel.app',
+  localUrl: 'http://localhost:3001',
+} satisfies Protocol;
+
+export const ATOM = {
+  token: 'ATOM',
+  name: 'Cosmos',
+  icon: <CosmosIcon className="size-5" />,
+  url: 'https://atom.minitel.app',
+  localUrl: 'http://localhost:3002',
+} satisfies Protocol;
+
+export const NEAR = {
+  token: 'NEAR',
+  name: 'Near',
+  icon: <NearIcon className="size-5" />,
+  url: 'https://near.minitel.app',
+  localUrl: 'http://localhost:3003',
+} satisfies Protocol;
+
+export const CRO = {
+  token: 'CRO',
+  name: 'Cronos',
+  icon: <CronosIcon className="size-5" />,
+  url: 'https://cro.minitel.app',
+  localUrl: 'http://localhost:3004',
+} satisfies Protocol;
+
+export const SEI = {
+  token: 'SEI',
+  name: 'Sei',
+  icon: <SeiIcon className="size-5" />,
+  url: 'https://sei.minitel.app',
+  localUrl: 'http://localhost:3005',
+} satisfies Protocol;
+
+export const ZETA = {
+  token: 'ZETA',
+  name: 'Zeta',
+  icon: <ZetaIcon className="size-5" />,
+  url: 'https://zeta.minitel.app',
+  localUrl: 'http://localhost:3006',
+} satisfies Protocol;
+
+export const DYDX = {
+  token: 'DYDX',
+  name: 'Dydx',
+  icon: <DydxIcon className="size-5" />,
+  url: 'https://dydx.minitel.app',
+  localUrl: 'http://localhost:3007',
+} satisfies Protocol;
+
+export const FET = {
+  token: 'FET',
+  name: 'Fetch',
+  icon: <FetchIcon className="size-5" />,
+  url: 'https://fet.minitel.app',
+  localUrl: 'http://localhost:3008',
+} satisfies Protocol;
+
+export const INJ = {
+  token: 'INJ',
+  name: 'Injective',
+  icon: <InjectiveIcon className="size-5" />,
+  url: 'https://inj.minitel.app',
+  localUrl: 'http://localhost:3009',
+} satisfies Protocol;
+
+export const KAVA = {
+  token: 'KAVA',
+  name: 'Kava',
+  icon: <KavaIcon className="size-5" />,
+  url: 'https://kava.minitel.app',
+  localUrl: 'http://localhost:3010',
+} satisfies Protocol;
+
+export const OM = {
+  token: 'OM',
+  name: 'Mantra',
+  icon: <OmIcon className="size-5" />,
+  url: 'https://om.minitel.app',
+  localUrl: 'http://localhost:3011',
+} satisfies Protocol;
+
+export const TIA = {
+  token: 'TIA',
+  name: 'Tia',
+  icon: <TiaIcon className="size-5" />,
+  url: 'https://tia.minitel.app',
+  localUrl: 'http://localhost:3012',
+} satisfies Protocol;
+
+export const OSMO = {
+  token: 'OSMO',
+  name: 'Osmosis',
+  icon: <OsmosisIcon className="size-5" />,
+  url: 'https://osmo.minitel.app',
+  localUrl: 'http://localhost:3013',
+} satisfies Protocol;
+
+export const ADA = {
+  token: 'ADA',
+  name: 'Ada',
+  icon: <AdaIcon className="size-5" />,
+  url: 'https://ada.minitel.app',
+  localUrl: 'http://localhost:3014',
+} satisfies Protocol;
+
+export const TON = {
+  token: 'TON',
+  name: 'Ton',
+  icon: <TonIcon className="size-5" />,
+  url: 'https://ton.minitel.app',
+  localUrl: 'http://localhost:3017',
+} satisfies Protocol;
+
+export const TRX = {
+  token: 'TRX',
+  name: 'Trx',
+  icon: <TrxIcon className="size-5" />,
+  url: 'https://trx.minitel.app',
+  localUrl: 'http://localhost:3018',
+} satisfies Protocol;
+
+export const SUI = {
+  token: 'SUI',
+  name: 'Sui',
+  icon: <SuiIcon className="size-5" />,
+  url: 'https://sui.minitel.app',
+  localUrl: 'http://localhost:3015',
+} satisfies Protocol;
+
+export const XTZ = {
+  token: 'XTZ',
+  name: 'Xtz',
+  icon: <XtzIcon className="size-5" />,
+  url: 'https://xtz.minitel.app',
+  localUrl: 'http://localhost:3016',
+} satisfies Protocol;
+
+export const PROTOCOLS: Protocol[] = [
+  ETH,
+  SOL,
+  ATOM,
+  NEAR,
+  CRO,
+  SEI,
+  ZETA,
+  DYDX,
+  FET,
+  INJ,
+  KAVA,
+  OM,
+  TIA,
+  OSMO,
+  ADA,
+  SUI,
+  XTZ,
+  TON,
+  TRX,
 ];
 
 export const getCurrentProtocol = () => {
   const currentOrigin = window.location.origin;
-  const currentProtocol = protocols.find(
+  const currentProtocol = PROTOCOLS.find(
     (protocol) => protocol.url === currentOrigin || protocol.localUrl === currentOrigin,
   );
   if (!currentProtocol) {

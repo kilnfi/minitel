@@ -1,5 +1,5 @@
 import type { Transaction } from '@mysten/sui/transactions';
-import type { ProtocolAdapter } from '@protocols/shared';
+import { type ProtocolAdapter, SUI } from '@protocols/shared';
 import { parseSuiTx } from '@/parser';
 
 const computeSuiHash = async (rawTx: string): Promise<string> => {
@@ -16,6 +16,7 @@ const computeSuiHash = async (rawTx: string): Promise<string> => {
 };
 
 export const suiAdapter: ProtocolAdapter<ReturnType<typeof Transaction.prototype.getData>> = {
+  protocol: SUI,
   name: 'sui',
   displayName: 'Sui',
   placeholder: 'Paste your transaction as hex',

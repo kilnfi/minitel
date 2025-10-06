@@ -1,5 +1,5 @@
 import type { DecodedTxRaw } from '@cosmjs/proto-signing';
-import type { ProtocolAdapter } from '@protocols/shared';
+import type { Protocol, ProtocolAdapter } from '@protocols/shared';
 import { parseCosmosTx } from './parser';
 
 const computeCosmosHash = async (rawTx: string): Promise<string> => {
@@ -18,11 +18,14 @@ const computeCosmosHash = async (rawTx: string): Promise<string> => {
 export const createCosmosAdapter = ({
   name,
   displayName,
+  protocol,
 }: {
   name: string;
   displayName: string;
+  protocol: Protocol;
 }): ProtocolAdapter<DecodedTxRaw> => {
   return {
+    protocol,
     name,
     displayName,
     placeholder: 'Paste your transaction as hex',

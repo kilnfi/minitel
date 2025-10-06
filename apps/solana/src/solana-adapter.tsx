@@ -1,4 +1,4 @@
-import type { ProtocolAdapter } from '@protocols/shared';
+import { type ProtocolAdapter, SOL } from '@protocols/shared';
 import { Summary } from '@/components/Summary';
 import { convertToMessage, looksLikeMessage, type MessageLike, type ParseSolTxResult, parseSolTx } from '@/parser';
 import type { DecodedInstruction } from '@/types';
@@ -37,6 +37,7 @@ const computeSolanaHash = async (rawTx: string): Promise<string> => {
 };
 
 export const solanaAdapter: ProtocolAdapter<ParseSolTxResult> = {
+  protocol: SOL,
   name: 'solana',
   displayName: 'Solana',
   placeholder: 'Paste your transaction as hex or Fireblocks message JSON',

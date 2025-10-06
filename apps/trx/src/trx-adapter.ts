@@ -1,4 +1,4 @@
-import type { ProtocolAdapter } from '@protocols/shared';
+import { type ProtocolAdapter, TRX } from '@protocols/shared';
 import { parseTrxTx } from '@/parser';
 
 const computeTrxHash = async (rawTx: string): Promise<string> => {
@@ -15,6 +15,7 @@ const computeTrxHash = async (rawTx: string): Promise<string> => {
 };
 
 export const trxAdapter: ProtocolAdapter<unknown> = {
+  protocol: TRX,
   name: 'trx',
   displayName: 'Trx',
   placeholder: 'Paste your transaction as hex',

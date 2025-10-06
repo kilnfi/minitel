@@ -1,5 +1,5 @@
 import { createCosmosAdapter } from '@protocols/cosmos-shared';
-import { getCurrentProtocol, type Protocol, protocols } from '@protocols/shared';
+import { FET, getCurrentProtocol, PROTOCOLS, type Protocol } from '@protocols/shared';
 import { Background, cn, Header, ProtocolTransactionDecoder } from '@protocols/ui';
 
 const currentProtocol = getCurrentProtocol();
@@ -15,8 +15,10 @@ function App() {
       <div className="flex">
         <div className={cn('relative w-full transition-all duration-300 ease-in-out')}>
           <Background />
-          <Header protocols={protocols} currentProtocol={currentProtocol} onChangeProtocol={onChangeProtocol} />
-          <ProtocolTransactionDecoder adapter={createCosmosAdapter({ name: 'fetch', displayName: 'Fetch' })} />
+          <Header protocols={PROTOCOLS} currentProtocol={currentProtocol} onChangeProtocol={onChangeProtocol} />
+          <ProtocolTransactionDecoder
+            adapter={createCosmosAdapter({ protocol: FET, name: 'fetch', displayName: 'Fetch' })}
+          />
         </div>
       </div>
     </div>

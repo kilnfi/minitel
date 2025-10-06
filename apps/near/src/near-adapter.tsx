@@ -1,4 +1,4 @@
-import type { ProtocolAdapter } from '@protocols/shared';
+import { NEAR, type ProtocolAdapter } from '@protocols/shared';
 import { TransactionSummary } from '@/components/TransactionSummary';
 import { type NearTransaction, parseNearTx } from '@/parser';
 
@@ -16,6 +16,7 @@ const computeNearHash = async (rawTx: string): Promise<string> => {
 };
 
 export const nearAdapter: ProtocolAdapter<NearTransaction> = {
+  protocol: NEAR,
   name: 'near',
   displayName: 'Near',
   placeholder: 'Paste your transaction as hex',

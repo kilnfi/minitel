@@ -1,4 +1,4 @@
-import { getCurrentProtocol, type Protocol, protocols } from '@protocols/shared';
+import { getCurrentProtocol, PROTOCOLS, type Protocol } from '@protocols/shared';
 import { Background, cn, Header, ProtocolTransactionDecoder } from '@protocols/ui';
 import { adaAdapter } from '@/ada-adapter';
 
@@ -15,7 +15,7 @@ function App() {
       <div className="flex">
         <div className={cn('relative w-full transition-all duration-300 ease-in-out')}>
           <Background />
-          <Header protocols={protocols} currentProtocol={currentProtocol} onChangeProtocol={onChangeProtocol} />
+          <Header protocols={PROTOCOLS} currentProtocol={currentProtocol} onChangeProtocol={onChangeProtocol} />
           <ProtocolTransactionDecoder adapter={adaAdapter} />
         </div>
       </div>
