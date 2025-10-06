@@ -75,13 +75,44 @@ const tryDecodeInputData = async (tx: AugmentedTransaction) => {
   return null;
 };
 
+export const looksLikeObject = (input: string): boolean => {
+  return input.startsWith('{') || input.startsWith('[');
+};
+
+const _serializeBigInt = (obj: any): any => {
+  if (typeof obj === 'bigint') {
+    return obj.toString();
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(_serializeBigInt);
+  }
+  if (obj && typeof obj === 'object') {
+    return Object.fromEntries(Object.entries(obj).map(([key, value]) => [key, _serializeBigInt(value)]));
+  }
+  return obj;
+};
+
 export const hashEthTx = (txRaw: string): string => {
+  if (looksLikeObject(txRaw)) {
+    const tx = JSON.parse(txRaw);
+    return keccak256(serializeTransaction(tx));
+  }
+
   const hex = normalizeHex(txRaw.trim());
   return keccak256(serializeTransaction(parseTransaction(hex)));
 };
 
 export const parseEthTx = async (txRaw: string): Promise<AugmentedTransaction> => {
   try {
+    if (looksLikeObject(txRaw)) {
+      const tx = JSON.parse(txRaw);
+      const inputData = await tryDecodeInputData(tx);
+      if (inputData) {
+        (tx as AugmentedTransactionWithFunction).inputData = inputData;
+      }
+      return tx;
+    }
+
     const hex = normalizeHex(txRaw.trim());
     const tx = parseTransaction(hex) as AugmentedTransaction;
 

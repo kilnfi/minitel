@@ -24,7 +24,7 @@ export function TransactionSummary({ transaction }: TransactionSummaryProps) {
 
   const actionDetails = getActionDetails(transaction);
   const riskLevel = actionDetails.riskLevel;
-  const ethValue = formatEther(transaction.value ?? 0n);
+  const ethValue = formatEther(BigInt(transaction.value ?? 0n));
   const maxFeeGwei = Number(formatGwei(transaction.maxFeePerGas ?? 0n)).toFixed(2);
 
   return (
