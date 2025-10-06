@@ -1,3 +1,4 @@
+import type { Protocol } from '@protocols/shared';
 import JsonView from '@uiw/react-json-view';
 import { githubLightTheme } from '@uiw/react-json-view/githubLight';
 import { vscodeTheme } from '@uiw/react-json-view/vscode';
@@ -28,6 +29,7 @@ export type TransactionDecoderProps<T> = {
   renderSummary?: (data: T) => React.ReactNode;
   placeholder?: string;
   error?: string;
+  protocol: Protocol;
 };
 
 export function TransactionDecoder<T>({

@@ -1,4 +1,4 @@
-import type { ProtocolAdapter } from '@protocols/shared';
+import { type ProtocolAdapter, XTZ } from '@protocols/shared';
 import type { ForgeParams } from '@taquito/local-forging';
 import { parseXtzTx } from '@/parser';
 
@@ -16,6 +16,7 @@ const computeXtzHash = async (rawTx: string): Promise<string> => {
 };
 
 export const xtzAdapter: ProtocolAdapter<ForgeParams> = {
+  protocol: XTZ,
   name: 'xtz',
   displayName: 'Xtz',
   placeholder: 'Paste your transaction as hex',

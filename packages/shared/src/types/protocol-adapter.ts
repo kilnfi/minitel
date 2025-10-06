@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
+import type { Protocol } from '../config/protocols';
 
 export type ProtocolAdapter<TDecodedTransaction> = {
+  protocol: Protocol;
   name: string;
   displayName: string;
 

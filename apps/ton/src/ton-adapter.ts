@@ -1,4 +1,4 @@
-import type { ProtocolAdapter } from '@protocols/shared';
+import { type ProtocolAdapter, TON } from '@protocols/shared';
 import { parseTonTx } from '@/parser';
 
 const computeTonHash = async (rawTx: string): Promise<string> => {
@@ -15,6 +15,7 @@ const computeTonHash = async (rawTx: string): Promise<string> => {
 };
 
 export const tonAdapter: ProtocolAdapter<any> = {
+  protocol: TON,
   name: 'ton',
   displayName: 'Ton',
   placeholder: 'Paste your transaction as hex',

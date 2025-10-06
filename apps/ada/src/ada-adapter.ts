@@ -1,5 +1,5 @@
 import type { TransactionJSON } from '@emurgo/cardano-serialization-lib-browser';
-import type { ProtocolAdapter } from '@protocols/shared';
+import { ADA, type ProtocolAdapter } from '@protocols/shared';
 import { parseAdaTx } from '@/parser';
 
 const computeAdaHash = async (rawTx: string): Promise<string> => {
@@ -16,6 +16,7 @@ const computeAdaHash = async (rawTx: string): Promise<string> => {
 };
 
 export const adaAdapter: ProtocolAdapter<TransactionJSON> = {
+  protocol: ADA,
   name: 'ada',
   displayName: 'Ada',
   placeholder: 'Paste your transaction as hex',

@@ -21,6 +21,7 @@ export function ProtocolTransactionDecoder<T>({ adapter }: ProtocolTransactionDe
 
   return (
     <TransactionDecoder
+      protocol={adapter.protocol}
       title={`${adapter.displayName} Transaction Decoder`}
       subtitle={`Decode and analyze ${adapter.displayName} transactions`}
       rawTransaction={rawTransaction}

@@ -1,4 +1,4 @@
-import { getCurrentProtocol, type Protocol, protocols } from '@protocols/shared';
+import { getCurrentProtocol, PROTOCOLS, type Protocol } from '@protocols/shared';
 import { Background, cn, Header, ProtocolTransactionDecoder, TransactionPlaybook } from '@protocols/ui';
 import { useState } from 'react';
 import { ETHEREUM_PLAYBOOK_OPERATIONS } from '@/config/playbook-operations';
@@ -35,7 +35,7 @@ function App() {
         >
           <Background />
           <Header
-            protocols={protocols}
+            protocols={PROTOCOLS}
             currentProtocol={currentProtocol}
             onChangeProtocol={onChangeProtocol}
             togglePlaybook={togglePlaybook}
