@@ -1,6 +1,14 @@
 import type { ReactNode } from 'react';
 import type { Protocol } from '../config/protocols';
 
+export type ManualInputField = {
+  key: string;
+  label: string;
+  placeholder?: string;
+  type?: 'input' | 'select';
+  options?: { value: string; label: string }[];
+};
+
 export type ProtocolAdapter<TDecodedTransaction> = {
   protocol: Protocol;
   name: string;
@@ -13,4 +21,7 @@ export type ProtocolAdapter<TDecodedTransaction> = {
 
   generateWarnings?: (data: TDecodedTransaction) => Array<{ message: string }>;
   placeholder?: string;
+
+  manualInputFields?: ManualInputField[];
+  buildTransactionFromFields?: (fields: Record<string, string>) => string;
 };
