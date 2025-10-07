@@ -14,7 +14,6 @@ export function ProtocolTransactionDecoder<T>({ adapter }: ProtocolTransactionDe
     defaultValue: '',
   });
 
-  // Initialize manual fields dynamically from adapter configuration
   const initialManualFields = useMemo(() => {
     if (!adapter.manualInputFields) return {};
     return adapter.manualInputFields.reduce(
