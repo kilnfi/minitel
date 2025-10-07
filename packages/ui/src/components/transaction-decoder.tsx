@@ -211,10 +211,7 @@ export function TransactionDecoder<T>({
                           </div>
                         ) : (
                           <>
-                            <Label>
-                              {fieldConfig.label}
-                              {fieldConfig.required && <span className="text-destructive ml-1">*</span>}
-                            </Label>
+                            <Label>{fieldConfig.label}</Label>
                             <Input
                               placeholder={fieldConfig.placeholder}
                               value={manualFields?.[fieldConfig.key] ?? ''}
@@ -242,7 +239,7 @@ export function TransactionDecoder<T>({
                 className="transition-transform active:scale-95 active:opacity-80"
                 disabled={
                   isManualMode
-                    ? !manualInputFieldsConfig?.some((field) => field.required && manualFields?.[field.key]?.trim())
+                    ? !manualInputFieldsConfig?.every((field) => manualFields?.[field.key]?.trim())
                     : !rawTransaction
                 }
                 size="lg"

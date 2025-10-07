@@ -5,7 +5,6 @@ export type ManualInputField = {
   key: string;
   label: string;
   placeholder?: string;
-  required?: boolean;
   type?: 'input' | 'select';
   options?: { value: string; label: string }[];
 };

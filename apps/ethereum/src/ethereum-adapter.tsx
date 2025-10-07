@@ -36,8 +36,8 @@ export const ethereumAdapter: ProtocolAdapter<AugmentedTransaction> = {
   renderSummary: (data) => <TransactionSummary transaction={data} />,
 
   manualInputFields: [
-    { key: 'data', label: 'Calldata (hex)', placeholder: '0x...', required: true },
-    { key: 'to', label: 'To Address', placeholder: '0x...', required: true },
+    { key: 'data', label: 'Calldata (hex)', placeholder: '0x...' },
+    { key: 'to', label: 'To Address', placeholder: '0x...' },
     { key: 'from', label: 'From Address', placeholder: '0x...' },
     { key: 'value', label: 'Value (Wei)', placeholder: '0' },
     { key: 'chainId', type: 'select', options: chains, label: 'Chain ID', placeholder: '1' },
