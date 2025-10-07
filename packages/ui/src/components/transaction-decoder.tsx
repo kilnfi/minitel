@@ -1,9 +1,17 @@
-import type { Protocol } from '@protocols/shared';
+import type { ManualInputField, Protocol } from '@protocols/shared';
 import JsonView from '@uiw/react-json-view';
 import { githubLightTheme } from '@uiw/react-json-view/githubLight';
 import { vscodeTheme } from '@uiw/react-json-view/vscode';
-import { DownloadIcon, InboxIcon, InfoIcon, TriangleAlertIcon, ZapIcon } from 'lucide-react';
-import { useId, useRef } from 'react';
+import {
+  CheckIcon,
+  ChevronsUpDownIcon,
+  DownloadIcon,
+  InboxIcon,
+  InfoIcon,
+  TriangleAlertIcon,
+  ZapIcon,
+} from 'lucide-react';
+import { useId, useRef, useState } from 'react';
 import { useIsDarkMode } from '../hooks/useIsDarkMode';
 import { cn, convertBigIntToString } from '../lib/utils';
 import { CopyButtonIcon } from './copy-button';
@@ -12,7 +20,11 @@ import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Card, CardContent, CardFooter } from './ui/card';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/command';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Textarea } from './ui/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
@@ -30,6 +42,11 @@ export type TransactionDecoderProps<T> = {
   placeholder?: string;
   error?: string;
   protocol: Protocol;
+  isManualMode?: boolean;
+  onManualModeChange?: (enabled: boolean) => void;
+  manualFields?: Record<string, string>;
+  manualInputFieldsConfig?: ManualInputField[];
+  onManualFieldChange?: (field: string, value: string) => void;
 };
 
 export function TransactionDecoder<T>({
@@ -44,11 +61,31 @@ export function TransactionDecoder<T>({
   renderSummary,
   placeholder = 'Paste your transaction as hex or JSON',
   error,
+  isManualMode = false,
+  onManualModeChange,
+  manualFields,
+  manualInputFieldsConfig,
+  onManualFieldChange,
 }: TransactionDecoderProps<T>) {
   const textareaId = useId();
+  const manualModeId = useId();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const warningsAmount = warnings.length;
   const isDarkMode = useIsDarkMode();
+  const supportsManualInput = !!manualInputFieldsConfig && manualInputFieldsConfig.length > 0;
+
+  const [openStates, setOpenStates] = useState<Record<string, boolean>>(() => {
+    if (!manualInputFieldsConfig) return {};
+    return manualInputFieldsConfig.reduce(
+      (acc, field) => {
+        if (field.type === 'select') {
+          acc[field.key] = false;
+        }
+        return acc;
+      },
+      {} as Record<string, boolean>,
+    );
+  });
 
   return (
     <div className="relative flex flex-col gap-4 items-center justify-center px-4 w-full">
@@ -63,7 +100,9 @@ export function TransactionDecoder<T>({
           <Card>
             <CardContent className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
-                <span className="text-xl font-semibold">Paste your raw transaction</span>
+                <span className="text-xl font-semibold">
+                  {isManualMode ? 'Enter transaction fields' : 'Paste your raw transaction'}
+                </span>
                 <div className="flex items-center gap-2">
                   <Dialog>
                     <DialogTrigger asChild>
@@ -87,21 +126,125 @@ export function TransactionDecoder<T>({
                   </Dialog>
                 </div>
               </div>
+
+              {supportsManualInput && (
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id={manualModeId}
+                    checked={isManualMode}
+                    onChange={(e) => onManualModeChange?.(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 cursor-pointer"
+                  />
+                  <label htmlFor={manualModeId} className="text-sm font-medium leading-none cursor-pointer">
+                    Enter transaction fields separately
+                  </label>
+                </div>
+              )}
+
               <div className="grid w-full gap-3">
-                <Textarea
-                  className="h-20 overflow-auto resize-y"
-                  placeholder={placeholder}
-                  id={textareaId}
-                  value={rawTransaction}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onRawTransactionChange(e.target.value)}
-                  ref={textAreaRef}
-                />
+                {isManualMode ? (
+                  <div className="grid gap-4">
+                    {manualInputFieldsConfig?.map((fieldConfig) => (
+                      <div key={fieldConfig.key} className="grid gap-2">
+                        {fieldConfig.type === 'select' ? (
+                          <div className="space-y-2">
+                            <Label>{fieldConfig.label}</Label>
+                            <Popover
+                              open={openStates[fieldConfig.key]}
+                              onOpenChange={(open) => {
+                                setOpenStates((prev) => ({
+                                  ...prev,
+                                  [fieldConfig.key]: open,
+                                }));
+                              }}
+                            >
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" role="combobox" className="w-full justify-between">
+                                  {manualFields?.[fieldConfig.key]
+                                    ? fieldConfig.options?.find(
+                                        (option) => option.value === manualFields[fieldConfig.key],
+                                      )?.label
+                                    : fieldConfig.placeholder}
+                                  <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-full p-0" align="start">
+                                <Command>
+                                  <CommandInput placeholder={`Search ${fieldConfig.label.toLowerCase()}...`} />
+                                  <CommandList>
+                                    <CommandEmpty>No options found.</CommandEmpty>
+                                    <CommandGroup>
+                                      {fieldConfig.options?.map((option, i) => (
+                                        <CommandItem
+                                          key={`${i}-${option.value}`}
+                                          value={option.label}
+                                          onSelect={(currentValue) => {
+                                            onManualFieldChange?.(
+                                              fieldConfig.key,
+                                              fieldConfig.options?.find((option) => option.label === currentValue)
+                                                ?.value ?? '',
+                                            );
+                                            // Close only this specific popover
+                                            setOpenStates((prev) => ({
+                                              ...prev,
+                                              [fieldConfig.key]: false,
+                                            }));
+                                          }}
+                                        >
+                                          <CheckIcon
+                                            className={cn(
+                                              'mr-2 h-4 w-4',
+                                              manualFields?.[fieldConfig.key] === option.label
+                                                ? 'opacity-100'
+                                                : 'opacity-0',
+                                            )}
+                                          />
+                                          {option.label}
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                        ) : (
+                          <>
+                            <Label>
+                              {fieldConfig.label}
+                              {fieldConfig.required && <span className="text-destructive ml-1">*</span>}
+                            </Label>
+                            <Input
+                              placeholder={fieldConfig.placeholder}
+                              value={manualFields?.[fieldConfig.key] ?? ''}
+                              onChange={(e) => onManualFieldChange?.(fieldConfig.key, e.target.value)}
+                            />
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <Textarea
+                    className="h-20 overflow-auto resize-y"
+                    placeholder={placeholder}
+                    id={textareaId}
+                    value={rawTransaction}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onRawTransactionChange(e.target.value)}
+                    ref={textAreaRef}
+                  />
+                )}
               </div>
             </CardContent>
             <CardFooter className="flex justify-end">
               <Button
                 className="transition-transform active:scale-95 active:opacity-80"
-                disabled={!rawTransaction}
+                disabled={
+                  isManualMode
+                    ? !manualInputFieldsConfig?.some((field) => field.required && manualFields?.[field.key]?.trim())
+                    : !rawTransaction
+                }
                 size="lg"
                 onClick={onDecode}
               >

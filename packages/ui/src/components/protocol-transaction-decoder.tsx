@@ -1,4 +1,5 @@
 import type { ProtocolAdapter } from '@protocols/shared';
+import { useMemo, useState } from 'react';
 import { useTransactionDecoder } from '../hooks/useTransactionDecoder';
 import { useUrlParam } from '../hooks/useUrlParam';
 import { TransactionDecoder } from './transaction-decoder';
@@ -13,10 +14,35 @@ export function ProtocolTransactionDecoder<T>({ adapter }: ProtocolTransactionDe
     defaultValue: '',
   });
 
+  // Initialize manual fields dynamically from adapter configuration
+  const initialManualFields = useMemo(() => {
+    if (!adapter.manualInputFields) return {};
+    return adapter.manualInputFields.reduce(
+      (acc, field) => {
+        acc[field.key] = '';
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
+  }, [adapter.manualInputFields]);
+
+  const [isManualMode, setIsManualMode] = useState(false);
+  const [manualFields, setManualFields] = useState<Record<string, string>>(initialManualFields);
+
   const { decodedTransaction, hash, error, warnings, decodeTransaction } = useTransactionDecoder(adapter);
 
+  const handleManualFieldChange = (field: string, value: string) => {
+    setManualFields((prev) => ({ ...prev, [field]: value }));
+  };
+
   const handleDecode = async () => {
-    await decodeTransaction(rawTransaction);
+    let txToProcess = rawTransaction;
+
+    if (isManualMode && adapter.buildTransactionFromFields) {
+      txToProcess = adapter.buildTransactionFromFields(manualFields);
+    }
+
+    await decodeTransaction(txToProcess);
   };
 
   return (
@@ -33,6 +59,11 @@ export function ProtocolTransactionDecoder<T>({ adapter }: ProtocolTransactionDe
       renderSummary={adapter.renderSummary ? (data: T) => adapter.renderSummary?.(data, hash) : undefined}
       placeholder={adapter.placeholder ?? 'Paste your transaction'}
       error={error}
+      isManualMode={isManualMode}
+      onManualModeChange={setIsManualMode}
+      manualFields={manualFields}
+      manualInputFieldsConfig={adapter.manualInputFields}
+      onManualFieldChange={handleManualFieldChange}
     />
   );
 }

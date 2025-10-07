@@ -79,19 +79,6 @@ export const looksLikeObject = (input: string): boolean => {
   return input.startsWith('{') || input.startsWith('[');
 };
 
-const _serializeBigInt = (obj: any): any => {
-  if (typeof obj === 'bigint') {
-    return obj.toString();
-  }
-  if (Array.isArray(obj)) {
-    return obj.map(_serializeBigInt);
-  }
-  if (obj && typeof obj === 'object') {
-    return Object.fromEntries(Object.entries(obj).map(([key, value]) => [key, _serializeBigInt(value)]));
-  }
-  return obj;
-};
-
 export const hashEthTx = (txRaw: string): string => {
   if (looksLikeObject(txRaw)) {
     const tx = JSON.parse(txRaw);
