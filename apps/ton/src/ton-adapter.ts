@@ -6,10 +6,8 @@ const computeTonHash = async (rawTx: string): Promise<string> => {
   try {
     const input = rawTx.trim();
 
-    // Convert hex string to Uint8Array
     const bocBytes = new Uint8Array(input.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || []);
 
-    // Parse the BOC (Bag of Cells) and compute TON cell hash
     const cell = Cell.fromBoc(Buffer.from(bocBytes))[0];
     const cellHash = cell.hash();
 
