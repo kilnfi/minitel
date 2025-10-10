@@ -1,15 +1,19 @@
 import { type ProtocolAdapter, TON } from '@protocols/shared';
+import { Cell } from '@ton/core';
 import { parseTonTx } from '@/parser';
 
 const computeTonHash = async (rawTx: string): Promise<string> => {
   try {
     const input = rawTx.trim();
 
-    const transactionUint8Array = new Uint8Array(input.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || []);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', transactionUint8Array);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-  } catch {
+    const bocBytes = new Uint8Array(input.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || []);
+
+    const cell = Cell.fromBoc(Buffer.from(bocBytes))[0];
+    const cellHash = cell.hash();
+
+    return Buffer.from(cellHash).toString('hex');
+  } catch (error) {
+    console.error('Failed to compute TON hash:', error);
     throw new Error('Failed to compute Ton hash');
   }
 };
