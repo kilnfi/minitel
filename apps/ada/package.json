@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@emurgo/cardano-serialization-lib-browser": "^15.0.1",
+    "@noble/hashes": "^2.0.1",
     "@protocols/shared": "workspace:*",
     "@protocols/ui": "workspace:*",
     "@uiw/react-json-view": "^2.0.0-alpha.36",
