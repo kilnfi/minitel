@@ -1,0 +1,32 @@
+{
+  "name": "@protocols/substrate-shared",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc",
+    "lint": "biome check .",
+    "format": "biome format --write ."
+  },
+  "dependencies": {
+    "@polkadot/api": "^14.3.1",
+    "@polkadot/types": "^14.3.1",
+    "@polkadot/util": "^13.2.3",
+    "@polkadot/util-crypto": "^13.2.3",
+    "blakejs": "^1.2.1",
+    "@protocols/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/react": "^19.0.0"
+  },
+  "peerDependencies": {
+    "react": "^19.1.1"
+  }
+}

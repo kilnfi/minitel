@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        app: [ethereum, solana, near, zeta, tia, sei, osmosis, mantra, injective, fetch, dydx, cronos, atom, kava, ada, sui, xtz, ton, trx]
+        app: [ethereum, solana, near, zeta, tia, sei, osmosis, mantra, injective, fetch, dydx, cronos, atom, kava, ada, sui, xtz, ton, trx, ksm, dot]
 
     steps:
       - name: Checkout
@@ -55,6 +55,8 @@ jobs:
             xtz) echo "project_id=${{ secrets.VERCEL_PROJECT_ID_XTZ }}" >> $GITHUB_OUTPUT ;;
             ton) echo "project_id=${{ secrets.VERCEL_PROJECT_ID_TON }}" >> $GITHUB_OUTPUT ;;
             trx) echo "project_id=${{ secrets.VERCEL_PROJECT_ID_TRX }}" >> $GITHUB_OUTPUT ;;
+            ksm) echo "project_id=${{ secrets.VERCEL_PROJECT_ID_KSM }}" >> $GITHUB_OUTPUT ;;
+            dot) echo "project_id=${{ secrets.VERCEL_PROJECT_ID_DOT }}" >> $GITHUB_OUTPUT ;;
           esac
 
       - name: Pull Vercel Environment Information
