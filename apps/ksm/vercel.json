@@ -1,6 +1,6 @@
 {
     "installCommand": "bun install --cwd ../../",
-    "buildCommand": "bun --cwd ../../ --filter @protocols/zeta build",
+    "buildCommand": "bun --cwd ../../ --filter @protocols/ksm build",
     "outputDirectory": "dist",
     "framework": null
 }
