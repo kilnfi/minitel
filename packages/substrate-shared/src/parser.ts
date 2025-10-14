@@ -49,7 +49,8 @@ export const parseSubstrateTx = async (token: SupportedSubstrateChains, txRaw: s
 
     try {
       // Try to decode as hex to string to check if it's JSON
-      const possibleJson = Buffer.from(cleanedInput, 'hex').toString('utf8');
+      const bytes = new Uint8Array(cleanedInput.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || []);
+      const possibleJson = new TextDecoder('utf-8').decode(bytes);
       if (possibleJson.startsWith('{')) {
         const parsed = JSON.parse(possibleJson);
         if (parsed.method) {

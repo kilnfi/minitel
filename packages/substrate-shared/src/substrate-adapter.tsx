@@ -9,7 +9,8 @@ const computeSubstrateHash = async (token: SupportedSubstrateChains, rawTx: stri
     const cleanedInput = input.startsWith('0x') ? input.substring(2) : input;
 
     // Decode hex to get the SignerPayloadJSON
-    const jsonString = Buffer.from(cleanedInput, 'hex').toString('utf8');
+    const bytes = new Uint8Array(cleanedInput.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || []);
+    const jsonString = new TextDecoder('utf-8').decode(bytes);
     const payload = JSON.parse(jsonString);
 
     // Get the WebSocket client to access the Polkadot API registry
