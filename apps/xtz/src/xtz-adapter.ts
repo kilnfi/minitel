@@ -1,18 +1,20 @@
+import { blake2b } from '@noble/hashes/blake2.js';
 import { type ProtocolAdapter, XTZ } from '@protocols/shared';
 import type { ForgeParams } from '@taquito/local-forging';
 import { parseXtzTx } from '@/parser';
 
-const computeXtzHash = async (rawTx: string): Promise<string> => {
-  try {
-    const input = rawTx.trim();
+export const computeXtzHash = (rawTx: string): string => {
+  const forgedBytes = new Uint8Array(rawTx.match(/.{1,2}/g)?.map((b) => parseInt(b, 16)) || []);
 
-    const transactionUint8Array = new Uint8Array(input.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || []);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', transactionUint8Array);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-  } catch {
-    throw new Error('Failed to compute Xtz hash');
-  }
+  const watermarked = new Uint8Array(forgedBytes.length + 1);
+  watermarked[0] = 0x03;
+  watermarked.set(forgedBytes, 1);
+
+  const digest = blake2b(watermarked, { dkLen: 32 });
+
+  return Array.from(digest)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
 };
 
 export const xtzAdapter: ProtocolAdapter<ForgeParams> = {
