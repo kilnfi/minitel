@@ -17,7 +17,7 @@ const computeTrxHash = async (rawTx: string): Promise<string> => {
 export const trxAdapter: ProtocolAdapter<unknown> = {
   protocol: TRX,
   name: 'trx',
-  displayName: 'Trx',
+  displayName: 'Tron',
   placeholder: 'Paste your transaction as hex',
   parseTransaction: parseTrxTx,
   computeHash: computeTrxHash,

@@ -31,7 +31,7 @@ const computeAdaHash = async (rawTx: string): Promise<string> => {
 export const adaAdapter: ProtocolAdapter<TransactionJSON> = {
   protocol: ADA,
   name: 'ada',
-  displayName: 'Ada',
+  displayName: 'Cardano',
   placeholder: 'Paste your transaction as hex',
   parseTransaction: parseAdaTx,
   computeHash: computeAdaHash,
