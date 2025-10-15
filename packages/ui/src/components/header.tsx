@@ -28,7 +28,7 @@ export const Header = ({
       <DropdownMenu>
         <DropdownMenuTrigger className="flex items-center text-xl gap-8 px-3 py-2">
           <div className="flex items-center gap-1 leading-7 font-medium">
-            {currentProtocol.icon && currentProtocol.icon} {currentProtocol.name}
+            {currentProtocol.icon && currentProtocol.icon} {currentProtocol.shortName || currentProtocol.name}
             <span className="text-xl text-muted-foreground">Minitel</span>
           </div>
           <ChevronsUpDownIcon className="w-4 h-4 text-muted-foreground" />
