@@ -18,7 +18,7 @@ const computeXtzHash = async (rawTx: string): Promise<string> => {
 export const xtzAdapter: ProtocolAdapter<ForgeParams> = {
   protocol: XTZ,
   name: 'xtz',
-  displayName: 'Xtz',
+  displayName: 'Tezos',
   placeholder: 'Paste your transaction as hex',
   parseTransaction: parseXtzTx,
   computeHash: computeXtzHash,

@@ -17,7 +17,7 @@ function App() {
           <Background />
           <Header protocols={PROTOCOLS} currentProtocol={currentProtocol} onChangeProtocol={onChangeProtocol} />
           <ProtocolTransactionDecoder
-            adapter={createCosmosAdapter({ protocol: DYDX, name: 'dydx', displayName: 'Dydx' })}
+            adapter={createCosmosAdapter({ protocol: DYDX, name: 'dydx', displayName: 'dYdX' })}
           />
         </div>
       </div>

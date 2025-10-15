@@ -90,7 +90,7 @@ export const ZETA = {
 
 export const DYDX = {
   token: 'DYDX',
-  name: 'Dydx',
+  name: 'dYdX',
   icon: <DydxIcon className="size-5" />,
   url: 'https://dydx.minitel.app',
   localUrl: 'http://localhost:3007',
@@ -130,7 +130,7 @@ export const OM = {
 
 export const TIA = {
   token: 'TIA',
-  name: 'Tia',
+  name: 'Celestia',
   icon: <TiaIcon className="size-5" />,
   url: 'https://tia.minitel.app',
   localUrl: 'http://localhost:3012',
@@ -146,7 +146,7 @@ export const OSMO = {
 
 export const ADA = {
   token: 'ADA',
-  name: 'Ada',
+  name: 'Cardano',
   icon: <AdaIcon className="size-5" />,
   url: 'https://ada.minitel.app',
   localUrl: 'http://localhost:3014',
@@ -162,7 +162,7 @@ export const TON = {
 
 export const TRX = {
   token: 'TRX',
-  name: 'Trx',
+  name: 'Tron',
   icon: <TrxIcon className="size-5" />,
   url: 'https://trx.minitel.app',
   localUrl: 'http://localhost:3018',
@@ -178,7 +178,7 @@ export const SUI = {
 
 export const XTZ = {
   token: 'XTZ',
-  name: 'Xtz',
+  name: 'Tezos',
   icon: <XtzIcon className="size-5" />,
   url: 'https://xtz.minitel.app',
   localUrl: 'http://localhost:3016',
