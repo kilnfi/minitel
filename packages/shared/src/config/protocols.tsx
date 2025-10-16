@@ -29,6 +29,7 @@ export type Token = CosmosToken | 'ETH' | 'NEAR' | 'SOL' | 'ADA' | 'SUI' | 'XTZ'
 export type Protocol = {
   token: Token;
   name: string;
+  shortName?: string;
   icon?: React.ReactNode;
   url: string;
   localUrl: string;
@@ -156,7 +157,8 @@ export const ADA = {
 
 export const TON = {
   token: 'TON',
-  name: 'Ton',
+  name: 'The Open Network',
+  shortName: 'Ton',
   icon: <TonIcon className="size-5" />,
   url: 'https://ton.minitel.app',
   localUrl: 'http://localhost:3017',
@@ -188,7 +190,7 @@ export const XTZ = {
 
 export const DOT = {
   token: 'DOT',
-  name: 'Dot',
+  name: 'Polkadot',
   icon: <DotIcon className="size-5" />,
   url: 'https://dot.minitel.app',
   localUrl: 'http://localhost:3019',

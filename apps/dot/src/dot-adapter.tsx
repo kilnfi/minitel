@@ -4,6 +4,6 @@ import { createSubstrateAdapter } from '@protocols/substrate-shared';
 export const dotAdapter = createSubstrateAdapter({
   protocol: DOT,
   name: 'dot',
-  displayName: 'Dot',
+  displayName: 'Polkadot',
   token: 'DOT',
 });

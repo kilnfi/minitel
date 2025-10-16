@@ -21,7 +21,7 @@ const computeTonHash = async (rawTx: string): Promise<string> => {
 export const tonAdapter: ProtocolAdapter<any> = {
   protocol: TON,
   name: 'ton',
-  displayName: 'Ton',
+  displayName: 'The Open Network',
   placeholder: 'Paste your transaction as hex',
   parseTransaction: parseTonTx,
   computeHash: computeTonHash,
