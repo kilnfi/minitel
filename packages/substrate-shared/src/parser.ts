@@ -11,7 +11,7 @@ const chains = {
   KSM: {
     chainName: 'Kusama',
     specName: 'kusama',
-    rpcUrl: 'wss://kusama-rpc.polkadot.io',
+    rpcUrl: 'wss://assethub-kusama.api.onfinality.io/public-ws',
   },
 };
 
