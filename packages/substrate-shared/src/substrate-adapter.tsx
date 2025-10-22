@@ -22,7 +22,7 @@ const computeSubstrateHash = async (token: SupportedSubstrateChains, rawTx: stri
     const { registry } = wsClient.client;
 
     // Encode SignerPayload fields in order (matches API's signer_payload.toRaw().data)
-    // Format v5: method + era + nonce + tip + assetId + [metadataHash (KSM only)] + specVersion + transactionVersion + genesisHash + blockHash + mode
+    // Format v5: method + era + nonce + tip + assetId + metadataHash (KSM only) + specVersion + transactionVersion + genesisHash + blockHash + mode
     const encodedFields = [
       registry.createType('Call', payload.method).toU8a(),
       registry.createType('ExtrinsicEra', payload.era).toU8a(),
