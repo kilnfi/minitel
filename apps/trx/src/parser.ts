@@ -1,4 +1,3 @@
-import type Long from 'long';
 import tronweb from 'tronweb';
 import { TrxProtobuf } from '@/protos';
 
@@ -114,14 +113,14 @@ export class TrxParser {
     const VoteWitnessContract = TrxProtobuf.lookupType('protocol.VoteWitnessContract');
     const decoded = VoteWitnessContract.decode(buffer) as unknown as {
       owner_address: Buffer;
-      votes: Array<{ vote_address: Buffer; vote_count: Long }>;
+      votes: Array<{ vote_address: Buffer; vote_count: number }>;
     };
 
     return {
       owner_address: this.formatAddress(decoded.owner_address),
       votes: decoded.votes.map((vote) => ({
         vote_address: this.formatAddress(vote.vote_address),
-        vote_count: vote.vote_count.toNumber(),
+        vote_count: vote.vote_count,
       })),
     };
   }
