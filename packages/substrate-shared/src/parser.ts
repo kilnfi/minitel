@@ -6,7 +6,7 @@ const chains = {
   DOT: {
     chainName: 'Polkadot',
     specName: 'polkadot',
-    rpcUrl: 'wss://rpc.polkadot.io',
+    rpcUrl: 'wss://statemint.api.onfinality.io/public-ws',
   },
   KSM: {
     chainName: 'Kusama',
