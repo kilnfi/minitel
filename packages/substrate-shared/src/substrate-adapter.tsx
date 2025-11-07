@@ -37,13 +37,7 @@ const computeSubstrateHash = async (token: SupportedSubstrateChains, rawTx: stri
       registry.createType('Compact<Index>', payload.nonce).toU8a(),
       registry.createType('Compact<u128>', payload.tip).toU8a(),
       payload.assetId ? registry.createType('Option<u32>', payload.assetId).toU8a() : new Uint8Array([0x00]),
-      ...(token === 'KSM'
-        ? [
-            payload.metadataHash
-              ? registry.createType('Option<Hash>', payload.metadataHash).toU8a()
-              : new Uint8Array([0x00]),
-          ]
-        : []),
+      payload.metadataHash ? registry.createType('Option<Hash>', payload.metadataHash).toU8a() : new Uint8Array([0x00]),
       registry.createType('u32', payload.specVersion).toU8a(),
       registry.createType('u32', payload.transactionVersion).toU8a(),
       registry.createType('Hash', payload.genesisHash).toU8a(),
