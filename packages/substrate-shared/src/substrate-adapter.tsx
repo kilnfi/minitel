@@ -3,6 +3,14 @@ import { u8aToHex } from '@polkadot/util';
 import type { Protocol, ProtocolAdapter } from '@protocols/shared';
 import { getWsClient, parseSubstrateTx, type SupportedSubstrateChains } from './parser';
 
+const isValidSubstrateInput = (rawTx: string): boolean => {
+  const input = rawTx.trim();
+  if (!input) return false;
+
+  const hex = input.startsWith('0x') ? input.substring(2) : input;
+  return /^[0-9a-fA-F]+$/.test(hex) && hex.length % 2 === 0;
+};
+
 const computeSubstrateHash = async (token: SupportedSubstrateChains, rawTx: string): Promise<string> => {
   try {
     const input = rawTx.trim();
@@ -29,7 +37,13 @@ const computeSubstrateHash = async (token: SupportedSubstrateChains, rawTx: stri
       registry.createType('Compact<Index>', payload.nonce).toU8a(),
       registry.createType('Compact<u128>', payload.tip).toU8a(),
       payload.assetId ? registry.createType('Option<u32>', payload.assetId).toU8a() : new Uint8Array([0x00]),
-      ...(token === 'KSM' ? [payload.metadataHash ? registry.createType('Option<Hash>', payload.metadataHash).toU8a() : new Uint8Array([0x00])] : []),
+      ...(token === 'KSM'
+        ? [
+            payload.metadataHash
+              ? registry.createType('Option<Hash>', payload.metadataHash).toU8a()
+              : new Uint8Array([0x00]),
+          ]
+        : []),
       registry.createType('u32', payload.specVersion).toU8a(),
       registry.createType('u32', payload.transactionVersion).toU8a(),
       registry.createType('Hash', payload.genesisHash).toU8a(),
@@ -67,6 +81,7 @@ export const createSubstrateAdapter = ({
     name,
     displayName,
     placeholder: 'Paste your transaction as hex',
+    validateInput: isValidSubstrateInput,
     parseTransaction: async (rawTx) => parseSubstrateTx(token, rawTx),
     computeHash: async (rawTx) => computeSubstrateHash(token, rawTx),
   };
