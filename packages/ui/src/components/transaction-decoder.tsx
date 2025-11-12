@@ -265,7 +265,7 @@ export function TransactionDecoder<T>({
                 disabled={
                   isManualMode
                     ? !manualInputFieldsConfig?.every((field) => manualFields?.[field.key]?.trim())
-                    : !rawTransaction || rawTxInvalid
+                    : !rawTransaction || rawTxInvalid || rawTxTooLarge
                 }
                 size="lg"
                 onClick={onDecode}
