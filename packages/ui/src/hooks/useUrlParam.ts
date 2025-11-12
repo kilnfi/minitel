@@ -23,7 +23,7 @@ export function useUrlParam({ paramName, defaultValue = '', replaceState = true 
   const updateValue = (newValue: string) => {
     if (newValue.length > MAX_TRANSACTION_SIZE) {
       console.warn(
-        `Transaction size (${newValue.length} bytes) exceeds maximum (${MAX_TRANSACTION_SIZE} bytes). Truncating URL.`,
+        `Transaction size (${newValue.length} bytes) exceeds maximum (${MAX_TRANSACTION_SIZE} bytes). Transaction not added to URL.`,
       );
       setValue(newValue);
       return;
