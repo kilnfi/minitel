@@ -58,6 +58,7 @@ export function ProtocolTransactionDecoder<T>({ adapter }: ProtocolTransactionDe
       renderSummary={adapter.renderSummary ? (data: T) => adapter.renderSummary?.(data, hash) : undefined}
       placeholder={adapter.placeholder ?? 'Paste your transaction'}
       error={error}
+      validateInput={adapter.validateInput}
       isManualMode={isManualMode}
       onManualModeChange={setIsManualMode}
       manualFields={manualFields}

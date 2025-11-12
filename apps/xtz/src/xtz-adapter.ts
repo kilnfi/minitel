@@ -3,6 +3,12 @@ import { type ProtocolAdapter, XTZ } from '@protocols/shared';
 import type { ForgeParams } from '@taquito/local-forging';
 import { parseXtzTx } from '@/parser';
 
+const isValidXtzInput = (rawTx: string): boolean => {
+  const input = rawTx.trim();
+  if (!input) return false;
+  return /^[0-9a-fA-F]+$/.test(input) && input.length % 2 === 0;
+};
+
 export const computeXtzHash = (rawTx: string): string => {
   const forgedBytes = new Uint8Array(rawTx.match(/.{1,2}/g)?.map((b) => parseInt(b, 16)) || []);
 
@@ -22,6 +28,7 @@ export const xtzAdapter: ProtocolAdapter<ForgeParams> = {
   name: 'xtz',
   displayName: 'Tezos',
   placeholder: 'Paste your transaction as hex',
+  validateInput: isValidXtzInput,
   parseTransaction: parseXtzTx,
   computeHash: computeXtzHash,
 };
