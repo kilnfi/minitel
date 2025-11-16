@@ -4,6 +4,12 @@ import { blake2b } from '@noble/hashes/blake2.js';
 import { ADA, type ProtocolAdapter } from '@protocols/shared';
 import { parseAdaTx } from '@/parser';
 
+const isValidAdaInput = (rawTx: string): boolean => {
+  const input = rawTx.trim();
+  if (!input) return false;
+  return /^[0-9a-fA-F]+$/.test(input) && input.length % 2 === 0;
+};
+
 const computeAdaHash = async (rawTx: string): Promise<string> => {
   try {
     const input = rawTx.trim();
@@ -33,6 +39,7 @@ export const adaAdapter: ProtocolAdapter<TransactionJSON> = {
   name: 'ada',
   displayName: 'Cardano',
   placeholder: 'Paste your transaction as hex',
+  validateInput: isValidAdaInput,
   parseTransaction: parseAdaTx,
   computeHash: computeAdaHash,
 };
