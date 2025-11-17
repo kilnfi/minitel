@@ -1,5 +1,6 @@
 import type { ProtocolAdapter } from '@protocols/shared';
 import { useCallback, useState } from 'react';
+import { convertBigIntToString } from '../lib/utils';
 
 export type UseTransactionDecoderResult<T> = {
   decodedTransaction: T | null;
@@ -25,7 +26,8 @@ export function useTransactionDecoder<T>(adapter: ProtocolAdapter<T>): UseTransa
         const decoded = await adapter.parseTransaction(rawTx);
         const computedHash = await adapter.computeHash(rawTx);
 
-        setDecodedTransaction(decoded);
+        const decodedWithStrings = convertBigIntToString(decoded);
+        setDecodedTransaction(decodedWithStrings);
         setHash(computedHash);
       } catch (err) {
         console.error('Transaction decode error:', err);
