@@ -2,12 +2,6 @@ import type { Transaction } from '@mysten/sui/transactions';
 import { type ProtocolAdapter, SUI } from '@protocols/shared';
 import { parseSuiTx } from '@/parser';
 
-const isValidSuiInput = (rawTx: string): boolean => {
-  const input = rawTx.trim();
-  if (!input) return false;
-  return /^[0-9a-fA-F]+$/.test(input) && input.length % 2 === 0;
-};
-
 const computeSuiHash = async (rawTx: string): Promise<string> => {
   try {
     const input = rawTx.trim();
@@ -26,7 +20,6 @@ export const suiAdapter: ProtocolAdapter<ReturnType<typeof Transaction.prototype
   name: 'sui',
   displayName: 'Sui',
   placeholder: 'Paste your transaction as hex',
-  validateInput: isValidSuiInput,
   parseTransaction: parseSuiTx,
   computeHash: computeSuiHash,
 };
