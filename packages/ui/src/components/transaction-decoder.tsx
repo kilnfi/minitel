@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { useId, useRef, useState } from 'react';
 import { useIsDarkMode } from '../hooks/useIsDarkMode';
-import { cn } from '../lib/utils';
+import { cn, convertBigIntToString } from '../lib/utils';
 import { CopyButtonIcon } from './copy-button';
 import { Footer } from './footer';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
@@ -29,8 +29,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Textarea } from './ui/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
-const MAX_TRANSACTION_SIZE = 1048576; // 1MB
-
 export type TransactionDecoderProps<T> = {
   title?: string;
   subtitle?: string;
@@ -44,7 +42,6 @@ export type TransactionDecoderProps<T> = {
   placeholder?: string;
   error?: string;
   protocol: Protocol;
-  validateInput?: (rawTx: string) => boolean;
   isManualMode?: boolean;
   onManualModeChange?: (enabled: boolean) => void;
   manualFields?: Record<string, string>;
@@ -64,13 +61,11 @@ export function TransactionDecoder<T>({
   renderSummary,
   placeholder = 'Paste your transaction as hex or JSON',
   error,
-  validateInput,
   isManualMode = false,
   onManualModeChange,
   manualFields,
   manualInputFieldsConfig,
   onManualFieldChange,
-  protocol,
 }: TransactionDecoderProps<T>) {
   const textareaId = useId();
   const manualModeId = useId();
@@ -78,9 +73,6 @@ export function TransactionDecoder<T>({
   const warningsAmount = warnings.length;
   const isDarkMode = useIsDarkMode();
   const supportsManualInput = !!manualInputFieldsConfig && manualInputFieldsConfig.length > 0;
-
-  const rawTxInvalid = !isManualMode && !!rawTransaction && validateInput && !validateInput(rawTransaction);
-  const rawTxTooLarge = !isManualMode && rawTransaction.length > MAX_TRANSACTION_SIZE;
 
   const [openStates, setOpenStates] = useState<Record<string, boolean>>(() => {
     if (!manualInputFieldsConfig) return {};
@@ -193,6 +185,7 @@ export function TransactionDecoder<T>({
                                               fieldConfig.options?.find((option) => option.label === currentValue)
                                                 ?.value ?? '',
                                             );
+                                            // Close only this specific popover
                                             setOpenStates((prev) => ({
                                               ...prev,
                                               [fieldConfig.key]: false,
@@ -230,32 +223,14 @@ export function TransactionDecoder<T>({
                     ))}
                   </div>
                 ) : (
-                  <div className="grid gap-2">
-                    <Textarea
-                      className={cn(
-                        'h-20 overflow-auto resize-y',
-                        (rawTxInvalid || rawTxTooLarge) && 'border-destructive focus-visible:ring-destructive',
-                      )}
-                      aria-invalid={rawTxInvalid || rawTxTooLarge}
-                      placeholder={placeholder}
-                      id={textareaId}
-                      value={rawTransaction}
-                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onRawTransactionChange(e.target.value)}
-                      maxLength={MAX_TRANSACTION_SIZE}
-                      ref={textAreaRef}
-                    />
-                    {rawTxTooLarge && (
-                      <p className="text-xs text-destructive">
-                        Transaction size ({rawTransaction.length.toLocaleString()} bytes) exceeds maximum (
-                        {MAX_TRANSACTION_SIZE.toLocaleString()} bytes).
-                      </p>
-                    )}
-                    {rawTxInvalid && !rawTxTooLarge && (
-                      <p className="text-xs text-destructive">
-                        Invalid transaction format for {protocol.name}. Please check your input and try again.
-                      </p>
-                    )}
-                  </div>
+                  <Textarea
+                    className="h-20 overflow-auto resize-y"
+                    placeholder={placeholder}
+                    id={textareaId}
+                    value={rawTransaction}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onRawTransactionChange(e.target.value)}
+                    ref={textAreaRef}
+                  />
                 )}
               </div>
             </CardContent>
@@ -265,7 +240,7 @@ export function TransactionDecoder<T>({
                 disabled={
                   isManualMode
                     ? !manualInputFieldsConfig?.every((field) => manualFields?.[field.key]?.trim())
-                    : !rawTransaction || rawTxInvalid || rawTxTooLarge
+                    : !rawTransaction
                 }
                 size="lg"
                 onClick={onDecode}
@@ -376,7 +351,7 @@ export function TransactionDecoderTabs<T>({
                 <CopyButtonIcon
                   variant="outline"
                   size="icon"
-                  textToCopy={JSON.stringify(decodedTransaction ?? {})}
+                  textToCopy={JSON.stringify(convertBigIntToString(decodedTransaction ?? {}))}
                   disabled={!decodedTransaction}
                 />
                 <Button
@@ -384,7 +359,7 @@ export function TransactionDecoderTabs<T>({
                   size="icon"
                   variant="outline"
                   onClick={() => {
-                    const blob = new Blob([JSON.stringify(decodedTransaction ?? {})], {
+                    const blob = new Blob([JSON.stringify(convertBigIntToString(decodedTransaction ?? {}))], {
                       type: 'application/json',
                     });
                     const url = URL.createObjectURL(blob);
@@ -397,7 +372,10 @@ export function TransactionDecoderTabs<T>({
                   <DownloadIcon />
                 </Button>
               </div>
-              <JsonView value={decodedTransaction ?? {}} style={isDarkMode ? vscodeTheme : githubLightTheme} />
+              <JsonView
+                value={convertBigIntToString(decodedTransaction ?? {})}
+                style={isDarkMode ? vscodeTheme : githubLightTheme}
+              />
             </TabsContent>
           </>
         ) : (

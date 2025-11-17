@@ -1,6 +1,5 @@
 import type { ProtocolAdapter } from '@protocols/shared';
 import { useCallback, useState } from 'react';
-import { convertBigIntToString } from '../lib/utils';
 
 export type UseTransactionDecoderResult<T> = {
   decodedTransaction: T | null;
@@ -26,16 +25,11 @@ export function useTransactionDecoder<T>(adapter: ProtocolAdapter<T>): UseTransa
         const decoded = await adapter.parseTransaction(rawTx);
         const computedHash = await adapter.computeHash(rawTx);
 
-        const decodedWithStrings = convertBigIntToString(decoded);
-        setDecodedTransaction(decodedWithStrings);
+        setDecodedTransaction(decoded);
         setHash(computedHash);
       } catch (err) {
         console.error('Transaction decode error:', err);
-        const sanitizedMessage =
-          err instanceof Error
-            ? 'Failed to decode transaction. Please check the transaction format and try again.'
-            : 'An unexpected error occurred while decoding the transaction.';
-        setError(sanitizedMessage);
+        setError(err instanceof Error ? err.message : 'Unknown error');
         setDecodedTransaction(null);
         setHash('');
       } finally {

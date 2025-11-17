@@ -2,12 +2,6 @@ import { NEAR, type ProtocolAdapter } from '@protocols/shared';
 import { TransactionSummary } from '@/components/TransactionSummary';
 import { type NearTransaction, parseNearTx } from '@/parser';
 
-const isValidNearInput = (rawTx: string): boolean => {
-  const input = rawTx.trim();
-  if (!input) return false;
-  return /^[0-9a-fA-F]+$/.test(input) && input.length % 2 === 0;
-};
-
 const computeNearHash = async (rawTx: string): Promise<string> => {
   try {
     const input = rawTx.trim();
@@ -27,7 +21,6 @@ export const nearAdapter: ProtocolAdapter<NearTransaction> = {
   displayName: 'Near',
   placeholder: 'Paste your transaction as hex',
 
-  validateInput: isValidNearInput,
   parseTransaction: async (rawTx) => parseNearTx(rawTx),
   computeHash: computeNearHash,
 

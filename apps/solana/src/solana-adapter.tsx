@@ -36,22 +36,12 @@ const computeSolanaHash = async (rawTx: string): Promise<string> => {
   }
 };
 
-const isValidSolanaInput = (rawTx: string): boolean => {
-  const input = rawTx.trim();
-  if (!input) return false;
-
-  if (input.startsWith('{') || input.startsWith('[')) return true;
-
-  return /^[0-9a-fA-F]+$/.test(input) && input.length % 2 === 0;
-};
-
 export const solanaAdapter: ProtocolAdapter<ParseSolTxResult> = {
   protocol: SOL,
   name: 'solana',
   displayName: 'Solana',
   placeholder: 'Paste your transaction as hex or Fireblocks message JSON',
 
-  validateInput: isValidSolanaInput,
   parseTransaction: async (rawTx) => parseSolTx(rawTx),
   computeHash: computeSolanaHash,
 

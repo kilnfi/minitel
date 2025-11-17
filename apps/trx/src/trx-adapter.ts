@@ -1,12 +1,6 @@
 import { type ProtocolAdapter, TRX } from '@protocols/shared';
 import { parseTrxTx } from '@/parser';
 
-const isValidTrxInput = (rawTx: string): boolean => {
-  const input = rawTx.trim();
-  if (!input) return false;
-  return /^[0-9a-fA-F]+$/.test(input) && input.length % 2 === 0;
-};
-
 const computeTrxHash = async (rawTx: string): Promise<string> => {
   try {
     const input = rawTx.trim();
@@ -25,7 +19,6 @@ export const trxAdapter: ProtocolAdapter<unknown> = {
   name: 'trx',
   displayName: 'Tron',
   placeholder: 'Paste your transaction as hex',
-  validateInput: isValidTrxInput,
   parseTransaction: parseTrxTx,
   computeHash: computeTrxHash,
 };

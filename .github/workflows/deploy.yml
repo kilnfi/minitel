@@ -13,20 +13,16 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      contents: read
-      deployments: write
     strategy:
       matrix:
         app: [ethereum, solana, near, zeta, tia, sei, osmosis, mantra, injective, fetch, dydx, cronos, atom, kava, ada, sui, xtz, ton, trx, ksm, dot]
 
     steps:
       - name: Checkout
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
+        uses: actions/checkout@v4
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
