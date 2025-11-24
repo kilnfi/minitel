@@ -2,6 +2,13 @@ import type { DecodedTxRaw } from '@cosmjs/proto-signing';
 import type { Protocol, ProtocolAdapter } from '@protocols/shared';
 import { parseCosmosTx } from './parser';
 
+const isValidCosmosInput = (rawTx: string): boolean => {
+  const input = rawTx.trim();
+  if (!input) return false;
+
+  return /^[0-9a-fA-F]+$/.test(input) && input.length % 2 === 0;
+};
+
 const computeCosmosHash = async (rawTx: string): Promise<string> => {
   try {
     const input = rawTx.trim();
@@ -29,6 +36,8 @@ export const createCosmosAdapter = ({
     name,
     displayName,
     placeholder: 'Paste your transaction as hex',
+    validateInput: isValidCosmosInput,
+    convertBigInt: true,
     parseTransaction: async (rawTx) => parseCosmosTx(rawTx),
     computeHash: computeCosmosHash,
   };

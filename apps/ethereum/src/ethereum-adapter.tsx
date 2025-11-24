@@ -1,5 +1,5 @@
 import { ETH, type ProtocolAdapter } from '@protocols/shared';
-import { formatEther } from 'viem';
+import { formatEther, isHex } from 'viem';
 import * as viemChains from 'viem/chains';
 import { TransactionSummary } from '@/components/TransactionSummary';
 import { hashEthTx, parseEthTx } from '@/parser';
@@ -26,11 +26,22 @@ const chains = Object.values(viemChains).map((chain) => ({
   label: `${chain.id.toString()} - ${chain.name}`,
 }));
 
+const isValidEthereumInput = (rawTx: string): boolean => {
+  const input = rawTx.trim();
+  if (!input) return false;
+
+  if (input.startsWith('{')) return true;
+
+  return isHex(input);
+};
+
 export const ethereumAdapter: ProtocolAdapter<AugmentedTransaction> = {
   protocol: ETH,
   name: 'ethereum',
   displayName: 'Ethereum',
   placeholder: 'Paste your transaction as hex or JSON',
+  validateInput: isValidEthereumInput,
+  convertBigInt: true,
   parseTransaction: parseEthTx,
   computeHash: hashEthTx,
   renderSummary: (data) => <TransactionSummary transaction={data} />,
