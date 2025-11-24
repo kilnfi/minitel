@@ -37,6 +37,7 @@ export const createCosmosAdapter = ({
     displayName,
     placeholder: 'Paste your transaction as hex',
     validateInput: isValidCosmosInput,
+    convertBigInt: true,
     parseTransaction: async (rawTx) => parseCosmosTx(rawTx),
     computeHash: computeCosmosHash,
   };

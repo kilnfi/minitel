@@ -26,8 +26,8 @@ export function useTransactionDecoder<T>(adapter: ProtocolAdapter<T>): UseTransa
         const decoded = await adapter.parseTransaction(rawTx);
         const computedHash = await adapter.computeHash(rawTx);
 
-        const decodedWithStrings = convertBigIntToString(decoded);
-        setDecodedTransaction(decodedWithStrings);
+        const finalDecoded = adapter.convertBigInt ? convertBigIntToString(decoded) : decoded;
+        setDecodedTransaction(finalDecoded);
         setHash(computedHash);
       } catch (err) {
         console.error('Transaction decode error:', err);

@@ -24,6 +24,8 @@ export type ProtocolAdapter<TDecodedTransaction> = {
 
   validateInput?: (rawTx: string) => boolean;
 
+  convertBigInt?: boolean;
+
   manualInputFields?: ManualInputField[];
   buildTransactionFromFields?: (fields: Record<string, string>) => string;
 };

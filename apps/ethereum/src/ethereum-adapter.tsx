@@ -41,6 +41,7 @@ export const ethereumAdapter: ProtocolAdapter<AugmentedTransaction> = {
   displayName: 'Ethereum',
   placeholder: 'Paste your transaction as hex or JSON',
   validateInput: isValidEthereumInput,
+  convertBigInt: true,
   parseTransaction: parseEthTx,
   computeHash: hashEthTx,
   renderSummary: (data) => <TransactionSummary transaction={data} />,
