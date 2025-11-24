@@ -31,7 +31,11 @@ export function useTransactionDecoder<T>(adapter: ProtocolAdapter<T>): UseTransa
         setHash(computedHash);
       } catch (err) {
         console.error('Transaction decode error:', err);
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        const sanitizedMessage =
+          err instanceof Error
+            ? 'Failed to decode transaction. Please check the transaction format and try again.'
+            : 'An unexpected error occurred while decoding the transaction.';
+        setError(sanitizedMessage);
         setDecodedTransaction(null);
         setHash('');
       } finally {
