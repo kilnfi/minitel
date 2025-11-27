@@ -1,4 +1,5 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
+import { cryptoWaitReady } from '@polkadot/util-crypto';
 
 export class SubstrateWsClient {
   public client: ApiPromise | null = null;
@@ -11,6 +12,9 @@ export class SubstrateWsClient {
 
   async connect(): Promise<void> {
     try {
+      // Wait for crypto to be ready, this will use JS fallback if WASM fails
+      await cryptoWaitReady();
+
       const wsProvider = new WsProvider(this.rpcUrl);
       this.client = await ApiPromise.create({ provider: wsProvider });
       this.isConnected = true;
