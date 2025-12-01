@@ -4,21 +4,6 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
-function removeProtobufEval() {
-  return {
-    name: 'remove-protobuf-eval',
-    transform(code: string, id: string) {
-      if (id.includes('@protobufjs/inquire')) {
-        const transformedCode = code.replace(/eval\s*\(.*/g, 'null; //');
-        return {
-          code: transformedCode,
-          map: null,
-        };
-      }
-    },
-  };
-}
-
 export default defineConfig({
   plugins: [
     react(),
@@ -31,7 +16,6 @@ export default defineConfig({
         process: true,
       },
     }),
-    removeProtobufEval(),
   ],
   resolve: {
     alias: {
