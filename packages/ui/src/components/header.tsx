@@ -1,5 +1,6 @@
 import type { Protocol } from '@protocols/shared';
 import { CheckIcon, ChevronsUpDownIcon, ExternalLinkIcon, PanelRightIcon } from 'lucide-react';
+import { DataTests } from '../lib/data-tests';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { Toggle } from './ui/toggle';
 
@@ -26,7 +27,10 @@ export const Header = ({
   return (
     <div className="flex items-center justify-between p-3 bg-background/30 backdrop-blur-2xl sticky top-0 z-50 border-b border-border">
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex items-center text-xl gap-8 px-3 py-2">
+        <DropdownMenuTrigger
+          data-test={DataTests.protocol_dropdown_trigger}
+          className="flex items-center text-xl gap-8 px-3 py-2"
+        >
           <div className="flex items-center gap-1 leading-7 font-medium">
             {currentProtocol.icon && currentProtocol.icon} {currentProtocol.shortName || currentProtocol.name}
             <span className="text-xl text-muted-foreground">Minitel</span>

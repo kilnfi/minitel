@@ -24,4 +24,5 @@ export * from './components/ui/tooltip';
 export * from './hooks/useIsDarkMode';
 export * from './hooks/useTransactionDecoder';
 export * from './hooks/useUrlParam';
+export * from './lib/data-tests';
 export * from './lib/utils';
