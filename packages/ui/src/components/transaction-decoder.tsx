@@ -417,7 +417,7 @@ export function TransactionDecoderTabs<T>({
             </TabsContent>
           </>
         ) : (
-          <TransactionDecoderEmptyState />
+          <TransactionDecoderEmptyState data-test={DataTests.transaction_decoder_empty_state} />
         )}
       </Tabs>
     </div>
