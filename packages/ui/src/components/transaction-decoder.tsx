@@ -316,14 +316,14 @@ export function TransactionDecoder<T>({
                 </div>
               </div>
               {error && (
-                <Alert variant="destructive">
+                <Alert variant="destructive" data-test={DataTests.transaction_decoder_error}>
                   <TriangleAlertIcon />
                   <AlertTitle>Error decoding transaction</AlertTitle>
                   <AlertDescription className="text-sm overflow-y-auto max-h-40 break-all">{error}</AlertDescription>
                 </Alert>
               )}
               {warningsAmount > 0 && (
-                <Alert variant="warning">
+                <Alert variant="warning" data-test={DataTests.transaction_decoder_warning}>
                   <TriangleAlertIcon />
                   <AlertTitle>Important notice</AlertTitle>
                   <AlertDescription>
