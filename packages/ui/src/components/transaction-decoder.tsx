@@ -28,6 +28,7 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Textarea } from './ui/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { DataTests } from '../lib/data-tests';
 
 const MAX_TRANSACTION_SIZE = 1048576; // 1MB
 
@@ -99,10 +100,15 @@ export function TransactionDecoder<T>({
     <div className="relative flex flex-col gap-4 items-center justify-center px-4 w-full">
       <div className="flex flex-col items-center gap-y-8 py-8 w-full">
         <div className="gap-4 text-foreground flex flex-col items-center justify-center text-center">
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold leading-tight tracking-tight">
+          <h1
+            data-test={DataTests.transaction_decoder_title}
+            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold leading-tight tracking-tight"
+          >
             {title}
           </h1>
-          <p className="text-muted-foreground">{subtitle}</p>
+          <p data-test={DataTests.transaction_decoder_subtitle} className="text-muted-foreground">
+            {subtitle}
+          </p>
         </div>
         <div className="flex flex-col gap-4 max-w-5xl w-full mx-auto">
           <Card>
@@ -113,7 +119,7 @@ export function TransactionDecoder<T>({
                 </span>
                 <div className="flex items-center gap-2">
                   <Dialog>
-                    <DialogTrigger asChild>
+                    <DialogTrigger data-test={DataTests.transaction_decoder_info_trigger} asChild>
                       <Button size="icon" variant="outline">
                         <InfoIcon />
                       </Button>
@@ -237,6 +243,7 @@ export function TransactionDecoder<T>({
                         (rawTxInvalid || rawTxTooLarge) && 'border-destructive focus-visible:ring-destructive',
                       )}
                       aria-invalid={rawTxInvalid || rawTxTooLarge}
+                      data-test={DataTests.transaction_decoder_textarea}
                       placeholder={placeholder}
                       id={textareaId}
                       value={rawTransaction}
@@ -280,6 +287,7 @@ export function TransactionDecoder<T>({
                 <span className="text-xl font-semibold">Output</span>
                 <div className="flex items-center justify-between gap-2 overflow-hidden">
                   <div
+                    data-test={DataTests.transaction_decoder_transaction_hash}
                     className={cn(
                       'flex items-center gap-2 bg-transparent dark:bg-input/30 rounded-md p-2 text-sm border border-input min-w-0',
                       hash ? 'text-foreground' : 'text-muted-foreground',
@@ -365,13 +373,21 @@ export function TransactionDecoderTabs<T>({
         </TabsList>
         {decodedTransaction ? (
           <>
-            <TabsContent className="space-y-6 overflow-y-auto" value="summary">
+            <TabsContent
+              data-test={DataTests.transaction_decoder_tab_content}
+              className="space-y-6 overflow-y-auto"
+              value="summary"
+            >
               <div className="space-y-3">
                 {decodedTransaction && renderSummary && renderSummary(decodedTransaction)}
               </div>
             </TabsContent>
 
-            <TabsContent value="json" className="max-h-96 overflow-y-auto border-border border rounded-md p-2 relative">
+            <TabsContent
+              data-test={DataTests.transaction_decoder_tab_content}
+              value="json"
+              className="max-h-96 overflow-y-auto border-border border rounded-md p-2 relative"
+            >
               <div className="flex items-center sticky right-0 top-0 justify-end gap-2 z-10">
                 <CopyButtonIcon
                   variant="outline"
@@ -401,7 +417,7 @@ export function TransactionDecoderTabs<T>({
             </TabsContent>
           </>
         ) : (
-          <TransactionDecoderEmptyState />
+          <TransactionDecoderEmptyState data-test={DataTests.transaction_decoder_empty_state} />
         )}
       </Tabs>
     </div>
