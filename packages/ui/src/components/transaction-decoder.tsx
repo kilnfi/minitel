@@ -268,6 +268,7 @@ export function TransactionDecoder<T>({
             </CardContent>
             <CardFooter className="flex justify-end">
               <Button
+                data-test={DataTests.transaction_decoder_run_button}
                 className="transition-transform active:scale-95 active:opacity-80"
                 disabled={
                   isManualMode
@@ -368,8 +369,14 @@ export function TransactionDecoderTabs<T>({
     <div className="w-full">
       <Tabs className="w-full gap-6" defaultValue={renderSummary ? 'summary' : 'json'}>
         <TabsList className="w-full">
-          {renderSummary && <TabsTrigger value="summary">Summary</TabsTrigger>}
-          <TabsTrigger value="json">JSON</TabsTrigger>
+          {renderSummary && (
+            <TabsTrigger data-test={DataTests.transaction_decoder_tab_summary_trigger} value="summary">
+              Summary
+            </TabsTrigger>
+          )}
+          <TabsTrigger data-test={DataTests.transaction_decoder_tab_json_trigger} value="json">
+            JSON
+          </TabsTrigger>
         </TabsList>
         {decodedTransaction ? (
           <>

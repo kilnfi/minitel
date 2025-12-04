@@ -37,9 +37,14 @@ export const Header = ({
           </div>
           <ChevronsUpDownIcon className="w-4 h-4 text-muted-foreground" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="flex flex-col gap-2 w-60 max-h-96 overflow-y-auto">
+        <DropdownMenuContent
+          data-test={DataTests.protocol_dropdown_menu_content}
+          align="start"
+          className="flex flex-col gap-2 w-60 max-h-96 overflow-y-auto"
+        >
           {protocols.map((protocol) => (
             <DropdownMenuItem
+              data-test={DataTests.protocol_dropdown_menu_item}
               className="p-2 text-sm justify-between"
               key={protocol.name}
               onClick={() => handleProtocolChange(protocol)}
