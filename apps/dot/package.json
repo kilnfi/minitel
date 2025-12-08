@@ -15,8 +15,8 @@
     "@protocols/substrate-shared": "workspace:*",
     "@protocols/ui": "workspace:*",
     "@uiw/react-json-view": "^2.0.0-alpha.36",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react": "^19.1.2",
+    "react-dom": "^19.1.2"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.13",
