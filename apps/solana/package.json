@@ -16,8 +16,8 @@
     "@solana/web3.js": "^1.78.5",
     "@uiw/react-json-view": "^2.0.0-alpha.36",
     "bs58": "^6.0.0",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react": "^19.1.2",
+    "react-dom": "^19.1.2"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.13",
