@@ -19,6 +19,7 @@ import {
   type StakeInstructionParams,
   type SystemInstructionParams,
 } from '@/types';
+import { base64ToHex, isBase64, isHex } from '@/utils';
 
 export type MessageLike = {
   header: {
@@ -30,8 +31,6 @@ export type MessageLike = {
   accountKeys: string[];
   instructions: { programIdIndex: number; accounts: number[]; data: string }[];
 };
-
-const isHex = (s: string) => /^[0-9a-fA-F]+$/.test(s) && s.length % 2 === 0;
 
 export const looksLikeMessage = (obj: unknown): obj is MessageLike => {
   const msg = obj as Record<string, unknown>;
@@ -321,16 +320,26 @@ export const parseSolTx = (txRaw: string): ParseSolTxResult => {
         };
       }
     } catch {
-      // fall through to hex path
+      // fall through to hex/base64 path
     }
   }
 
-  if (!isHex(input)) {
-    throw new Error('Input is not valid hex or Fireblocks message JSON');
+  // Check if input is base64, if so convert to hex
+  let hexInput = input;
+  if (!isHex(input) && isBase64(input)) {
+    try {
+      hexInput = base64ToHex(input);
+    } catch (error) {
+      throw new Error('Failed to decode base64 input');
+    }
+  }
+
+  if (!isHex(hexInput)) {
+    throw new Error('Input is not valid hex, base64, or Fireblocks message JSON');
   }
 
   try {
-    const buffer = Buffer.from(input, 'hex');
+    const buffer = Buffer.from(hexInput, 'hex');
 
     const tx = Transaction.from(buffer);
     const parsedInstructions = tx.instructions.map(safeDecode);
