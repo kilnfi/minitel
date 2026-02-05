@@ -19,3 +19,10 @@ export const base64ToHex = (base64: string): string => {
   }
   return hex;
 };
+
+export const sha256 = async (data: Uint8Array): Promise<string> => {
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data as BufferSource);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+};

@@ -329,7 +329,7 @@ export const parseSolTx = (txRaw: string): ParseSolTxResult => {
   if (!isHex(input) && isBase64(input)) {
     try {
       hexInput = base64ToHex(input);
-    } catch (error) {
+    } catch (_error) {
       throw new Error('Failed to decode base64 input');
     }
   }
