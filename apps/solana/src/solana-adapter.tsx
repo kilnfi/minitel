@@ -3,14 +3,7 @@ import { Transaction } from '@solana/web3.js';
 import { Summary } from '@/components/Summary';
 import { convertToMessage, looksLikeMessage, type MessageLike, type ParseSolTxResult, parseSolTx } from '@/parser';
 import type { DecodedInstruction } from '@/types';
-import { base64ToHex, isBase64, isHex } from '@/utils';
-
-const sha256 = async (data: Uint8Array): Promise<string> => {
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data as BufferSource);
-  return Array.from(new Uint8Array(hashBuffer))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
-};
+import { base64ToHex, isBase64, isHex, sha256 } from '@/utils';
 
 const computeSolanaHash = async (rawTx: string): Promise<string> => {
   try {
