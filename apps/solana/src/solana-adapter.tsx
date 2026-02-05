@@ -5,45 +5,35 @@ import { convertToMessage, looksLikeMessage, type MessageLike, type ParseSolTxRe
 import type { DecodedInstruction } from '@/types';
 import { base64ToHex, isBase64, isHex } from '@/utils';
 
+const sha256 = async (data: Uint8Array): Promise<string> => {
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data as BufferSource);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+};
+
 const computeSolanaHash = async (rawTx: string): Promise<string> => {
   try {
     const input = rawTx.trim();
 
     // If input is a JSON message
     if (input.startsWith('{') || input.startsWith('[')) {
-      try {
-        const obj = JSON.parse(input);
-        const msg = (obj.message ?? obj) as MessageLike;
-        if (looksLikeMessage(msg)) {
-          const message = convertToMessage(msg);
-          const messageBytes = message.serialize();
-          const hexString = messageBytes.toString('hex');
-
-          const transactionUint8Array = new Uint8Array(
-            hexString.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || [],
-          );
-          const hashBuffer = await crypto.subtle.digest('SHA-256', transactionUint8Array);
-          const hashArray = Array.from(new Uint8Array(hashBuffer));
-          return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-        }
-      } catch {}
+      const obj = JSON.parse(input);
+      const msg = (obj.message ?? obj) as MessageLike;
+      if (looksLikeMessage(msg)) {
+        const message = convertToMessage(msg);
+        return sha256(new Uint8Array(message.serialize()));
+      }
     }
 
+    // Hex or base64 path
     let hexInput = input;
-    // If input is in base64
     if (!isHex(input) && isBase64(input)) {
       hexInput = base64ToHex(input);
     }
 
-    // Parse transaction and extract message to compute hash
-    const buffer = Buffer.from(hexInput, 'hex');
-    const tx = Transaction.from(buffer);
-    const messageBytes = tx.serializeMessage();
-
-    const transactionUint8Array = new Uint8Array(messageBytes);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', transactionUint8Array);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    const tx = Transaction.from(Buffer.from(hexInput, 'hex'));
+    return sha256(new Uint8Array(tx.serializeMessage()));
   } catch {
     throw new Error('Failed to compute Solana hash');
   }
