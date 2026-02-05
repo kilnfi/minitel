@@ -1,4 +1,5 @@
 import { type ProtocolAdapter, SOL } from '@protocols/shared';
+import { Transaction } from '@solana/web3.js';
 import { Summary } from '@/components/Summary';
 import { convertToMessage, looksLikeMessage, type MessageLike, type ParseSolTxResult, parseSolTx } from '@/parser';
 import type { DecodedInstruction } from '@/types';
@@ -29,11 +30,17 @@ const computeSolanaHash = async (rawTx: string): Promise<string> => {
     }
 
     let hexInput = input;
+    // If input is in base64
     if (!isHex(input) && isBase64(input)) {
       hexInput = base64ToHex(input);
     }
 
-    const transactionUint8Array = new Uint8Array(hexInput.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || []);
+    // Parse transaction and extract message to compute hash
+    const buffer = Buffer.from(hexInput, 'hex');
+    const tx = Transaction.from(buffer);
+    const messageBytes = tx.serializeMessage();
+
+    const transactionUint8Array = new Uint8Array(messageBytes);
     const hashBuffer = await crypto.subtle.digest('SHA-256', transactionUint8Array);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
