@@ -1,6 +1,7 @@
 import { Address as AddressComponent } from '@protocols/ui';
 import type { ReactNode } from 'react';
 import { type Address, type erc20Abi, formatEther, type Hash } from 'viem';
+import type { ASYNC_VAULT_ABI } from '@/abi/ASYNC_VAULT_ABI';
 import type { ETH_DEPOSIT_CONTRACT_ABI } from '@/abi/ETH_DEPOSIT_CONTRACT_ABI';
 import type { ETH_EXIT_CONTRACT_ABI } from '@/abi/ETH_EXIT_CONTRACT_ABI';
 import type { MATIC_STAKE_MANAGER_CONTRACT_ABI } from '@/abi/MATIC_STAKE_MANAGER_CONTRACT_ABI';
@@ -330,6 +331,134 @@ const ACTION_HANDLERS = {
       description: <>Withdrawing restaked execution layer Gwei from {shortenAddress(to)}</>,
       riskLevel: 'high',
       warning: 'Withdrawing restaked execution layer Gwei is a high risk operation',
+    };
+  },
+  cancelRequestDeposit: (tx) => {
+    const to = tx.to ?? '0x';
+    return {
+      description: <>Cancelling deposit request on vault {shortenAddress(to)}</>,
+      riskLevel: 'high',
+      warning: 'Cancelling a deposit request is a high risk operation',
+    };
+  },
+  updateNewTotalAssets: (tx) => {
+    const args = tx.inputData.args as ExtractArgs<typeof ASYNC_VAULT_ABI, 'updateNewTotalAssets'>;
+    const newTotalAssets = args[0];
+    const to = tx.to ?? '0x';
+    return {
+      description: (
+        <>
+          Updating NAV to {newTotalAssets.toString()} on vault {shortenAddress(to)}
+        </>
+      ),
+      riskLevel: 'high',
+      warning: 'Updating NAV is a high risk operation',
+    };
+  },
+  requestDeposit: (tx) => {
+    const args = tx.inputData.args as ExtractArgs<typeof ASYNC_VAULT_ABI, 'requestDeposit'>;
+    const assets = args[0];
+    const to = tx.to ?? '0x';
+    return {
+      description: (
+        <>
+          Requesting deposit of {assets.toString()} assets on vault {shortenAddress(to)}
+        </>
+      ),
+      riskLevel: 'high',
+      warning: 'Requesting a deposit is a high risk operation',
+    };
+  },
+  requestRedeem: (tx) => {
+    const args = tx.inputData.args as ExtractArgs<typeof ASYNC_VAULT_ABI, 'requestRedeem'>;
+    const shares = args[0];
+    const to = tx.to ?? '0x';
+    return {
+      description: (
+        <>
+          Requesting withdrawal of {shares.toString()} shares on vault {shortenAddress(to)}
+        </>
+      ),
+      riskLevel: 'high',
+      warning: 'Requesting a withdrawal is a high risk operation',
+    };
+  },
+  settleDeposit: (tx) => {
+    const args = tx.inputData.args as ExtractArgs<typeof ASYNC_VAULT_ABI, 'settleDeposit'>;
+    const newTotalAssets = args[0];
+    const to = tx.to ?? '0x';
+    return {
+      description: (
+        <>
+          Settling deposits with total assets {newTotalAssets.toString()} on vault {shortenAddress(to)}
+        </>
+      ),
+      riskLevel: 'high',
+      warning: 'Settling deposits is a high risk operation',
+    };
+  },
+  settleRedeem: (tx) => {
+    const args = tx.inputData.args as ExtractArgs<typeof ASYNC_VAULT_ABI, 'settleRedeem'>;
+    const newTotalAssets = args[0];
+    const to = tx.to ?? '0x';
+    return {
+      description: (
+        <>
+          Settling redemptions with total assets {newTotalAssets.toString()} on vault {shortenAddress(to)}
+        </>
+      ),
+      riskLevel: 'high',
+      warning: 'Settling redemptions is a high risk operation',
+    };
+  },
+  claimSharesAndRequestRedeem: (tx) => {
+    const args = tx.inputData.args as ExtractArgs<typeof ASYNC_VAULT_ABI, 'claimSharesAndRequestRedeem'>;
+    const sharesToRedeem = args[0];
+    const to = tx.to ?? '0x';
+    return {
+      description: (
+        <>
+          Claiming shares and requesting redemption of {sharesToRedeem.toString()} shares on vault {shortenAddress(to)}
+        </>
+      ),
+      riskLevel: 'high',
+      warning: 'Claiming shares and requesting redemption is a high risk operation',
+    };
+  },
+  claimSharesOnBehalf: (tx) => {
+    const to = tx.to ?? '0x';
+    return {
+      description: <>Claiming shares on behalf of controllers on vault {shortenAddress(to)}</>,
+      riskLevel: 'high',
+      warning: 'Claiming shares on behalf is a high risk operation',
+    };
+  },
+  syncDeposit: (tx) => {
+    const args = tx.inputData.args as ExtractArgs<typeof ASYNC_VAULT_ABI, 'syncDeposit'>;
+    const assets = args[0];
+    const to = tx.to ?? '0x';
+    return {
+      description: (
+        <>
+          Depositing {assets.toString()} assets on vault {shortenAddress(to)}
+        </>
+      ),
+      riskLevel: 'high',
+      warning: 'Depositing assets is a high risk operation',
+    };
+  },
+  close: (tx) => {
+    const args = tx.inputData.args as ExtractArgs<typeof ASYNC_VAULT_ABI, 'close'>;
+    const newTotalAssets = args[0];
+    const to = tx.to ?? '0x';
+    return {
+      description: (
+        <>
+          Closing vault {shortenAddress(to)} with total assets {newTotalAssets.toString()}
+        </>
+      ),
+      riskLevel: 'high',
+      warning: 'Closing a vault is a high risk operation',
     };
   },
 } satisfies Record<keyof FunctionNameToAbiMap, (tx: AugmentedTransactionWithFunction) => DetailsResult>;

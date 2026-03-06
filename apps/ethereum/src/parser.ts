@@ -62,6 +62,11 @@ const tryDecodeInputData = async (tx: AugmentedTransaction) => {
     }
   }
 
+  const asyncVaultResult = await tryDecodeWithAbi(tx, ABIS.asyncVaultAbi);
+  if (asyncVaultResult) {
+    return asyncVaultResult;
+  }
+
   const erc4626Result = await tryDecodeWithAbi(tx, erc4626Abi);
   if (erc4626Result) {
     return erc4626Result;
