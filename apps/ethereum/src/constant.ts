@@ -1,4 +1,5 @@
 import { erc20Abi, erc4626Abi, parseAbi } from 'viem';
+import { ASYNC_VAULT_ABI } from '@/abi/ASYNC_VAULT_ABI';
 import { CCTP_MESSAGE_TRANSMITTER_ABI } from '@/abi/CCTP_MESSAGE_TRANSMITTER_ABI';
 import { ETH_BEACON_DEPOSIT_ABI } from '@/abi/ETH_BEACON_DEPOSIT_ABI';
 import { ETH_DEPOSIT_CONTRACT_ABI } from '@/abi/ETH_DEPOSIT_CONTRACT_ABI';
@@ -56,6 +57,7 @@ export const ABIS = {
     'struct Withdrawal { address staker; address delegatedTo; address withdrawer; uint256 nonce; uint32 startBlock; address[] strategies; uint256[] shares; }',
     'function completeQueuedWithdrawals(Withdrawal[] calldata withdrawals, address[][] calldata tokens, uint256[] calldata middlewareTimesIndexes, bool[] calldata receiveAsTokens) external',
   ]),
+  asyncVaultAbi: ASYNC_VAULT_ABI,
   erc4626Abi,
   erc20Abi,
   dedicatedStaking: parseAbi(['function requestValidatorsExit(bytes _publicKeys) external']),
@@ -99,4 +101,14 @@ export type FunctionNameToAbiMap = {
   maxWithdraw: (typeof ABIS)['erc4626Abi'];
   withdrawableRestakedExecutionLayerGwei: (typeof ABIS)[typeof ETH_EXIT_CONTRACT_ADDRESS];
   delegatedTo: (typeof ABIS)[typeof EIGENLAYER_DELEGATION_MANAGER_ADDRESS];
+  cancelRequestDeposit: (typeof ABIS)['asyncVaultAbi'];
+  updateNewTotalAssets: (typeof ABIS)['asyncVaultAbi'];
+  requestDeposit: (typeof ABIS)['asyncVaultAbi'];
+  requestRedeem: (typeof ABIS)['asyncVaultAbi'];
+  settleDeposit: (typeof ABIS)['asyncVaultAbi'];
+  settleRedeem: (typeof ABIS)['asyncVaultAbi'];
+  claimSharesAndRequestRedeem: (typeof ABIS)['asyncVaultAbi'];
+  claimSharesOnBehalf: (typeof ABIS)['asyncVaultAbi'];
+  syncDeposit: (typeof ABIS)['asyncVaultAbi'];
+  close: (typeof ABIS)['asyncVaultAbi'];
 };
