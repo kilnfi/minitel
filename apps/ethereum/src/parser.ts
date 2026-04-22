@@ -98,6 +98,8 @@ export const parseEthTx = async (txRaw: string): Promise<AugmentedTransaction> =
   try {
     if (looksLikeObject(txRaw)) {
       const tx = JSON.parse(txRaw);
+      // Never trust caller-supplied inputData — always derive from actual calldata.
+      delete (tx as AugmentedTransactionWithFunction).inputData;
       const inputData = await tryDecodeInputData(tx);
       if (inputData) {
         (tx as AugmentedTransactionWithFunction).inputData = inputData;
