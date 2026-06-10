@@ -340,6 +340,7 @@
       "version": "0.0.0",
       "dependencies": {
         "@mysten/sui": "^1.39.0",
+        "@noble/hashes": "^2.2.0",
         "@protocols/shared": "workspace:*",
         "@protocols/ui": "workspace:*",
         "@uiw/react-json-view": "^2.0.0-alpha.36",
@@ -347,7 +348,6 @@
         "react-dom": "^19.1.2",
       },
       "devDependencies": {
-        "@noble/hashes": "^2.2.0",
         "@tailwindcss/vite": "^4.1.13",
         "@types/react": "^19.0.0",
         "@types/react-dom": "^19.0.0",
@@ -472,6 +472,8 @@
       "dependencies": {
         "@cosmjs/proto-signing": "^0.36.0",
         "@protocols/shared": "workspace:*",
+        "@protocols/ui": "workspace:*",
+        "cosmjs-types": "^0.10.0",
       },
       "devDependencies": {
         "@types/react": "^19.0.0",
