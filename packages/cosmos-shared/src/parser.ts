@@ -225,8 +225,18 @@ const decodeFee = (tx: DecodedTxRaw): CosmosFee | null => {
   };
 };
 
+const hexToBytes = (hex: string): Uint8Array => {
+  // Canonicalize the same way validateInput/computeHash do, so decoding and
+  // hashing operate on identical bytes and malformed hex fails closed.
+  const input = hex.trim();
+  if (!/^[0-9a-fA-F]*$/.test(input) || input.length % 2 !== 0) {
+    throw new Error('Invalid Cosmos transaction hex');
+  }
+  return new Uint8Array(input.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || []);
+};
+
 export const parseCosmosTx = async (txRaw: string): Promise<CosmosTransaction> => {
-  const bytes = new Uint8Array(txRaw.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || []);
+  const bytes = hexToBytes(txRaw);
   const tx = decodeTxRaw(bytes);
 
   return {

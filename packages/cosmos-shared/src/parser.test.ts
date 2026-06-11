@@ -49,6 +49,22 @@ describe('parseCosmosTx', () => {
     });
   });
 
+  test('trims surrounding whitespace so decoding matches the hashed bytes', async () => {
+    const hex = encodeTx([delegateMsg('cosmosvaloper1validator')]);
+
+    const tx = await parseCosmosTx(`  \n${hex}\n  `);
+
+    const message = tx.messages[0];
+    expect(message.kind).toBe('delegate');
+    if (message.kind !== 'delegate') throw new Error('expected delegate');
+    expect(message.validatorAddress).toBe('cosmosvaloper1validator');
+  });
+
+  test('rejects malformed hex instead of decoding garbage', async () => {
+    await expect(parseCosmosTx('not-hex')).rejects.toThrow('Invalid Cosmos transaction hex');
+    await expect(parseCosmosTx('abc')).rejects.toThrow('Invalid Cosmos transaction hex');
+  });
+
   test('two delegations differing only in validator parse to different validatorAddress', async () => {
     const a = await parseCosmosTx(encodeTx([delegateMsg('cosmosvaloper1AAA')]));
     const b = await parseCosmosTx(encodeTx([delegateMsg('cosmosvaloper1BBB')]));
