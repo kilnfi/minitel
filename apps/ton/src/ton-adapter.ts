@@ -27,15 +27,18 @@ const computeTonHash = async (rawTx: string): Promise<string> => {
 
     return Buffer.from(cellHash).toString('hex');
   } catch (error) {
-    console.error('Failed to compute TON hash:', error);
-    throw new Error('Failed to compute Ton hash');
+    console.error('Failed to compute Gram hash:', error);
+    throw new Error('Failed to compute Gram hash');
   }
 };
 
 export const tonAdapter: ProtocolAdapter<any> = {
   protocol: TON,
   name: 'ton',
-  displayName: 'The Open Network',
+  // Gram is the rebranded ticker (ex TON); the chain tooling stays the same.
+  // displayName drives the decoder title + subtitle, so keep it plain "Gram";
+  // the "ex TON" reminder lives in the header chip (shortName) and dropdown.
+  displayName: 'Gram',
   placeholder: 'Paste your transaction as hex or base64',
   validateInput: isValidTonInput,
   parseTransaction: parseTonTx,

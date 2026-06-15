@@ -3,6 +3,14 @@
   "buildCommand": "bun --cwd ../../ --filter @protocols/ton build",
   "outputDirectory": "dist",
   "framework": null,
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "ton.minitel.app" }],
+      "destination": "https://gram.minitel.app/:path*",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

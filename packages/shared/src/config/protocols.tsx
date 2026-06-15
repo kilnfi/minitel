@@ -6,6 +6,7 @@ import {
   DydxIcon,
   EthereumIcon,
   FetchIcon,
+  GramIcon,
   InjectiveIcon,
   KavaIcon,
   KsmIcon,
@@ -16,7 +17,6 @@ import {
   SolanaIcon,
   SuiIcon,
   TiaIcon,
-  TonIcon,
   TrxIcon,
   XtzIcon,
   ZetaIcon,
@@ -24,7 +24,7 @@ import {
 
 type CosmosToken = 'ATOM' | 'TIA' | 'ZETA' | 'OSMO' | 'DYDX' | 'FET' | 'INJ' | 'KAVA' | 'OM' | 'CRO' | 'SEI';
 
-export type Token = CosmosToken | 'ETH' | 'NEAR' | 'SOL' | 'ADA' | 'SUI' | 'XTZ' | 'TON' | 'TRX' | 'DOT' | 'KSM';
+export type Token = CosmosToken | 'ETH' | 'NEAR' | 'SOL' | 'ADA' | 'SUI' | 'XTZ' | 'GRAM' | 'TRX' | 'DOT' | 'KSM';
 
 export type Protocol = {
   token: Token;
@@ -155,12 +155,16 @@ export const ADA = {
   localUrl: 'http://localhost:3014',
 } satisfies Protocol;
 
+// Gram is the rebranded ticker for The Open Network (ex TON). Only the
+// user-facing naming/branding is renamed; the code identifier, app folder and
+// package stay `ton`, and the underlying chain tooling is unchanged. The public
+// URL moves to gram.minitel.app (ton.minitel.app redirects there via vercel.json).
 export const TON = {
-  token: 'TON',
-  name: 'The Open Network',
-  shortName: 'Ton',
-  icon: <TonIcon className="size-5" />,
-  url: 'https://ton.minitel.app',
+  token: 'GRAM',
+  name: 'Gram (ex TON)',
+  shortName: 'Gram (ex TON)',
+  icon: <GramIcon className="size-5" />,
+  url: 'https://gram.minitel.app',
   localUrl: 'http://localhost:3017',
 } satisfies Protocol;
 
