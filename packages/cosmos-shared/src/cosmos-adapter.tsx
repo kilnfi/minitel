@@ -1,6 +1,6 @@
-import type { DecodedTxRaw } from '@cosmjs/proto-signing';
 import type { Protocol, ProtocolAdapter } from '@protocols/shared';
-import { parseCosmosTx } from './parser';
+import { CosmosTransactionSummary } from './CosmosTransactionSummary';
+import { type CosmosMessage, type CosmosTransaction, parseCosmosTx } from './parser';
 
 const isValidCosmosInput = (rawTx: string): boolean => {
   const input = rawTx.trim();
@@ -22,6 +22,31 @@ const computeCosmosHash = async (rawTx: string): Promise<string> => {
   }
 };
 
+const warningsForMessage = (message: CosmosMessage): string[] => {
+  switch (message.kind) {
+    case 'unsupported':
+      return [`🚨 CRITICAL: Unsupported message type detected: ${message.typeUrl || 'unknown'}`];
+    case 'send':
+      return [`⚠️ Token transfer (MsgSend) detected to ${message.toAddress} — unusual for a staking operation`];
+    case 'redelegate':
+      return [
+        `⚠️ Redelegation detected: moving stake from ${message.validatorSrcAddress} to ${message.validatorDstAddress}`,
+      ];
+    case 'authzGrant':
+      return [
+        `🚨 CRITICAL: Authz grant detected — granting ${message.grantee} authorization ${message.authorizationType}`,
+      ];
+    case 'authzExec':
+      return [
+        `🚨 CRITICAL: Authz exec detected — ${message.grantee} executing ${message.innerTypeUrls.length} nested message(s)`,
+      ];
+    case 'authzRevoke':
+      return [`⚠️ Authz revoke detected for ${message.grantee} (${message.msgTypeUrl})`];
+    default:
+      return [];
+  }
+};
+
 export const createCosmosAdapter = ({
   name,
   displayName,
@@ -30,15 +55,16 @@ export const createCosmosAdapter = ({
   name: string;
   displayName: string;
   protocol: Protocol;
-}): ProtocolAdapter<DecodedTxRaw> => {
+}): ProtocolAdapter<CosmosTransaction> => {
   return {
     protocol,
     name,
     displayName,
     placeholder: 'Paste your transaction as hex',
     validateInput: isValidCosmosInput,
-    convertBigInt: true,
     parseTransaction: async (rawTx) => parseCosmosTx(rawTx),
     computeHash: computeCosmosHash,
+    renderSummary: (data) => <CosmosTransactionSummary transaction={data} />,
+    generateWarnings: (data) => data.messages.flatMap(warningsForMessage).map((message) => ({ message })),
   };
 };

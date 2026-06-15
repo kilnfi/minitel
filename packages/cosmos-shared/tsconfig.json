@@ -3,8 +3,10 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@protocols/shared": ["../shared/src"]
+      "@protocols/shared": ["../shared/src"],
+      "@protocols/ui": ["../ui/src"]
     }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules", "src/**/*.test.ts"]
 }
