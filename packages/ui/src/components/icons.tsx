@@ -583,6 +583,20 @@ export const TonIcon = (props: React.SVGProps<SVGSVGElement> & { ref?: React.Ref
   );
 };
 
+// Gram (ex TON). Diamond mark on the dark Gram brand background, mirrored from
+// the api-dashboard gram-logo.svg.
+export const GramIcon = (props: React.SVGProps<SVGSVGElement> & { ref?: React.Ref<SVGSVGElement> }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" fill="none" {...props}>
+      <rect width="100%" height="100%" fill="#1E1E23" rx="28" />
+      <path
+        fill="#fff"
+        d="M36.6657 15H19.1981C15.9865 15 13.9508 18.4644 15.5666 21.2651L26.347 39.9504C27.0504 41.1705 28.8134 41.1705 29.5169 39.9504L40.2994 21.2651C41.913 18.4689 39.8773 15 36.6679 15H36.6657ZM26.3382 34.347L23.9904 29.8032L18.3255 19.6713C17.9518 19.0228 18.4133 18.1918 19.1959 18.1918H26.336V34.3492L26.3382 34.347ZM37.534 19.6691L31.8712 29.8054L29.5234 34.347V18.1896H36.6635C37.4461 18.1896 37.9077 19.0207 37.534 19.6691Z"
+      />
+    </svg>
+  );
+};
+
 export const TrxIcon = (props: React.SVGProps<SVGSVGElement> & { ref?: React.Ref<SVGSVGElement> }) => {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" {...props}>
