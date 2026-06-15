@@ -157,13 +157,14 @@ export const ADA = {
 
 // Gram is the rebranded ticker for The Open Network (ex TON). Only the
 // user-facing naming/branding is renamed; the code identifier, app folder and
-// URL stay `ton`, and the underlying chain tooling is unchanged.
+// package stay `ton`, and the underlying chain tooling is unchanged. The public
+// URL moves to gram.minitel.app (ton.minitel.app redirects there via vercel.json).
 export const TON = {
   token: 'GRAM',
   name: 'Gram (ex TON)',
   shortName: 'Gram (ex TON)',
   icon: <GramIcon className="size-5" />,
-  url: 'https://ton.minitel.app',
+  url: 'https://gram.minitel.app',
   localUrl: 'http://localhost:3017',
 } satisfies Protocol;
 
