@@ -1,6 +1,7 @@
 import { type ProtocolAdapter, SOL } from '@protocols/shared';
 import { Transaction } from '@solana/web3.js';
 import { Summary } from '@/components/Summary';
+import { classifySolanaTransaction } from '@/kiln-operations';
 import { convertToMessage, looksLikeMessage, type MessageLike, type ParseSolTxResult, parseSolTx } from '@/parser';
 import type { DecodedInstruction } from '@/types';
 import { base64ToHex, isBase64, isHex, sha256 } from '@/utils';
@@ -59,6 +60,8 @@ export const solanaAdapter: ProtocolAdapter<ParseSolTxResult> = {
   computeHash: computeSolanaHash,
 
   renderSummary: (data) => <Summary instructions={data.instructions} />,
+
+  classifyTransaction: (data) => classifySolanaTransaction(data.instructions),
 
   generateWarnings: (data) => {
     return data.instructions

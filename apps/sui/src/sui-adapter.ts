@@ -1,7 +1,7 @@
 import type { Transaction } from '@mysten/sui/transactions';
 import { fromBase64, fromHex } from '@mysten/sui/utils';
 import { blake2b } from '@noble/hashes/blake2.js';
-import { type ProtocolAdapter, SUI } from '@protocols/shared';
+import { type ProtocolAdapter, pendingAllowlist, SUI } from '@protocols/shared';
 import { parseSuiTx } from '@/parser';
 
 const isHex = (input: string): boolean => {
@@ -63,4 +63,6 @@ export const suiAdapter: ProtocolAdapter<ReturnType<typeof Transaction.prototype
   validateInput: isValidSuiInput,
   parseTransaction: parseSuiTx,
   computeHash: computeSuiHash,
+  // Kiln crafts stake, unstake, split-stake, merge and send on Sui — allowlist not written yet.
+  classifyTransaction: pendingAllowlist,
 };

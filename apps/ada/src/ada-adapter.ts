@@ -1,7 +1,7 @@
 import type { TransactionJSON } from '@emurgo/cardano-serialization-lib-browser';
 import { Transaction, TransactionBody } from '@emurgo/cardano-serialization-lib-browser';
 import { blake2b } from '@noble/hashes/blake2.js';
-import { ADA, type ProtocolAdapter } from '@protocols/shared';
+import { ADA, type ProtocolAdapter, pendingAllowlist } from '@protocols/shared';
 import { parseAdaTx } from '@/parser';
 
 const isValidAdaInput = (rawTx: string): boolean => {
@@ -42,4 +42,6 @@ export const adaAdapter: ProtocolAdapter<TransactionJSON> = {
   validateInput: isValidAdaInput,
   parseTransaction: parseAdaTx,
   computeHash: computeAdaHash,
+  // Kiln crafts stake, unstake and withdraw-rewards on Cardano — allowlist not written yet.
+  classifyTransaction: pendingAllowlist,
 };

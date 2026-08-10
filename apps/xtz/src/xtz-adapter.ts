@@ -1,5 +1,5 @@
 import { blake2b } from '@noble/hashes/blake2.js';
-import { type ProtocolAdapter, XTZ } from '@protocols/shared';
+import { type ProtocolAdapter, pendingAllowlist, XTZ } from '@protocols/shared';
 import type { ForgeParams } from '@taquito/local-forging';
 import { parseXtzTx } from '@/parser';
 
@@ -31,4 +31,7 @@ export const xtzAdapter: ProtocolAdapter<ForgeParams> = {
   validateInput: isValidXtzInput,
   parseTransaction: parseXtzTx,
   computeHash: computeXtzHash,
+  // Kiln crafts stake, unstake, delegate, undelegate and finalize-unstake on Tezos —
+  // allowlist not written yet.
+  classifyTransaction: pendingAllowlist,
 };

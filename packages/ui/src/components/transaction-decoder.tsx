@@ -1,4 +1,4 @@
-import type { ManualInputField, Protocol } from '@protocols/shared';
+import type { ManualInputField, Protocol, TransactionVerdict } from '@protocols/shared';
 import JsonView from '@uiw/react-json-view';
 import { githubLightTheme } from '@uiw/react-json-view/githubLight';
 import { vscodeTheme } from '@uiw/react-json-view/vscode';
@@ -8,6 +8,9 @@ import {
   DownloadIcon,
   InboxIcon,
   InfoIcon,
+  OctagonAlertIcon,
+  ShieldCheckIcon,
+  ShieldQuestionIcon,
   TriangleAlertIcon,
   ZapIcon,
 } from 'lucide-react';
@@ -40,6 +43,7 @@ export type TransactionDecoderProps<T> = {
   onDecode: () => void;
   decodedTransaction: T | null;
   hash?: string;
+  verdict?: TransactionVerdict | null;
   warnings?: Array<{ message: string }>;
   renderSummary?: (data: T) => React.ReactNode;
   placeholder?: string;
@@ -53,6 +57,54 @@ export type TransactionDecoderProps<T> = {
   onManualFieldChange?: (field: string, value: string) => void;
 };
 
+/**
+ * The headline answer: is this one of the operations Kiln produces?
+ *
+ * It sits above the decoded details deliberately. The details are still rendered for every
+ * verdict — withholding them only pushes people to decode elsewhere — but an unrecognized
+ * transaction must not be able to borrow the credibility of a clean-looking summary.
+ */
+function VerdictAlert({ verdict }: { verdict: TransactionVerdict }) {
+  if (verdict.status === 'recognized') {
+    return (
+      <Alert
+        className="border-emerald-600/40 text-emerald-700 dark:border-emerald-400/30 dark:text-emerald-400"
+        data-test={DataTests.transaction_decoder_verdict}
+        data-verdict="recognized"
+      >
+        <ShieldCheckIcon />
+        <AlertTitle>Kiln operation — {verdict.operation}</AlertTitle>
+        <AlertDescription className="text-emerald-700/90 dark:text-emerald-400/90">
+          This matches a transaction Kiln produces. Check the details below against what you asked for.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (verdict.status === 'unverified') {
+    return (
+      <Alert variant="warning" data-test={DataTests.transaction_decoder_verdict} data-verdict="unverified">
+        <ShieldQuestionIcon />
+        <AlertTitle>Not checked against Kiln operations</AlertTitle>
+        <AlertDescription>{verdict.reason}</AlertDescription>
+      </Alert>
+    );
+  }
+
+  return (
+    <Alert variant="destructive" data-test={DataTests.transaction_decoder_verdict} data-verdict="unrecognized">
+      <OctagonAlertIcon />
+      <AlertTitle>Not a Kiln operation</AlertTitle>
+      <AlertDescription>
+        <p>{verdict.reason}</p>
+        <p>
+          Do not sign this on Kiln's authority. The details below are a best-effort decode and are not verified.
+        </p>
+      </AlertDescription>
+    </Alert>
+  );
+}
+
 export function TransactionDecoder<T>({
   title = 'Transaction decoder',
   subtitle = 'Decode and analyze transactions',
@@ -61,6 +113,7 @@ export function TransactionDecoder<T>({
   onDecode,
   decodedTransaction,
   hash,
+  verdict,
   warnings = [],
   renderSummary,
   placeholder = 'Paste your transaction as hex or JSON',
@@ -322,6 +375,7 @@ export function TransactionDecoder<T>({
                   <AlertDescription className="text-sm overflow-y-auto max-h-40 break-all">{error}</AlertDescription>
                 </Alert>
               )}
+              {verdict && <VerdictAlert verdict={verdict} />}
               {warningsAmount > 0 && (
                 <Alert variant="warning" data-test={DataTests.transaction_decoder_warning}>
                   <TriangleAlertIcon />

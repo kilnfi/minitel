@@ -1,4 +1,4 @@
-import { NEAR, type ProtocolAdapter } from '@protocols/shared';
+import { NEAR, type ProtocolAdapter, pendingAllowlist } from '@protocols/shared';
 import { TransactionSummary } from '@/components/TransactionSummary';
 import { type NearTransaction, parseNearTx } from '@/parser';
 
@@ -32,6 +32,10 @@ export const nearAdapter: ProtocolAdapter<NearTransaction> = {
   computeHash: computeNearHash,
 
   renderSummary: (data) => <TransactionSummary transaction={data} />,
+
+  // Kiln crafts stake, unstake and withdraw on NEAR. The parser already resolves each function
+  // call to a stakingOperation or null, so this is a short step from a real allowlist.
+  classifyTransaction: pendingAllowlist,
 
   generateWarnings: (data) => {
     const warnings: { message: string }[] = [];

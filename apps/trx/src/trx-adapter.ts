@@ -1,4 +1,4 @@
-import { type ProtocolAdapter, TRX } from '@protocols/shared';
+import { type ProtocolAdapter, pendingAllowlist, TRX } from '@protocols/shared';
 import { parseTrxTx } from '@/parser';
 
 const isValidTrxInput = (rawTx: string): boolean => {
@@ -28,4 +28,7 @@ export const trxAdapter: ProtocolAdapter<unknown> = {
   validateInput: isValidTrxInput,
   parseTransaction: parseTrxTx,
   computeHash: computeTrxHash,
+  // Kiln crafts stake, unstake, cancel-unstake, withdraw-unstaked, vote and withdraw-rewards
+  // on Tron — allowlist not written yet.
+  classifyTransaction: pendingAllowlist,
 };

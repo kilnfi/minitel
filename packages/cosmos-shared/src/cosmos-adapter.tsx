@@ -1,4 +1,4 @@
-import type { Protocol, ProtocolAdapter } from '@protocols/shared';
+import { type Protocol, type ProtocolAdapter, pendingAllowlist } from '@protocols/shared';
 import { CosmosTransactionSummary } from './CosmosTransactionSummary';
 import { type CosmosMessage, type CosmosTransaction, parseCosmosTx } from './parser';
 
@@ -65,6 +65,11 @@ export const createCosmosAdapter = ({
     parseTransaction: async (rawTx) => parseCosmosTx(rawTx),
     computeHash: computeCosmosHash,
     renderSummary: (data) => <CosmosTransactionSummary transaction={data} />,
+    // The Cosmos parser already fails closed on unknown typeUrls, so the pieces for a real
+    // allowlist are here. It is left pending deliberately: the operation set differs per chain
+    // (send exists on cro/fet/sei only, restake-rewards on atom/tia/osmo/cro/fet), so it needs
+    // to be driven per protocol rather than guessed in the shared factory.
+    classifyTransaction: pendingAllowlist,
     generateWarnings: (data) => data.messages.flatMap(warningsForMessage).map((message) => ({ message })),
   };
 };

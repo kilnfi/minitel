@@ -1,4 +1,4 @@
-import type { ProtocolAdapter } from '@protocols/shared';
+import type { ProtocolAdapter, TransactionVerdict } from '@protocols/shared';
 import { useCallback, useState } from 'react';
 import { convertBigIntToString } from '../lib/utils';
 
@@ -6,6 +6,7 @@ export type UseTransactionDecoderResult<T> = {
   decodedTransaction: T | null;
   hash: string;
   error?: string;
+  verdict: TransactionVerdict | null;
   warnings: Array<{ message: string }>;
   decodeTransaction: (rawTx: string) => Promise<void>;
   isLoading: boolean;
@@ -47,10 +48,25 @@ export function useTransactionDecoder<T>(adapter: ProtocolAdapter<T>): UseTransa
 
   const warnings = decodedTransaction ? (adapter.generateWarnings?.(decodedTransaction) ?? []) : [];
 
+  // A classifier that throws must not read as "no objection" — fall closed to unrecognized.
+  const classify = (data: T): TransactionVerdict => {
+    try {
+      return adapter.classifyTransaction(data);
+    } catch {
+      return {
+        status: 'unrecognized',
+        reason: 'This transaction could not be checked against the operations Kiln produces.',
+      };
+    }
+  };
+
+  const verdict = decodedTransaction ? classify(decodedTransaction) : null;
+
   return {
     decodedTransaction,
     hash,
     error,
+    verdict,
     warnings,
     decodeTransaction,
     isLoading,

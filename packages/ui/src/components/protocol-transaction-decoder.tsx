@@ -28,7 +28,7 @@ export function ProtocolTransactionDecoder<T>({ adapter }: ProtocolTransactionDe
   const [isManualMode, setIsManualMode] = useState(false);
   const [manualFields, setManualFields] = useState<Record<string, string>>(initialManualFields);
 
-  const { decodedTransaction, hash, error, warnings, decodeTransaction } = useTransactionDecoder(adapter);
+  const { decodedTransaction, hash, error, verdict, warnings, decodeTransaction } = useTransactionDecoder(adapter);
 
   const handleManualFieldChange = (field: string, value: string) => {
     setManualFields((prev) => ({ ...prev, [field]: value }));
@@ -54,6 +54,7 @@ export function ProtocolTransactionDecoder<T>({ adapter }: ProtocolTransactionDe
       onDecode={handleDecode}
       decodedTransaction={decodedTransaction}
       hash={hash}
+      verdict={verdict}
       warnings={warnings}
       renderSummary={adapter.renderSummary ? (data: T) => adapter.renderSummary?.(data, hash) : undefined}
       placeholder={adapter.placeholder ?? 'Paste your transaction'}
