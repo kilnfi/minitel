@@ -1,8 +1,0 @@
-{
-  "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "skipLibCheck": true
-  },
-  "include": ["vite.config.ts"]
-}
