@@ -2,16 +2,13 @@ import {
   AdaIcon,
   CosmosIcon,
   CronosIcon,
-  DotIcon,
   DydxIcon,
   EthereumIcon,
   FetchIcon,
   GramIcon,
   InjectiveIcon,
   KavaIcon,
-  KsmIcon,
   NearIcon,
-  OmIcon,
   OsmosisIcon,
   SeiIcon,
   SolanaIcon,
@@ -22,9 +19,9 @@ import {
   ZetaIcon,
 } from '@protocols/ui';
 
-type CosmosToken = 'ATOM' | 'TIA' | 'ZETA' | 'OSMO' | 'DYDX' | 'FET' | 'INJ' | 'KAVA' | 'OM' | 'CRO' | 'SEI';
+type CosmosToken = 'ATOM' | 'TIA' | 'ZETA' | 'OSMO' | 'DYDX' | 'FET' | 'INJ' | 'KAVA' | 'CRO' | 'SEI';
 
-export type Token = CosmosToken | 'ETH' | 'NEAR' | 'SOL' | 'ADA' | 'SUI' | 'XTZ' | 'GRAM' | 'TRX' | 'DOT' | 'KSM';
+export type Token = CosmosToken | 'ETH' | 'NEAR' | 'SOL' | 'ADA' | 'SUI' | 'XTZ' | 'GRAM' | 'TRX';
 
 export type Protocol = {
   token: Token;
@@ -123,14 +120,6 @@ export const KAVA = {
   localUrl: 'http://localhost:3010',
 } satisfies Protocol;
 
-export const OM = {
-  token: 'OM',
-  name: 'Mantra',
-  icon: <OmIcon className="size-5" />,
-  url: 'https://om.minitel.app',
-  localUrl: 'http://localhost:3011',
-} satisfies Protocol;
-
 export const TIA = {
   token: 'TIA',
   name: 'Celestia',
@@ -192,22 +181,6 @@ export const XTZ = {
   localUrl: 'http://localhost:3016',
 } satisfies Protocol;
 
-export const DOT = {
-  token: 'DOT',
-  name: 'Polkadot',
-  icon: <DotIcon className="size-5" />,
-  url: 'https://dot.minitel.app',
-  localUrl: 'http://localhost:3019',
-} satisfies Protocol;
-
-export const KSM = {
-  token: 'KSM',
-  name: 'Kusama',
-  icon: <KsmIcon className="size-5" />,
-  url: 'https://ksm.minitel.app',
-  localUrl: 'http://localhost:3020',
-} satisfies Protocol;
-
 export const PROTOCOLS: Protocol[] = [
   ETH,
   SOL,
@@ -220,7 +193,6 @@ export const PROTOCOLS: Protocol[] = [
   FET,
   INJ,
   KAVA,
-  OM,
   TIA,
   OSMO,
   ADA,
@@ -228,8 +200,6 @@ export const PROTOCOLS: Protocol[] = [
   XTZ,
   TON,
   TRX,
-  DOT,
-  KSM,
 ];
 
 export const getCurrentProtocol = () => {
