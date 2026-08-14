@@ -18,6 +18,10 @@ jobs:
       contents: read
       deployments: write
     strategy:
+      # One app's failure must not cancel the other seventeen: with fail-fast on, the
+      # first job to fail hid the state of every other deploy, so a single broken app
+      # read as "the deploy is broken" and the ones that would have shipped never ran.
+      fail-fast: false
       matrix:
         app: [ethereum, solana, near, zeta, tia, sei, osmosis, injective, fetch, dydx, cronos, atom, kava, ada, sui, xtz, ton, trx]
 
