@@ -99,7 +99,9 @@ export const parseEthTx = async (txRaw: string): Promise<AugmentedTransaction> =
     if (looksLikeObject(txRaw)) {
       const tx = JSON.parse(txRaw);
       // Never trust caller-supplied inputData — always derive from actual calldata.
-      delete (tx as AugmentedTransactionWithFunction).inputData;
+      // Cast through Partial: inputData is required on the augmented type, and TS
+      // rejects delete on a non-optional property (TS2790).
+      delete (tx as Partial<AugmentedTransactionWithFunction>).inputData;
       const inputData = await tryDecodeInputData(tx);
       if (inputData) {
         (tx as AugmentedTransactionWithFunction).inputData = inputData;
