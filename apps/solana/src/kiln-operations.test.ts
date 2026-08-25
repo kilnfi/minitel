@@ -9,8 +9,8 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js';
-import { classifySolanaTransaction } from './kiln-operations';
-import { parseSolTx } from './parser';
+import { classifySolanaTransaction } from '@/kiln-operations';
+import { parseSolTx } from '@/parser';
 
 /**
  * The instruction sequences below mirror how services/sof/tx builds each operation, so a
@@ -22,8 +22,7 @@ const nonceAccount = Keypair.generate().publicKey;
 const stakeAccount = Keypair.generate().publicKey;
 const voteAccount = Keypair.generate().publicKey;
 
-const nonceAdvance = () =>
-  SystemProgram.nonceAdvance({ noncePubkey: nonceAccount, authorizedPubkey: wallet });
+const nonceAdvance = () => SystemProgram.nonceAdvance({ noncePubkey: nonceAccount, authorizedPubkey: wallet });
 
 /** Serialize an unsigned transaction the way minitel receives it, then run the real parser. */
 const classify = async (tx: Transaction) => {
