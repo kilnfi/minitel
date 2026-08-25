@@ -11,9 +11,8 @@ import { classifyEthereumTransaction } from '@/kiln-operations';
 import { parseEthTx } from '@/parser';
 
 /**
- * The calls below mirror how services/sof/tx builds each operation (EthService, PolService,
- * MaticService, DefiService), so a change on either side shows up here rather than in
- * production.
+ * The calls below mirror how Kiln's transaction-crafting API builds each operation, so a change on
+ * either side shows up here rather than in production.
  */
 
 const WITHDRAWAL_REQUEST_PREDEPLOY = '0x00000961Ef480Eb55e80D19ad83579A64c007002' as const;
@@ -156,7 +155,7 @@ describe('Kiln Ethereum operations are recognized', () => {
 });
 
 describe('Non-Kiln Ethereum transactions are rejected', () => {
-  test('SEC-358: a Kiln-shaped call on Base is rejected on the chain id alone', async () => {
+  test('a Kiln-shaped call on Base is rejected on the chain id alone', async () => {
     const verdict = await classify({
       chainId: 8453,
       to: ETH_EXIT_CONTRACT_ADDRESS,

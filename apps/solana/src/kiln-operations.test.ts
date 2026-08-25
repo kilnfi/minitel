@@ -13,7 +13,7 @@ import { classifySolanaTransaction } from '@/kiln-operations';
 import { parseSolTx } from '@/parser';
 
 /**
- * The instruction sequences below mirror how services/sof/tx builds each operation, so a
+ * The instruction sequences below mirror how Kiln's transaction-crafting API builds each operation, so a
  * change on either side shows up here rather than in production.
  */
 

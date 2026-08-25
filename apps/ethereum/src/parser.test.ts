@@ -4,7 +4,7 @@ import { EIGENLAYER_DELEGATION_MANAGER_ADDRESS, ETH_EXIT_CONTRACT_ADDRESS } from
 import { parseEthTx } from '@/parser';
 
 /**
- * SEC-358: the hardcoded address→ABI map is keyed by destination address alone, so a
+ * the hardcoded address→ABI map is keyed by destination address alone, so a
  * transaction on any other EVM chain that happens to target one of those addresses used to
  * inherit an Ethereum protocol label. The address may be empty, or attacker-controlled, on the
  * chain actually being signed for.

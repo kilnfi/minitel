@@ -5,7 +5,7 @@ import { classifyNearTransaction } from '@/kiln-operations';
 import { parseNearTx } from '@/parser';
 
 /**
- * The actions below mirror how services/sof/tx builds each operation, so a change on either
+ * The actions below mirror how Kiln's transaction-crafting API builds each operation, so a change on either
  * side shows up here rather than in production.
  */
 
@@ -16,7 +16,7 @@ const pool = 'kiln.pool.near';
 const publicKey = KeyPair.fromRandom('ed25519').getPublicKey();
 const blockHash = new Uint8Array(32).fill(1);
 
-/** 300 Tgas — what NearService attaches to every call it crafts. */
+/** 300 Tgas — what Kiln attaches to every call it crafts. */
 const MAX_GAS = 300_000_000_000_000n;
 
 /** Serialize an unsigned transaction the way minitel receives it, then run the real parser. */

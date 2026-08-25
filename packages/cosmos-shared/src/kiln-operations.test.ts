@@ -11,7 +11,7 @@ import { type CosmosChainName, classifyCosmosTransaction } from './kiln-operatio
 import { parseCosmosTx } from './parser';
 
 /**
- * The messages below mirror how services/sof/tx (CosmosMessages + CosmosServiceV2) builds each
+ * The messages below mirror how Kiln's transaction-crafting API builds each
  * operation, so a change on either side shows up here rather than in production.
  */
 
@@ -85,7 +85,7 @@ const sendMsg = (toAddress = 'cosmos1recipient'): Any => ({
   ).finish(),
 });
 
-/** The MsgGrant CosmosMessages.getRestakeRewardsMsg builds. */
+/** The MsgGrant Kiln's restake-rewards route builds. */
 const restakeGrantMsg = (authorizationType = AuthorizationType.AUTHORIZATION_TYPE_DELEGATE): Any => ({
   typeUrl: '/cosmos.authz.v1beta1.MsgGrant',
   value: MsgGrant.encode(

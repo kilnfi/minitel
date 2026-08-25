@@ -4,7 +4,7 @@ import type { DecodedAction, NearTransaction } from '@/parser';
 /**
  * The NEAR operations Kiln crafts, and the shape each one has.
  *
- * Source of truth is the crafting service (services/sof/tx, NearController + NearService):
+ * Source of truth is Kiln's transaction-crafting API:
  * `/near/transaction/{stake,unstake,withdraw}`, which the public Kiln Connect spec exposes
  * unchanged. Every one of them builds exactly one FunctionCall against the staking pool, so a
  * genuine Kiln transaction is a single action and nothing else.

@@ -4,8 +4,7 @@ import type { CosmosMessage, CosmosTransaction } from './parser';
 /**
  * The Cosmos operations Kiln crafts, per chain.
  *
- * Source of truth is the crafting service (services/sof/tx, the per-chain controllers over
- * CosmosServiceV2) and the public Kiln Connect spec, which expose the same set:
+ * Source of truth is Kiln's transaction-crafting API and the public Kiln Connect spec, which expose the same set:
  * `/{chain}/transaction/{stake,unstake,redelegate,withdraw-rewards,restake-rewards,
  * revoke-restake-rewards,send,noble-ibc-transfer}`. Not every chain exposes all of them, which
  * is exactly why this is keyed per chain rather than shared: a `send` on Cosmos Hub or a

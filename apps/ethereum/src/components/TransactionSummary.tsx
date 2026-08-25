@@ -12,8 +12,20 @@ import {
 } from '@protocols/ui';
 import { ArrowLeftRightIcon, FuelIcon, ShrinkIcon, TriangleAlertIcon } from 'lucide-react';
 import { formatEther, formatGwei } from 'viem';
+import { classifyEthereumTransaction } from '@/kiln-operations';
 import type { AugmentedTransaction } from '@/types';
 import { ethExplorerLink, getActionDetails } from '@/utils';
+
+/**
+ * The verdict is the risk signal. Every action handler used to report 'high', so the badge read
+ * HIGH RISK on a routine stake and on a drainer approval alike; a transaction Kiln produces is
+ * the expected case and should read as one.
+ */
+const RISK_BY_VERDICT = {
+  recognized: { label: 'EXPECTED', variant: 'success' },
+  unverified: { label: 'CHECK DETAILS', variant: 'secondary' },
+  unrecognized: { label: 'HIGH RISK', variant: 'destructive' },
+} as const;
 
 type TransactionSummaryProps = {
   transaction: AugmentedTransaction;
@@ -23,7 +35,14 @@ export function TransactionSummary({ transaction }: TransactionSummaryProps) {
   if (!transaction) return null;
 
   const actionDetails = getActionDetails(transaction);
-  const riskLevel = actionDetails.riskLevel;
+  const verdict = classifyEthereumTransaction(transaction);
+  const risk = RISK_BY_VERDICT[verdict.status];
+  const transactionType =
+    'inputData' in transaction && transaction.inputData
+      ? transaction.inputData.functionName
+      : (transaction.value ?? 0n) > 0n
+        ? 'ETH transfer'
+        : 'Contract call';
   const ethValue = formatEther(BigInt(transaction.value ?? 0n));
   const maxFeeGwei = Number(formatGwei(transaction.maxFeePerGas ?? 0n)).toFixed(2);
 
@@ -51,12 +70,12 @@ export function TransactionSummary({ transaction }: TransactionSummaryProps) {
             <div className="flex w-full md:w-2/5 bg-secondary justify-between items-center p-3 text-muted-foreground">
               <div className="flex items-center gap-2">
                 <TriangleAlertIcon className="size-4" />
-                <span className="text-sm text-muted-foreground">Risk level</span>
+                <span className="text-sm text-muted-foreground">Assessment</span>
               </div>
               <span className="text-sm text-muted-foreground">-</span>
             </div>
             <div className="p-3 border-l flex-1 w-full bg-secondary/10">
-              <Badge variant="destructive">{riskLevel.toUpperCase()} RISK</Badge>
+              <Badge variant={risk.variant}>{risk.label}</Badge>
             </div>
           </div>
           <div className="rounded-b-lg overflow-hidden border flex md:flex-row flex-col">
@@ -68,7 +87,7 @@ export function TransactionSummary({ transaction }: TransactionSummaryProps) {
               <span className="text-sm">-</span>
             </div>
             <div className="p-3 border-l flex-1 w-full bg-secondary/10">
-              <Badge variant="success">Approval</Badge>
+              <Badge variant="secondary">{transactionType}</Badge>
             </div>
           </div>
         </div>

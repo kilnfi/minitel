@@ -6,15 +6,14 @@ import type { AugmentedTransaction } from '@/types';
 /**
  * The Ethereum operations Kiln crafts, and the calls each one makes.
  *
- * Source of truth is the crafting service (services/sof/tx: EthService, PolService, MaticService
- * and DefiService) and the public Kiln Connect spec, which expose the same set across
+ * Source of truth is Kiln's transaction-crafting API and the public Kiln Connect spec, which expose the same set across
  * `/eth/transaction/*`, `/pol/transaction/*`, `/matic/transaction/*` and `/defi/transaction/*`.
  *
  * Most of them are ordinary contract calls, so the function the transaction decodes to is what
  * identifies the operation. Matching on the function rather than the contract address is
  * deliberate and matches the other chains: the deposit contract, the exit-queue helper and the
  * per-customer onchain-v2 vaults all live in Kiln's configuration and change without minitel
- * knowing. The address→ABI map is still what makes the decode possible, and SEC-358 gates that
+ * knowing. The address→ABI map is still what makes the decode possible, and chain-id gating gates that
  * map on chain id, so a call only reaches this classifier already labelled by a contract Kiln
  * actually deploys on a chain Kiln actually uses.
  *
@@ -111,7 +110,7 @@ const classifyPredeployCall = (to: `0x${string}`, data: `0x${string}`): Transact
 export const classifyEthereumTransaction = (tx: AugmentedTransaction): TransactionVerdict => {
   const chainId = chainIdOf(tx);
 
-  // SEC-358: the same contract address means something different on every other EVM chain, so
+  // the same contract address means something different on every other EVM chain, so
   // the chain is part of the operation's identity, not a detail below it.
   if (chainId === null) {
     return unrecognized(

@@ -4,7 +4,7 @@ import { type DecodedInstruction, getProgramKeyFromId, type InstructionType } fr
 /**
  * The Solana operations Kiln crafts, and the instructions each one is made of.
  *
- * Source of truth is the crafting service (services/sof/tx, SolController + SolService):
+ * Source of truth is Kiln's transaction-crafting API:
  * `/sol/transaction/{stake,deactivate-stake,withdraw-stake,split-stake,merge-stakes}`.
  * Every one of those is built as a nonce advance followed by a single Stake Program action,
  * so the shape of a genuine Kiln transaction is narrow and checkable.

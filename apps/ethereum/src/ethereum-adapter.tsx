@@ -5,7 +5,6 @@ import { TransactionSummary } from '@/components/TransactionSummary';
 import { classifyEthereumTransaction } from '@/kiln-operations';
 import { hashEthTx, parseEthTx } from '@/parser';
 import type { AugmentedTransaction } from '@/types';
-import { getActionDetails } from '@/utils';
 
 export const buildEthTransactionFromFields = (fields: Record<string, string>) => {
   const txObject: Record<string, string> = {};
@@ -58,14 +57,11 @@ export const ethereumAdapter: ProtocolAdapter<AugmentedTransaction> = {
 
   classifyTransaction: classifyEthereumTransaction,
 
+  // Only things the verdict and the summary do not already say. The per-function
+  // "X is a high risk operation" strings that used to live here fired on every decoded
+  // transaction, including an empty one, so they read as noise rather than as an alert.
   generateWarnings: (data) => {
-    const valueWei = data.value ?? 0n;
-    const ethAmount = formatEther(valueWei);
-    const isHighValue = Number(ethAmount) > 1;
-    const warnings = [
-      { message: getActionDetails(data).warning },
-      ...(isHighValue ? [{ message: `High value transaction: ${ethAmount} ETH` }] : []),
-    ];
-    return warnings;
+    const ethAmount = formatEther(data.value ?? 0n);
+    return Number(ethAmount) > 1 ? [{ message: `High value transaction: ${ethAmount} ETH` }] : [];
   },
 };
