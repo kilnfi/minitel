@@ -1,6 +1,7 @@
 import { blake2b } from '@noble/hashes/blake2.js';
-import { type ProtocolAdapter, pendingAllowlist, XTZ } from '@protocols/shared';
+import { type ProtocolAdapter, XTZ } from '@protocols/shared';
 import type { ForgeParams } from '@taquito/local-forging';
+import { classifyXtzTransaction } from '@/kiln-operations';
 import { parseXtzTx } from '@/parser';
 
 const isValidXtzInput = (rawTx: string): boolean => {
@@ -31,7 +32,5 @@ export const xtzAdapter: ProtocolAdapter<ForgeParams> = {
   validateInput: isValidXtzInput,
   parseTransaction: parseXtzTx,
   computeHash: computeXtzHash,
-  // Kiln crafts stake, unstake, delegate, undelegate and finalize-unstake on Tezos —
-  // allowlist not written yet.
-  classifyTransaction: pendingAllowlist,
+  classifyTransaction: classifyXtzTransaction,
 };
