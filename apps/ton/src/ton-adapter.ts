@@ -1,5 +1,6 @@
-import { type ProtocolAdapter, pendingAllowlist, TON } from '@protocols/shared';
+import { type ProtocolAdapter, TON } from '@protocols/shared';
 import { Cell } from '@ton/core';
+import { classifyTonTransaction } from '@/kiln-operations';
 import { parseTonTx } from '@/parser';
 
 const isValidTonInput = (rawTx: string): boolean => {
@@ -43,7 +44,5 @@ export const tonAdapter: ProtocolAdapter<any> = {
   validateInput: isValidTonInput,
   parseTransaction: parseTonTx,
   computeHash: computeTonHash,
-  // Kiln crafts the nomination-pool and whales-pool stake/unstake pairs plus
-  // whitelist-vesting-contract here — allowlist not written yet.
-  classifyTransaction: pendingAllowlist,
+  classifyTransaction: classifyTonTransaction,
 };
