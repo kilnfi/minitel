@@ -1,7 +1,8 @@
-import { ETH, type ProtocolAdapter, pendingAllowlist } from '@protocols/shared';
+import { ETH, type ProtocolAdapter } from '@protocols/shared';
 import { formatEther, isHex } from 'viem';
 import * as viemChains from 'viem/chains';
 import { TransactionSummary } from '@/components/TransactionSummary';
+import { classifyEthereumTransaction } from '@/kiln-operations';
 import { hashEthTx, parseEthTx } from '@/parser';
 import type { AugmentedTransaction } from '@/types';
 import { getActionDetails } from '@/utils';
@@ -55,12 +56,7 @@ export const ethereumAdapter: ProtocolAdapter<AugmentedTransaction> = {
   ],
   buildTransactionFromFields: buildEthTransactionFromFields,
 
-  // Kiln crafts stake, deposit, withdrawal, consolidate, enable-compounding and exit-request
-  // here, plus the DeFi vault and Polygon operations. The address→ABI map in constant.ts is
-  // most of an allowlist already, and it is now gated on chain id (SEC-358), but it still
-  // falls through to generic ERC20/ERC4626 decoding for anything else — so turning it into a
-  // verdict is its own change.
-  classifyTransaction: pendingAllowlist,
+  classifyTransaction: classifyEthereumTransaction,
 
   generateWarnings: (data) => {
     const valueWei = data.value ?? 0n;
