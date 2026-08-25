@@ -1,28 +1,12 @@
 import { recognized, type TransactionVerdict, unrecognized, unverified } from '@protocols/shared';
 
 /**
- * The Gram (ex TON) operations Kiln crafts, and the message each one sends.
+ * Kiln's Gram routes each send one internal message, identified by the opcode at the head of
+ * its body — or, for a whales deposit, a "Deposit" text comment. Any of them may be routed
+ * through a vesting contract, which wraps the real message in a vesting send.
  *
- * Source of truth is Kiln's transaction-crafting API, which the public Kiln Connect spec
- * exposes as `/gram/transaction/{stake-single-nomination-pool,unstake-single-nomination-pool,
- * stake-pool,unstake-pool,whitelist-vesting-contract}`.
- *
- * Every one sends a single internal message, identified by the opcode at the head of its body:
- *
- * - unstake from a single-nominator pool — the pool's withdraw opcode
- * - unstake from a whales pool — the nominator contract's stake_withdraw opcode
- * - stake into a whales pool — a text comment reading "Deposit"
- * - whitelist a vesting contract — the vesting contract's add_whitelist opcode
- *
- * Each of these can also be sent *through* a vesting contract, which wraps the real message in
- * a vesting `send`. The wrapper is unwrapped and the message inside is classified on its own
- * terms, so a vesting-routed unstake reads the same as a direct one.
- *
- * Staking into a single-nominator pool is the exception, and the reason this file returns
- * `unverified` for one case: on this chain that deposit is nothing but a transfer of TON to the
- * pool address, with no opcode and no comment to match on. It is indistinguishable from sending
- * TON to any other address, and the only thing separating the two is whether the destination is
- * a Kiln pool — which lives in Kiln's configuration and is not knowable here.
+ * Staking into a single-nominator pool is the exception: it is a bare transfer to the pool,
+ * indistinguishable from sending funds anywhere else, so it can only be unverified.
  */
 
 type ParsedBody = {
@@ -36,7 +20,7 @@ type ParsedMessage = {
   body?: ParsedBody;
 };
 
-/** The parser returns internal messages keyed by index, or just a wallet body if there are none. */
+/** Internal messages keyed by index, or just a wallet body if there are none. */
 type ParsedTonTransaction = Record<string, { message?: ParsedMessage } | unknown>;
 
 const OPERATION_BY_OPCODE_NAME: Record<string, string> = {
@@ -45,16 +29,13 @@ const OPERATION_BY_OPCODE_NAME: Record<string, string> = {
   vesting_contract_add_whitelist: 'whitelist-vesting-contract',
 };
 
-/** The text comment a whales-pool deposit carries in place of an opcode. */
+/** A whales-pool deposit carries this comment in place of an opcode. */
 const WHALES_DEPOSIT_COMMENT = 'Deposit';
 
 const isMessageEntry = (entry: unknown): entry is { message: ParsedMessage } =>
   typeof entry === 'object' && entry !== null && 'message' in entry;
 
-/**
- * A vesting contract forwards on the owner's behalf, so the operation being authorised is the
- * one inside the wrapper rather than the wrapper itself.
- */
+/** A vesting contract forwards on the owner's behalf, so the real operation is inside. */
 const unwrapVestingSend = (body: ParsedBody | undefined): ParsedBody | undefined =>
   body?.op_code_name === 'vesting_contract_send' ? body.params?.out_msg?.body : body;
 
@@ -65,8 +46,7 @@ export const classifyTonTransaction = (transaction: ParsedTonTransaction): Trans
     return unrecognized('This transaction sends no message, so there is no operation to check.');
   }
 
-  // Kiln sends one message per transaction. A wallet can carry up to four, and the summary
-  // renders them all, but a second message is not something we crafted.
+  // A wallet can carry up to four, but Kiln sends one.
   if (messages.length > 1) {
     return unrecognized(`This transaction sends ${messages.length} messages. Kiln operations on this chain send one.`);
   }
@@ -82,8 +62,7 @@ export const classifyTonTransaction = (transaction: ParsedTonTransaction): Trans
     return recognized('stake-pool');
   }
 
-  // No opcode and no comment: a bare transfer. That is exactly what a single-nominator pool
-  // deposit looks like, and exactly what sending TON to an attacker looks like too.
+  // No opcode and no comment: a bare transfer, which is both a pool deposit and a drain.
   if (!opCodeName || opCodeName === 'unknown') {
     if (body?.op_code !== undefined) {
       return unrecognized(

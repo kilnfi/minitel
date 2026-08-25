@@ -2,23 +2,10 @@ import { recognized, type TransactionVerdict, unrecognized } from '@protocols/sh
 import type { CosmosMessage, CosmosTransaction } from './parser';
 
 /**
- * The Cosmos operations Kiln crafts, per chain.
- *
- * Source of truth is Kiln's transaction-crafting API and the public Kiln Connect spec, which expose the same set:
- * `/{chain}/transaction/{stake,unstake,redelegate,withdraw-rewards,restake-rewards,
- * revoke-restake-rewards,send,noble-ibc-transfer}`. Not every chain exposes all of them, which
- * is exactly why this is keyed per chain rather than shared: a `send` on Cosmos Hub or a
- * restake grant on Injective is not something Kiln produces, and saying so is the point.
- *
- * Every one of those routes builds a single message, with one exception — `stake` with
- * `restake_rewards` set builds a MsgDelegate followed by a MsgGrant — so a genuine Kiln
- * transaction is one message, or that specific pair.
- *
- * Matching is on message shape, not on Kiln's own validator or grantee addresses. Those live
- * in Kiln's configuration and change without minitel knowing; baking them in here would
- * produce a list that silently goes stale and starts rejecting real transactions, which erodes
- * trust in the verdict just as badly as accepting a bad one. The decoded summary below the
- * verdict is where the user checks which validator they are delegating to.
+ * Kiln's Cosmos routes, keyed per chain because the set genuinely differs — a send on Cosmos
+ * Hub or a restake grant on Injective is not something Kiln produces. Each route builds one
+ * message, except stake with restaking on, which builds a MsgDelegate then a MsgGrant.
+ * Matched on message shape, not on Kiln's validator or grantee addresses.
  */
 
 /** Chains minitel ships a Cosmos decoder for. */
@@ -44,12 +31,7 @@ export type CosmosOperation =
   | 'send'
   | 'ibc-transfer';
 
-/**
- * Kava and ZetaChain are deliberately empty: Kiln Connect removed every `/kava/*` and
- * `/zeta/*` endpoint in API v1.10, so there is no such thing as a Kiln transaction on those
- * chains any more and nothing minitel can vouch for. The apps are candidates for removal the
- * way DOT, KSM and Mantra were.
- */
+/** Kava and ZetaChain are empty: Kiln Connect removed those endpoints in API v1.10. */
 const KILN_OPERATIONS_BY_CHAIN: Record<CosmosChainName, ReadonlySet<CosmosOperation>> = {
   atom: new Set(['stake', 'unstake', 'redelegate', 'withdraw-rewards', 'restake-rewards', 'revoke-restake-rewards']),
   cronos: new Set([
@@ -80,19 +62,17 @@ const KILN_OPERATIONS_BY_CHAIN: Record<CosmosChainName, ReadonlySet<CosmosOperat
   zeta: new Set([]),
 };
 
-/** The message Kiln's revoke-restake-rewards route revokes authorization for. */
+/** What the revoke-restake-rewards route revokes authorization for. */
 const DELEGATE_MSG_TYPE_URL = '/cosmos.staking.v1beta1.MsgDelegate';
 
-/** A rejection carrying the reason, or the operation a message set resolves to. */
+/** Either the operation a message set resolves to, or why it was rejected. */
 type Match = { operation: CosmosOperation } | { rejection: string };
 
 const isRejection = (match: Match): match is { rejection: string } => 'rejection' in match;
 
 /**
- * Kiln's restake grant authorizes one thing: delegating to a named validator on the user's
- * behalf. A StakeAuthorization can just as easily authorize undelegation or redelegation, and
- * a grant of some other authorization type can authorize anything at all — none of which is
- * visible from the `MsgGrant` typeUrl the summary shows.
+ * The restake grant authorizes delegation and nothing else. A StakeAuthorization can just as
+ * easily authorize undelegation, and none of that is visible from the typeUrl alone.
  */
 const matchRestakeGrant = (message: Extract<CosmosMessage, { kind: 'authzGrant' }>): Match => {
   const { stakeAuthorization } = message;
@@ -146,12 +126,8 @@ const matchMessage = (message: CosmosMessage): Match => {
 };
 
 /**
- * A single stake route emits a MsgDelegate plus the MsgGrant that turns on restaking, so the
- * pair is one operation rather than a bundle. It needs both halves to be operations the chain
- * offers, since that one route is what produces it.
- *
- * Returns null when the messages are not that pair at all, leaving the caller to fall through
- * to the ordinary single-message path.
+ * The stake-with-restaking pair is one operation rather than a bundle. Returns null when the
+ * messages are not that pair, so the caller falls through to the single-message path.
  */
 const matchStakeWithRestake = (
   messages: CosmosMessage[],

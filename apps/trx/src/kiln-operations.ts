@@ -2,16 +2,8 @@ import { recognized, type TransactionVerdict, unrecognized } from '@protocols/sh
 import type { TrxTransaction } from '@/parser';
 
 /**
- * The Tron operations Kiln crafts, one contract type each.
- *
- * Source of truth is Kiln's transaction-crafting API, which the public Kiln Connect spec
- * exposes as `/trx/transaction/{stake,unstake,cancel-unstake,withdraw-unstaked,vote,
- * withdraw-rewards}`. Tron models each of these as a distinct contract type, so the mapping is
- * one to one and there is nothing to match on beyond the type itself.
- *
- * Matching is on the contract type, not on the witness being voted for. The validator list
- * lives in Kiln's configuration and changes without minitel knowing; the decoded summary below
- * the verdict is where the user checks which witness their votes go to.
+ * Tron models each Kiln route as its own contract type, so the mapping is one to one. Matched
+ * on that type, not on the witness voted for, which is Kiln configuration.
  */
 const OPERATION_BY_CONTRACT: Record<string, string> = {
   'protocol.FreezeBalanceV2Contract': 'stake',
@@ -32,9 +24,7 @@ export const classifyTrxTransaction = (transaction: TrxTransaction): Transaction
     return unrecognized('This transaction carries no contract.');
   }
 
-  // The decoder only ever renders the first contract, so a second one would be invisible in the
-  // summary below. Every Kiln operation is a single contract, and Tron itself has never
-  // supported more, but rejecting the case is what keeps the summary honest about what it shows.
+  // The decoder renders only the first contract, so a second would be invisible below.
   if (contracts.length > 1) {
     return unrecognized(
       `This transaction bundles ${contracts.length} contracts, and only the first is shown below. Kiln operations carry exactly one.`,

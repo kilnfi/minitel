@@ -12,10 +12,7 @@ import {
 import { classifySolanaTransaction } from '@/kiln-operations';
 import { parseSolTx } from '@/parser';
 
-/**
- * The instruction sequences below mirror how Kiln's transaction-crafting API builds each operation, so a
- * change on either side shows up here rather than in production.
- */
+/** These mirror how Kiln crafts each operation, so a drift on either side shows up here. */
 
 const wallet = Keypair.generate().publicKey;
 const nonceAccount = Keypair.generate().publicKey;

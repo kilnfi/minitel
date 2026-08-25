@@ -4,10 +4,7 @@ import 'tronweb';
 import { classifyTrxTransaction } from '@/kiln-operations';
 import { parseTrxTx } from '@/parser';
 
-/**
- * Minimal protobuf writers, so each case is a real serialized Tron transaction run through the
- * actual parser rather than a hand-written object.
- */
+/** Minimal protobuf writers, so each case is a real transaction run through the real parser. */
 const varint = (n: number): number[] => {
   const out: number[] = [];
   let value = n;

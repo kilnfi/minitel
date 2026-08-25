@@ -26,14 +26,9 @@ export const unrecognized = (reason: string): TransactionVerdict => ({
 });
 
 /**
- * For the narrow case where a protocol has an allowlist, the transaction matches the shape of a
- * Kiln operation, but the thing that would make it safe is not knowable here — typically an
- * address that lives in Kiln's configuration.
- *
- * Unlike [pendingAllowlist] this is a considered answer about a specific transaction, so the
- * reason has to name what minitel could not check and what the user should check instead.
- * Reach for it sparingly: a verdict of "maybe" on an operation that could have been decided is
- * worse than either answer.
+ * For a transaction that matches a Kiln operation's shape but whose safety turns on something
+ * not knowable here — typically an address in Kiln's configuration. The reason must name what
+ * to check instead. Use sparingly: a "maybe" on a decidable operation is worse than either answer.
  */
 export const unverified = (reason: string): TransactionVerdict => ({
   status: 'unverified',

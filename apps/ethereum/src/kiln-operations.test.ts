@@ -10,10 +10,7 @@ import {
 import { classifyEthereumTransaction } from '@/kiln-operations';
 import { parseEthTx } from '@/parser';
 
-/**
- * The calls below mirror how Kiln's transaction-crafting API builds each operation, so a change on
- * either side shows up here rather than in production.
- */
+/** These mirror how Kiln crafts each operation, so a drift on either side shows up here. */
 
 const WITHDRAWAL_REQUEST_PREDEPLOY = '0x00000961Ef480Eb55e80D19ad83579A64c007002' as const;
 const CONSOLIDATION_REQUEST_PREDEPLOY = '0x0000BBdDc7CE488642fb579F8B00f3a590007251' as const;

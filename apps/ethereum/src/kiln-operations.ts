@@ -4,23 +4,10 @@ import { DEFI_CHAIN_IDS, ETHEREUM_CHAIN_IDS } from '@/constant';
 import type { AugmentedTransaction } from '@/types';
 
 /**
- * The Ethereum operations Kiln crafts, and the calls each one makes.
- *
- * Source of truth is Kiln's transaction-crafting API and the public Kiln Connect spec, which expose the same set across
- * `/eth/transaction/*`, `/pol/transaction/*`, `/matic/transaction/*` and `/defi/transaction/*`.
- *
- * Most of them are ordinary contract calls, so the function the transaction decodes to is what
- * identifies the operation. Matching on the function rather than the contract address is
- * deliberate and matches the other chains: the deposit contract, the exit-queue helper and the
- * per-customer onchain-v2 vaults all live in Kiln's configuration and change without minitel
- * knowing. The address→ABI map is still what makes the decode possible, and chain-id gating gates that
- * map on chain id, so a call only reaches this classifier already labelled by a contract Kiln
- * actually deploys on a chain Kiln actually uses.
- *
- * Two operations have no ABI at all: validator exits and consolidations are raw payloads sent
- * to the execution-layer predeploys from EIP-7002 and EIP-7251. Those are Ethereum protocol
- * constants rather than Kiln configuration, so matching them on address plus payload shape is
- * safe from going stale.
+ * Kiln's Ethereum operations are mostly ordinary contract calls, so the decoded function
+ * identifies them — not the contract address, which is Kiln configuration. Validator exits and
+ * consolidations have no ABI at all: they are raw payloads to the EIP-7002 and EIP-7251
+ * predeploys, which are protocol constants and so safe to match on address plus shape.
  */
 
 /** EIP-7002 withdrawal/exit request predeploy: 48-byte pubkey followed by an 8-byte amount. */
@@ -34,16 +21,8 @@ const CONSOLIDATION_REQUEST_SIZE = 96;
 const PUBKEY_SIZE = 48;
 
 /**
- * Decoded function name → the Kiln operation that produces it.
- *
- * EigenLayer's calls are deliberately absent even though the ABIs to decode them are still
- * bundled: Kiln Connect removed EigenLayer support in API v1.10, along with Kava and ZetaChain,
- * so `delegateTo`, `undelegate`, `createPod` and `completeQueuedWithdrawals` are no longer
- * operations Kiln produces.
- *
- * The async-vault operator functions are absent for the same fail-closed reason. `settleDeposit`,
- * `updateNewTotalAssets`, `close` and friends are vault-administration calls that no customer
- * route crafts, so a customer being asked to sign one is exactly the case worth flagging.
+ * Two absences are deliberate: EigenLayer's calls, dropped from Kiln Connect in API v1.10, and
+ * the async-vault operator functions, which no customer route crafts.
  */
 type Scope = 'ethereum' | 'defi';
 
@@ -54,8 +33,7 @@ const SCOPES: Record<Scope, { chainIds: readonly number[]; where: string }> = {
 };
 
 const OPERATION_BY_FUNCTION: Record<string, { operation: string; scope: Scope }> = {
-  // Native staking. The beacon deposit is payable and always carries ETH, which is what
-  // separates it from the ERC-4626 vault deposit that shares the name.
+  // The beacon deposit is payable, which separates it from the vault deposit of the same name.
   deposit: { operation: 'stake', scope: 'ethereum' },
   batchDeposit: { operation: 'stake', scope: 'ethereum' },
   batchDepositCustom: { operation: 'stake', scope: 'ethereum' },
@@ -86,11 +64,7 @@ const isVaultDeposit = (tx: AugmentedTransaction): boolean => (tx.value ?? 0n) =
 
 const chainIdOf = (tx: AugmentedTransaction): number | null => (tx.chainId === undefined ? null : Number(tx.chainId));
 
-/**
- * The raw predeploy payloads. An exit is a withdrawal of zero — the same request with the
- * amount field cleared — and enabling compounding is a consolidation of a validator onto
- * itself, so each pair is told apart by reading the payload rather than by a separate address.
- */
+/** An exit is a withdrawal of zero; enabling compounding is a consolidation onto itself. */
 const classifyPredeployCall = (to: `0x${string}`, data: `0x${string}`): TransactionVerdict | null => {
   if (isAddressEqual(to, WITHDRAWAL_REQUEST_PREDEPLOY)) {
     if (size(data) !== WITHDRAWAL_REQUEST_SIZE) {
@@ -139,8 +113,7 @@ export const classifyEthereumTransaction = (tx: AugmentedTransaction): Transacti
 
   if (tx.data && tx.data !== '0x') {
     const predeploy = classifyPredeployCall(tx.to, tx.data);
-    // The predeploys exist on every chain that has adopted the EIPs, but a Kiln validator
-    // request is only ever for the Ethereum network Kiln runs validators on.
+    // The predeploys exist wherever the EIPs are adopted, but Kiln's validators are on Ethereum.
     if (predeploy) {
       if (predeploy.status !== 'recognized') return predeploy;
       return onSupportedChain(predeploy.operation, 'ethereum');
@@ -157,10 +130,8 @@ export const classifyEthereumTransaction = (tx: AugmentedTransaction): Transacti
 
   const { functionName } = tx.inputData;
 
-  // Kiln's vault flow crafts an approval, but its whole safety rests on the spender being a Kiln
-  // vault — an address that lives in Kiln's configuration and is not knowable here. Calling it
-  // recognized would rubber-stamp an approval to a drainer; calling it unrecognized would
-  // reject a real operation. It is genuinely the one case minitel cannot answer.
+  // The approval's safety rests entirely on the spender being a Kiln vault, which is not
+  // knowable here — green would rubber-stamp a drainer, red would reject a real operation.
   if (functionName === 'approve') {
     if (!DEFI_CHAIN_IDS.includes(chainId)) {
       return unrecognized(
@@ -178,8 +149,7 @@ export const classifyEthereumTransaction = (tx: AugmentedTransaction): Transacti
     return unrecognized(`This transaction calls ${functionName}(), which is not a function Kiln operations use.`);
   }
 
-  // `deposit` is shared: the beacon deposit contract is payable and always carries ETH, while
-  // an ERC-4626 vault deposit moves tokens and carries none.
+  // `deposit` is shared: the beacon contract carries ETH, an ERC-4626 vault deposit does not.
   if (functionName === 'deposit' && isVaultDeposit(tx)) {
     return onSupportedChain('defi-deposit', 'defi');
   }

@@ -3,10 +3,7 @@ import TonWeb from 'tonweb';
 import { classifyTonTransaction } from '@/kiln-operations';
 import { parseTonTx } from '@/parser';
 
-/**
- * Each case is a real BOC, built with the same library Kiln's crafting service uses and run
- * back through the real parser, so a change on either side shows up here.
- */
+/** Each case is a real BOC, built the way Kiln builds them and run through the real parser. */
 
 const pool = 'EQAREREREREREREREREREREREREREREREREREREREREREeYT';
 const vestingContract = 'EQAiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIp3C';

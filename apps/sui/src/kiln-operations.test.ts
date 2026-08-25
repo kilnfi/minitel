@@ -3,10 +3,7 @@ import { Transaction } from '@mysten/sui/transactions';
 import { classifySuiTransaction } from '@/kiln-operations';
 import { parseSuiTx } from '@/parser';
 
-/**
- * Each case is built with the same library Kiln's crafting service uses, serialized to BCS and
- * run back through the real parser, so a change on either side shows up here.
- */
+/** Each case is built with the same library Kiln uses and run back through the real parser. */
 
 const sender = `0x${'11'.repeat(32)}`;
 const validator = `0x${'22'.repeat(32)}`;

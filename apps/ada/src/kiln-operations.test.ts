@@ -3,10 +3,8 @@ import type { CertificateJSON, TransactionJSON } from '@emurgo/cardano-serializa
 import { classifyAdaTransaction } from '@/kiln-operations';
 
 /**
- * These build the decoded JSON directly rather than round-tripping through the serialization
- * library: its browser WASM build does not initialize under the test runner, so a real
- * transaction cannot be forged here. The shapes below follow CertificateJSON and
- * TransactionBodyJSON, which is what the parser hands the classifier.
+ * Built as decoded JSON rather than forged: the serialization library's browser WASM build does
+ * not initialize under the test runner. Shapes follow CertificateJSON and TransactionBodyJSON.
  */
 
 const keyCredential = { Key: '00'.repeat(28) };

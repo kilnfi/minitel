@@ -2,32 +2,15 @@ import type { CertificateJSON, TransactionJSON } from '@emurgo/cardano-serializa
 import { recognized, type TransactionVerdict, unrecognized } from '@protocols/shared';
 
 /**
- * The Cardano operations Kiln crafts, and the certificates each one carries.
- *
- * Source of truth is Kiln's transaction-crafting API, which the public Kiln Connect spec
- * exposes as `/ada/transaction/{stake,unstake,withdraw-rewards}`:
- *
- * - stake — a stake-and-vote delegation, preceded by a stake registration the first time the
- *   key is used. A key already registered is delegated without re-registering, so both the
- *   one- and two-certificate forms are genuine.
- * - unstake — a stake deregistration, which also sweeps the outstanding rewards, so the
- *   withdrawals map is populated alongside the certificate.
- * - withdraw-rewards — a withdrawals map and no certificate at all.
- *
- * Matching is on certificate shape, not on the pool being delegated to. The pool id lives in
- * Kiln's configuration and changes without minitel knowing; baking it in here would produce a
- * list that goes stale and starts rejecting real transactions. The decoded summary below the
- * verdict is where the user checks which pool they are delegating to.
+ * Kiln's Cardano routes: stake is a delegation, preceded by a registration the first time a
+ * key is used; unstake is a deregistration; withdraw-rewards is a bare withdrawals map.
+ * Matched on certificate shape, not on the pool id, which is Kiln configuration.
  */
 
 /** Certificates are single-key objects tagged by variant, e.g. `{ StakeDelegation: {...} }`. */
 const certificateKind = (certificate: CertificateJSON): string => Object.keys(certificate)[0] ?? 'unknown';
 
-/**
- * The delegation certificates Kiln's stake route may produce. The Conway era split delegation
- * into several variants depending on whether a governance vote is delegated at the same time,
- * and whether registration is folded into the same certificate.
- */
+/** Conway split delegation into variants by whether a vote or registration rides along. */
 const DELEGATION_CERTIFICATES = new Set([
   'StakeDelegation',
   'StakeAndVoteDelegation',
@@ -44,8 +27,7 @@ export const classifyAdaTransaction = (transaction: TransactionJSON): Transactio
     return unrecognized('This transaction has no body to inspect.');
   }
 
-  // A staking operation never mints or burns, and never carries governance proposals. These
-  // ride alongside the certificates rather than replacing them, so they are checked first.
+  // These ride alongside the certificates rather than replacing them, so check them first.
   if (body.mint) {
     return unrecognized('This transaction mints or burns tokens, which no Kiln operation does.');
   }

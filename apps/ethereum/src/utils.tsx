@@ -29,12 +29,7 @@ export function shortenAddress(address: `0x${string}`): string {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
-/**
- * What the transaction does, in the user's words. Deliberately no risk level and no warning:
- * every handler used to return 'high' with a matching "X is a high risk operation" string, so
- * the badge said HIGH RISK on every transaction ever decoded and carried no information. Judging
- * the transaction is the verdict's job now — see kiln-operations.ts.
- */
+/** What the transaction does. Judging it is the verdict's job — see kiln-operations.ts. */
 type DetailsResult = {
   description: ReactNode;
 };

@@ -9,19 +9,16 @@ import { POL_CONTRACT_ABI } from '@/abi/POL_CONTRACT_ABI';
 import { POL_STAKE_MANAGER_ABI } from '@/abi/POL_STAKE_MANAGER_ABI';
 import { POL_VALIDATOR_SHARES_CONTRACT_ABI } from '@/abi/POL_VALIDATOR_SHARES_CONTRACT_ABI';
 
-// Chain IDs on which the hardcoded protocol ABIs (keyed by contract address) are
-// deployed. Protocol-specific decoding must be gated on these so a transaction on
-// another EVM chain that reuses one of these addresses cannot be falsely labeled as
-// a known Ethereum protocol action.
+// Chains the address-keyed protocol ABIs below are deployed on. Decoding is gated on these so
+// a transaction reusing one of those addresses elsewhere is not labeled as an Ethereum action.
 export const ETHEREUM_CHAIN_IDS: readonly number[] = [
   1, // mainnet
   11155111, // sepolia
   560048, // hoodi
 ];
 
-// Chains Kiln's DeFi vaults run on. Unlike the staking contracts above, the vault calls are
-// ERC-4626 and ERC-20 — identified by selector rather than by address — and the product is
-// deliberately multi-chain, so a vault deposit on Base is as genuine as one on mainnet.
+// Chains Kiln's vaults run on. Their calls are ERC-4626 and ERC-20, identified by selector
+// rather than address, and the product is deliberately multi-chain.
 export const DEFI_CHAIN_IDS: readonly number[] = [
   1, // mainnet
   10, // optimism

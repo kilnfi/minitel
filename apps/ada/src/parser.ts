@@ -1,12 +1,7 @@
 import type { TransactionJSON } from '@emurgo/cardano-serialization-lib-browser';
 import { Transaction, TransactionBody } from '@emurgo/cardano-serialization-lib-browser';
 
-/**
- * `to_js_value()` silently omits the withdrawals map, so a reward withdrawal used to decode as a
- * transaction that did nothing at all — and an unstake showed its deregistration certificate
- * with no sign of the rewards being moved. `to_json()` carries the whole body, so both are
- * derived from it instead.
- */
+/** `to_js_value()` omits the withdrawals map, so a reward withdrawal decoded as doing nothing. */
 const toJson = (value: { to_json: () => string }): TransactionJSON => JSON.parse(value.to_json());
 
 export const parseAdaTx = async (txRaw: string): Promise<TransactionJSON> => {

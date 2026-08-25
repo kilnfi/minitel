@@ -64,12 +64,7 @@ export type CosmosMessage =
       grantee: string;
       /** typeUrl of the granted authorization, e.g. '/cosmos.staking.v1beta1.StakeAuthorization'. */
       authorizationType: string;
-      /**
-       * The decoded StakeAuthorization body, or null when the grant is some other kind of
-       * authorization. The typeUrl alone says nothing about what the grantee may do: a
-       * StakeAuthorization can authorize undelegation to an arbitrary validator just as
-       * easily as the delegation Kiln's restake grant asks for.
-       */
+      /** Null for any other authorization. The typeUrl alone says nothing about what is granted. */
       stakeAuthorization: CosmosStakeAuthorization | null;
     }
   | {
@@ -146,11 +141,7 @@ const AUTHORIZATION_TYPES: Record<number, CosmosStakeAuthorization['authorizatio
   [AuthorizationType.AUTHORIZATION_TYPE_CANCEL_UNBONDING_DELEGATION]: 'cancelUnbondingDelegation',
 };
 
-/**
- * Decode the authorization nested inside a `MsgGrant`. Returns null for anything that is not a
- * StakeAuthorization, and for a StakeAuthorization whose bytes do not decode — in both cases
- * the caller has to treat the grant as unaccountable rather than assume it is harmless.
- */
+/** Null for a non-StakeAuthorization or bytes that do not decode; both are unaccountable. */
 const decodeStakeAuthorization = (authorization: Any | undefined): CosmosStakeAuthorization | null => {
   if (!authorization || authorization.typeUrl !== STAKE_AUTHORIZATION_TYPE_URL) return null;
 

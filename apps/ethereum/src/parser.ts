@@ -54,9 +54,7 @@ const tryDecodeInputData = async (tx: AugmentedTransaction) => {
     return null;
   }
 
-  // Only apply the hardcoded protocol ABIs (keyed by contract address) when the
-  // transaction targets a supported Ethereum chain. The same address may be empty,
-  // attacker-controlled, or a different contract on another EVM chain, so matching by
+  // The same address may be empty or attacker-controlled on another EVM chain, so matching by
   // address alone would produce a false protocol attribution.
   if (isSupportedEthereumChain(tx.chainId)) {
     const contractAddress = tx.to;

@@ -2,21 +2,9 @@ import type { Transaction } from '@mysten/sui/transactions';
 import { recognized, type TransactionVerdict, unrecognized } from '@protocols/shared';
 
 /**
- * The Sui operations Kiln crafts, and the commands each one is made of.
- *
- * Source of truth is Kiln's transaction-crafting API, which the public Kiln Connect spec
- * exposes as `/sui/transaction/{stake,unstake,split-stake,merge,send}`. Every one is a short,
- * fixed command sequence:
- *
- * - stake — split the amount off the gas coin, then request_add_stake
- * - unstake — request_withdraw_stake
- * - split-stake — split_staked_sui
- * - merge — join_staked_sui
- * - send — split the amount off the gas coin, then transfer it
- *
- * Matching is on that sequence and on the Move function called, not on the validator staked
- * with or the recipient sent to. Those are the user's own choices and live outside minitel; the
- * decoded summary below the verdict is where they are checked.
+ * Kiln's Sui routes are short fixed command sequences: stake splits the amount off the gas coin
+ * then calls request_add_stake, send splits then transfers, and the rest are a single Move call.
+ * Matched on that sequence and the function, not on the validator or recipient.
  */
 
 type TransactionData = ReturnType<typeof Transaction.prototype.getData>;
@@ -33,7 +21,7 @@ const OPERATION_BY_MOVE_CALL: Record<string, string> = {
   'staking_pool::join_staked_sui': 'merge',
 };
 
-/** A readable name for a command, used only to explain a rejection. */
+/** Used only to explain a rejection. */
 const describe = (command: Command): string => {
   if (command.$kind === 'MoveCall' && command.MoveCall) {
     const { package: pkg, module, function: fn } = command.MoveCall;
@@ -58,8 +46,7 @@ export const classifySuiTransaction = (transaction: TransactionData): Transactio
 
   const kinds = commands.map((command) => command.$kind);
 
-  // send is the one operation with no Move call at all: split the amount off the gas coin and
-  // hand it over. It is a genuine Kiln route, so it is matched before the staking calls.
+  // send is the one route with no Move call at all, so it is matched before the staking calls.
   if (kinds.length === 2 && kinds[0] === 'SplitCoins' && kinds[1] === 'TransferObjects') {
     return recognized('send');
   }
@@ -90,8 +77,7 @@ export const classifySuiTransaction = (transaction: TransactionData): Transactio
     return unrecognized(`This transaction calls ${key}, which is not a function Kiln operations use.`);
   }
 
-  // Staking splits the amount off the gas coin first; the other three take existing objects and
-  // add nothing. Any further command alongside the call is something we did not craft.
+  // Staking splits off the gas coin first; the others add nothing around the call.
   const expected = operation === 'stake' ? ['SplitCoins', 'MoveCall'] : ['MoveCall'];
   const matches = kinds.length === expected.length && kinds.every((kind, index) => kind === expected[index]);
 

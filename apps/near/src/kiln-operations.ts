@@ -2,21 +2,12 @@ import { recognized, type TransactionVerdict, unrecognized } from '@protocols/sh
 import type { DecodedAction, NearTransaction } from '@/parser';
 
 /**
- * The NEAR operations Kiln crafts, and the shape each one has.
- *
- * Source of truth is Kiln's transaction-crafting API:
- * `/near/transaction/{stake,unstake,withdraw}`, which the public Kiln Connect spec exposes
- * unchanged. Every one of them builds exactly one FunctionCall against the staking pool, so a
- * genuine Kiln transaction is a single action and nothing else.
- *
- * Matching is on that shape — one function call, a known method, no unexpected deposit — not
- * on the pool account it targets. The pool list lives in Kiln's configuration and changes
- * without minitel knowing; baking it in here would produce a list that silently goes stale and
- * starts rejecting real transactions. The decoded summary below the verdict is where the user
- * checks which pool they are staking with.
+ * Kiln's NEAR routes — /near/transaction/{stake,unstake,withdraw} — each build exactly one
+ * FunctionCall against the staking pool. Matched on that shape, not on the pool account: the
+ * pool list is Kiln configuration and would go stale here.
  */
 
-/** Human-readable name for an action, used only to explain a rejection. */
+/** Used only to explain a rejection. */
 const describeAction = (action: DecodedAction): string => {
   switch (action.type) {
     case 'functionCall':
@@ -47,8 +38,7 @@ export const classifyNearTransaction = (transaction: NearTransaction): Transacti
     return unrecognized('This transaction contains no actions.');
   }
 
-  // Kiln never batches: stake, unstake and withdraw are each a single FunctionCall. A second
-  // action is something we did not craft, however innocent the first one looks.
+  // Kiln never batches, so a second action is something we did not craft.
   if (actions.length > 1) {
     return unrecognized(
       `This transaction bundles ${actions.length} actions (${actions.map(describeAction).join(', ')}). Kiln operations on NEAR carry exactly one.`,
@@ -65,8 +55,7 @@ export const classifyNearTransaction = (transaction: NearTransaction): Transacti
     return unrecognized(`This transaction calls ${action.methodName}(), which is not a method Kiln operations use.`);
   }
 
-  // unstake and withdraw are crafted with a zero deposit — they move stake that is already in
-  // the pool. An attached deposit on either one sends NEAR the user is not expecting to send.
+  // unstake and withdraw move stake already in the pool, so a deposit sends unexpected NEAR.
   if (action.stakingOperation !== 'stake' && action.deposit !== '0') {
     return unrecognized(
       `This ${action.methodName}() call attaches a deposit of ${action.deposit} yoctoNEAR. Kiln crafts it with no deposit.`,

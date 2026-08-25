@@ -2,22 +2,9 @@ import { recognized, type TransactionVerdict, unrecognized } from '@protocols/sh
 import type { ForgeParams } from '@taquito/local-forging';
 
 /**
- * The Tezos operations Kiln crafts, and the operation each one forges.
- *
- * Source of truth is Kiln's transaction-crafting API, which the public Kiln Connect spec
- * exposes as `/xtz/transaction/{stake,unstake,finalize-unstake,delegate,undelegate}`:
- *
- * - stake, unstake and finalize-unstake are self-transactions — source and destination are the
- *   same account — calling the protocol entrypoint of the same name.
- * - delegate sets a baker, undelegate clears it. Both are delegation operations, told apart by
- *   whether a delegate is present.
- *
- * Matching is on the operation kind and entrypoint, not on the baker being delegated to. The
- * baker address is chosen per customer and lives outside minitel; the decoded summary below the
- * verdict is where the user checks it.
- *
- * A reveal may legitimately precede any of these the first time an account transacts, so it is
- * treated as envelope rather than as a second operation.
+ * Kiln's Tezos routes: stake, unstake and finalize-unstake are self-transactions calling the
+ * entrypoint of the same name; delegate and undelegate are delegations, told apart by whether
+ * a delegate is set. Matched on kind and entrypoint, not on the baker.
  */
 
 type OperationContent = ForgeParams['contents'][number];
@@ -29,10 +16,7 @@ const OPERATION_BY_ENTRYPOINT: Record<string, string> = {
   finalize_unstake: 'finalize-unstake',
 };
 
-/**
- * Revealing the public key is a one-off the protocol requires before an account's first
- * operation, and Kiln's crafting prepends it when needed. It moves no funds.
- */
+/** A one-off before an account's first operation, prepended by Kiln. It moves no funds. */
 const isReveal = (content: OperationContent): boolean => content.kind === 'reveal';
 
 const describe = (content: OperationContent): string => {
@@ -91,8 +75,8 @@ export const classifyXtzTransaction = (transaction: ForgeParams): TransactionVer
     return unrecognized(`This transaction calls the ${entrypoint} entrypoint, which Kiln operations do not use.`);
   }
 
-  // Staking on Tezos moves funds within your own account, so the destination is the source.
-  // A stake entrypoint aimed elsewhere is a contract call wearing a familiar name.
+  // Staking moves funds within your own account, so an entrypoint aimed elsewhere is a
+  // contract call wearing a familiar name.
   if (transactionOp.source && transactionOp.destination && transactionOp.source !== transactionOp.destination) {
     return unrecognized(
       `This transaction calls the ${entrypoint} entrypoint on ${transactionOp.destination}, not on your own account. Kiln stakes to your own account.`,

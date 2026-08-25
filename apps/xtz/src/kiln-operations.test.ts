@@ -3,10 +3,7 @@ import { localForger } from '@taquito/local-forging';
 import { classifyXtzTransaction } from '@/kiln-operations';
 import { parseXtzTx } from '@/parser';
 
-/**
- * Each case is forged with Taquito and run back through the real parser, so the shapes here are
- * the shapes minitel sees rather than hand-written objects.
- */
+/** Each case is forged with Taquito and run back through the real parser. */
 
 const wallet = 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb';
 const baker = 'tz1Kf25fX1VdmYGSEzwFy1wNmkbSEZ2V83sY';

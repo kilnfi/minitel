@@ -10,10 +10,7 @@ import { MsgTransfer } from 'cosmjs-types/ibc/applications/transfer/v1/tx';
 import { type CosmosChainName, classifyCosmosTransaction } from './kiln-operations';
 import { parseCosmosTx } from './parser';
 
-/**
- * The messages below mirror how Kiln's transaction-crafting API builds each
- * operation, so a change on either side shows up here rather than in production.
- */
+/** These mirror how Kiln crafts each operation, so a drift on either side shows up here. */
 
 const delegator = 'cosmos1delegator';
 const validator = 'cosmosvaloper1kiln';

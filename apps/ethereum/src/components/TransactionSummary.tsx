@@ -16,11 +16,7 @@ import { classifyEthereumTransaction } from '@/kiln-operations';
 import type { AugmentedTransaction } from '@/types';
 import { ethExplorerLink, getActionDetails } from '@/utils';
 
-/**
- * The verdict is the risk signal. Every action handler used to report 'high', so the badge read
- * HIGH RISK on a routine stake and on a drainer approval alike; a transaction Kiln produces is
- * the expected case and should read as one.
- */
+/** The verdict is the risk signal: a transaction Kiln produces should read as expected. */
 const RISK_BY_VERDICT = {
   recognized: { label: 'EXPECTED', variant: 'success' },
   unverified: { label: 'CHECK DETAILS', variant: 'secondary' },
