@@ -8,5 +8,6 @@
       "@protocols/shared": ["../../packages/shared/src"]
     }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules", "src/**/*.test.ts"]
 }
