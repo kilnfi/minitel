@@ -1,6 +1,6 @@
 import { recognized, type TransactionVerdict, unrecognized, unverified } from '@protocols/shared';
 import { isAddressEqual, size, slice } from 'viem';
-import { ETHEREUM_CHAIN_IDS } from '@/constant';
+import { DEFI_CHAIN_IDS, ETHEREUM_CHAIN_IDS } from '@/constant';
 import type { AugmentedTransaction } from '@/types';
 
 /**
@@ -45,31 +45,40 @@ const PUBKEY_SIZE = 48;
  * `updateNewTotalAssets`, `close` and friends are vault-administration calls that no customer
  * route crafts, so a customer being asked to sign one is exactly the case worth flagging.
  */
-const OPERATION_BY_FUNCTION: Record<string, string> = {
-  // Native staking — /eth/transaction/{stake,deposit}
-  deposit: 'stake',
-  batchDeposit: 'stake',
-  batchDepositCustom: 'stake',
-  bigBatchDeposit: 'stake',
-  bigBatchDepositCustom: 'stake',
-  // Pooled (onchain v2) staking
-  stake: 'stake',
-  requestExit: 'exit-request',
-  requestValidatorsExit: 'exit-request',
-  multiClaim: 'multi-claim',
-  // DeFi vaults — /defi/transaction/withdraw crafts redeem when withdrawing everything
-  withdraw: 'defi-withdraw',
-  redeem: 'defi-withdraw',
-  // Polygon — /pol/transaction/* and /matic/transaction/*
-  buyVoucher: 'buy-voucher',
-  buyVoucherPOL: 'buy-voucher',
-  sellVoucher: 'sell-voucher',
-  sellVoucherPOL: 'sell-voucher',
-  withdrawRewards: 'withdraw-rewards',
-  withdrawRewardsPOL: 'withdraw-rewards',
-  restake: 'restake-rewards',
-  restakePOL: 'restake-rewards',
-  unstakeClaimTokens: 'unstake-claim-tokens',
+type Scope = 'ethereum' | 'defi';
+
+/** Which chains an operation exists on, and how to say so when it does not. */
+const SCOPES: Record<Scope, { chainIds: readonly number[]; where: string }> = {
+  ethereum: { chainIds: ETHEREUM_CHAIN_IDS, where: 'mainnet, sepolia and hoodi' },
+  defi: { chainIds: DEFI_CHAIN_IDS, where: 'Ethereum, Optimism, BNB Chain, Polygon, Base, Arbitrum and Celo' },
+};
+
+const OPERATION_BY_FUNCTION: Record<string, { operation: string; scope: Scope }> = {
+  // Native staking. The beacon deposit is payable and always carries ETH, which is what
+  // separates it from the ERC-4626 vault deposit that shares the name.
+  deposit: { operation: 'stake', scope: 'ethereum' },
+  batchDeposit: { operation: 'stake', scope: 'ethereum' },
+  batchDepositCustom: { operation: 'stake', scope: 'ethereum' },
+  bigBatchDeposit: { operation: 'stake', scope: 'ethereum' },
+  bigBatchDepositCustom: { operation: 'stake', scope: 'ethereum' },
+  // Pooled staking
+  stake: { operation: 'stake', scope: 'ethereum' },
+  requestExit: { operation: 'exit-request', scope: 'ethereum' },
+  requestValidatorsExit: { operation: 'exit-request', scope: 'ethereum' },
+  multiClaim: { operation: 'multi-claim', scope: 'ethereum' },
+  // DeFi vaults — withdrawing everything is crafted as redeem
+  withdraw: { operation: 'defi-withdraw', scope: 'defi' },
+  redeem: { operation: 'defi-withdraw', scope: 'defi' },
+  // Polygon staking
+  buyVoucher: { operation: 'buy-voucher', scope: 'ethereum' },
+  buyVoucherPOL: { operation: 'buy-voucher', scope: 'ethereum' },
+  sellVoucher: { operation: 'sell-voucher', scope: 'ethereum' },
+  sellVoucherPOL: { operation: 'sell-voucher', scope: 'ethereum' },
+  withdrawRewards: { operation: 'withdraw-rewards', scope: 'ethereum' },
+  withdrawRewardsPOL: { operation: 'withdraw-rewards', scope: 'ethereum' },
+  restake: { operation: 'restake-rewards', scope: 'ethereum' },
+  restakePOL: { operation: 'restake-rewards', scope: 'ethereum' },
+  unstakeClaimTokens: { operation: 'unstake-claim-tokens', scope: 'ethereum' },
 };
 
 /** `deposit` is shared between the beacon deposit contract and the ERC-4626 vault flow. */
@@ -110,57 +119,70 @@ const classifyPredeployCall = (to: `0x${string}`, data: `0x${string}`): Transact
 export const classifyEthereumTransaction = (tx: AugmentedTransaction): TransactionVerdict => {
   const chainId = chainIdOf(tx);
 
-  // the same contract address means something different on every other EVM chain, so
-  // the chain is part of the operation's identity, not a detail below it.
   if (chainId === null) {
-    return unrecognized(
-      'This transaction declares no chain id, so it cannot be tied to the Ethereum network Kiln operates on.',
-    );
-  }
-  if (!ETHEREUM_CHAIN_IDS.includes(chainId)) {
-    return unrecognized(
-      `This transaction is for chain ${chainId}. Kiln crafts Ethereum operations on mainnet, sepolia and hoodi only.`,
-    );
+    return unrecognized('This transaction declares no chain id, so it cannot be tied to a network Kiln operates on.');
   }
 
   if (!tx.to) {
     return unrecognized('This transaction deploys a contract rather than calling one.');
   }
 
+  /** An operation only counts on a chain that actually offers it. */
+  const onSupportedChain = (operation: string, scope: Scope): TransactionVerdict => {
+    const { chainIds, where } = SCOPES[scope];
+    return chainIds.includes(chainId)
+      ? recognized(operation)
+      : unrecognized(
+          `This transaction is for chain ${chainId}. Kiln crafts ${scope === 'defi' ? 'vault' : 'staking'} operations on ${where}.`,
+        );
+  };
+
   if (tx.data && tx.data !== '0x') {
     const predeploy = classifyPredeployCall(tx.to, tx.data);
-    if (predeploy) return predeploy;
+    // The predeploys exist on every chain that has adopted the EIPs, but a Kiln validator
+    // request is only ever for the Ethereum network Kiln runs validators on.
+    if (predeploy) {
+      if (predeploy.status !== 'recognized') return predeploy;
+      return onSupportedChain(predeploy.operation, 'ethereum');
+    }
   }
 
   if (!('inputData' in tx) || !tx.inputData) {
     return unrecognized(
       (tx.value ?? 0n) > 0n && (!tx.data || tx.data === '0x')
-        ? 'This transaction is a plain ETH transfer. Kiln staking operations are all contract calls.'
+        ? 'This transaction is a plain ETH transfer. Kiln operations are all contract calls.'
         : 'This transaction calls a contract minitel could not match to any Kiln operation.',
     );
   }
 
   const { functionName } = tx.inputData;
 
-  // Kiln's DeFi flow crafts an approval, but its whole safety rests on the spender being a Kiln
+  // Kiln's vault flow crafts an approval, but its whole safety rests on the spender being a Kiln
   // vault — an address that lives in Kiln's configuration and is not knowable here. Calling it
   // recognized would rubber-stamp an approval to a drainer; calling it unrecognized would
   // reject a real operation. It is genuinely the one case minitel cannot answer.
   if (functionName === 'approve') {
+    if (!DEFI_CHAIN_IDS.includes(chainId)) {
+      return unrecognized(
+        `This transaction is for chain ${chainId}. Kiln crafts vault operations on ${SCOPES.defi.where}.`,
+      );
+    }
     return unverified(
       'This is the shape of the token approval Kiln crafts before a vault deposit, but minitel cannot confirm the spender is a Kiln vault. Check the spender address below against the vault you are depositing into.',
     );
   }
 
-  const operation = OPERATION_BY_FUNCTION[functionName];
+  const match = OPERATION_BY_FUNCTION[functionName];
 
-  if (!operation) {
+  if (!match) {
     return unrecognized(`This transaction calls ${functionName}(), which is not a function Kiln operations use.`);
   }
 
-  if (operation === 'stake' && functionName === 'deposit' && isVaultDeposit(tx)) {
-    return recognized('defi-deposit');
+  // `deposit` is shared: the beacon deposit contract is payable and always carries ETH, while
+  // an ERC-4626 vault deposit moves tokens and carries none.
+  if (functionName === 'deposit' && isVaultDeposit(tx)) {
+    return onSupportedChain('defi-deposit', 'defi');
   }
 
-  return recognized(operation);
+  return onSupportedChain(match.operation, match.scope);
 };

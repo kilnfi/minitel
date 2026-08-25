@@ -155,7 +155,7 @@ describe('Kiln Ethereum operations are recognized', () => {
 });
 
 describe('Non-Kiln Ethereum transactions are rejected', () => {
-  test('a Kiln-shaped call on Base is rejected on the chain id alone', async () => {
+  test('an exit request replayed on Base is rejected — the ABI is never applied there', async () => {
     const verdict = await classify({
       chainId: 8453,
       to: ETH_EXIT_CONTRACT_ADDRESS,
@@ -163,7 +163,34 @@ describe('Non-Kiln Ethereum transactions are rejected', () => {
     });
 
     expect(verdict.status).toBe('unrecognized');
+    expect(verdict).toMatchObject({ reason: expect.stringContaining('could not match') });
+  });
+
+  test('an exit request to the predeploy on Base names the chain, since predeploys decode anywhere', async () => {
+    const verdict = await classify({
+      chainId: 8453,
+      to: WITHDRAWAL_REQUEST_PREDEPLOY,
+      data: concat([pubkeyA, numberToHex(0, { size: 8 })]),
+      value: 1000n,
+    });
+
+    expect(verdict.status).toBe('unrecognized');
     expect(verdict).toMatchObject({ reason: expect.stringContaining('chain 8453') });
+  });
+
+  test('a vault withdrawal on a chain Kiln has no vaults on', async () => {
+    const verdict = await classify({
+      chainId: 250,
+      to: '0x8888888888888888888888888888888888888888',
+      data: call('function redeem(uint256 shares, address receiver, address owner) returns (uint256)', 'redeem', [
+        1n,
+        '0x1111111111111111111111111111111111111111',
+        '0x1111111111111111111111111111111111111111',
+      ]),
+    });
+
+    expect(verdict.status).toBe('unrecognized');
+    expect(verdict).toMatchObject({ reason: expect.stringContaining('chain 250') });
   });
 
   test('EigenLayer delegateTo — dropped from Kiln Connect in API v1.10', async () => {
@@ -222,9 +249,45 @@ describe('Non-Kiln Ethereum transactions are rejected', () => {
   });
 });
 
-describe('The one call minitel cannot decide', () => {
-  test('approve is unverified, because the spender is not knowable here', async () => {
+describe('Vault operations are multi-chain, unlike staking', () => {
+  test.each([
+    ['Base', 8453],
+    ['Arbitrum', 42161],
+    ['Optimism', 10],
+    ['Polygon', 137],
+    ['Celo', 42220],
+  ])('an ERC-4626 vault deposit on %s is recognized', async (_name, chainId) => {
     const verdict = await classify({
+      chainId,
+      to: '0x8888888888888888888888888888888888888888',
+      data: call('function deposit(uint256 assets, address receiver) returns (uint256)', 'deposit', [
+        1000000n,
+        '0x1111111111111111111111111111111111111111',
+      ]),
+    });
+
+    expect(verdict).toMatchObject({ status: 'recognized', operation: 'defi-deposit' });
+  });
+
+  test('a vault withdrawal on Base is recognized', async () => {
+    const verdict = await classify({
+      chainId: 8453,
+      to: '0x8888888888888888888888888888888888888888',
+      data: call('function withdraw(uint256 assets, address receiver, address owner) returns (uint256)', 'withdraw', [
+        1000000n,
+        '0x1111111111111111111111111111111111111111',
+        '0x1111111111111111111111111111111111111111',
+      ]),
+    });
+
+    expect(verdict).toMatchObject({ status: 'recognized', operation: 'defi-withdraw' });
+  });
+});
+
+describe('The one call minitel cannot decide', () => {
+  test('approve on Base is unverified, because the spender is not knowable here', async () => {
+    const verdict = await classify({
+      chainId: 8453,
       to: '0x7777777777777777777777777777777777777777',
       data: call('function approve(address spender, uint256 amount) returns (bool)', 'approve', [
         '0x2222222222222222222222222222222222222222',
