@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test';
+// The protobuf runtime the parser reads off globalThis is primed in test-preload.ts.
 import { classifyTrxTransaction } from '@/kiln-operations';
 import { parseTrxTx } from '@/parser';
 

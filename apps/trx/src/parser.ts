@@ -1,4 +1,3 @@
-import '@/tron-proto-global';
 import tronweb from 'tronweb';
 import { TrxProtobuf } from '@/protos';
 
