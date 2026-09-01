@@ -33,12 +33,15 @@ export function TransactionSummary({ transaction }: TransactionSummaryProps) {
   const actionDetails = getActionDetails(transaction);
   const verdict = classifyEthereumTransaction(transaction);
   const risk = RISK_BY_VERDICT[verdict.status];
+  // Calldata we could not decode is still a call: reading "ETH transfer" off a
+  // non-zero value alone labelled every validator exit a transfer, since the
+  // predeploy payloads have no ABI to decode and carry the request fee as value.
   const transactionType =
     'inputData' in transaction && transaction.inputData
       ? transaction.inputData.functionName
-      : (transaction.value ?? 0n) > 0n
-        ? 'ETH transfer'
-        : 'Contract call';
+      : transaction.data && transaction.data !== '0x'
+        ? 'Contract call'
+        : 'ETH transfer';
   const ethValue = formatEther(BigInt(transaction.value ?? 0n));
   const maxFeeGwei = Number(formatGwei(transaction.maxFeePerGas ?? 0n)).toFixed(2);
 

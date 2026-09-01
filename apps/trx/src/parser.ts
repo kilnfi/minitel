@@ -4,7 +4,7 @@ import { TrxProtobuf } from '@/protos';
 const TronWeb = tronweb.TronWeb;
 const addressUtils = TronWeb.address;
 
-/** One entry of `Transaction.raw.contract`, as protobuf.js renders it. */
+/** One entry of `raw.contractList`, protobuf.js's rendering of `Transaction.raw.contract`. */
 export type TrxContract = {
   type: number;
   parameter: { typeUrl: string; value: string };
