@@ -155,7 +155,8 @@ jobs:
           set -euo pipefail
           DEPLOYMENT_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} \
             --meta githubPrNumber=${{ github.event.pull_request.number }} \
-            --meta githubCommitSha=${{ github.event.pull_request.head.sha }} | tail -n1)
+            --meta githubCommitSha=${{ github.event.pull_request.head.sha }} \
+            --meta previewApp=${{ matrix.target.app }} | tail -n1)
           echo "url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
           mkdir -p "$RUNNER_TEMP/urls"
           echo "$DEPLOYMENT_URL" > "$RUNNER_TEMP/urls/${{ matrix.target.app }}"
@@ -273,14 +274,21 @@ jobs:
       - name: Remove this app's deployments for this pull request
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          APP: ${{ matrix.target.app }}
         run: |
           set -euo pipefail
-          # Only what this workflow deployed for this pull request: every deploy is
-          # stamped with the number, and --safe leaves anything holding an alias.
+          # This app's deployments for this pull request, and no others: `vercel ls`
+          # answers for the whole team rather than the linked project, so removing
+          # by the pull request number alone would take down a sibling app that only
+          # shares the branch. Deploys are stamped with the app; the project name
+          # covers the ones made before that stamp existed.
           urls=$(vercel ls -m "githubPrNumber=$PR_NUMBER" --json \
-            --token=${{ secrets.VERCEL_TOKEN }} | jq -r '.deployments[].url')
+            --token=${{ secrets.VERCEL_TOKEN }} \
+            | jq -r --arg app "$APP" '.deployments[]
+                | select(.meta.previewApp == $app or (.name | endswith("-" + $app)))
+                | .url')
           if [ -z "$urls" ]; then
-            echo "Nothing left to remove for ${{ matrix.target.app }}."
+            echo "Nothing left to remove for $APP."
             exit 0
           fi
           # shellcheck disable=SC2086
