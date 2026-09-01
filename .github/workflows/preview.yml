@@ -29,6 +29,7 @@ jobs:
     # `vercel pull` with an authentication error nobody can act on.
     if: >-
       github.event.pull_request.head.repo.full_name == github.repository &&
+      (github.event.action != 'labeled' || startsWith(github.event.label.name, 'preview')) &&
       (contains(github.event.pull_request.labels.*.name, 'preview') ||
        contains(join(github.event.pull_request.labels.*.name, ','), 'preview:'))
     runs-on: ubuntu-latest
@@ -46,12 +47,20 @@ jobs:
       - name: Select the apps to deploy
         id: targets
         env:
+          ACTION: ${{ github.event.action }}
+          NEW_LABEL: ${{ github.event.label.name }}
           LABELS: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           set -euo pipefail
           available=$(for dir in apps/*/; do basename "$dir"; done | sort)
-          requested=$(tr ' ' '\n' <<<"$LABELS" | sed -n 's#^preview:##p' | sort -u)
+
+          # Adding a label asks for that one app. The others already have a preview
+          # of this commit, and rebuilding them spends a deploy to arrive at the same
+          # page under a new URL. A push is the opposite: every labelled preview is
+          # stale, so they all go again.
+          if [ "$ACTION" = "labeled" ]; then labels="$NEW_LABEL"; else labels="$LABELS"; fi
+          requested=$(tr ' ' '\n' <<<"$labels" | sed -n 's#^preview:##p' | sort -u)
 
           if [ -n "$requested" ]; then
             # A label naming an app that does not exist is ignored rather than
