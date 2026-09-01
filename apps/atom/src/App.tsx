@@ -1,8 +1,8 @@
 import { createCosmosAdapter } from '@protocols/cosmos-shared';
-import { ATOM, getCurrentProtocol, PROTOCOLS, type Protocol } from '@protocols/shared';
+import { ATOM, PROTOCOLS, type Protocol } from '@protocols/shared';
 import { Background, cn, Header, ProtocolTransactionDecoder } from '@protocols/ui';
 
-const currentProtocol = getCurrentProtocol();
+const currentProtocol = ATOM;
 
 function App() {
   const onChangeProtocol = (protocol: Protocol) => {

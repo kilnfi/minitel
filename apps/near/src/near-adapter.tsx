@@ -1,5 +1,6 @@
 import { NEAR, type ProtocolAdapter } from '@protocols/shared';
 import { TransactionSummary } from '@/components/TransactionSummary';
+import { classifyNearTransaction } from '@/kiln-operations';
 import { type NearTransaction, parseNearTx } from '@/parser';
 
 const isValidNearInput = (rawTx: string): boolean => {
@@ -32,6 +33,8 @@ export const nearAdapter: ProtocolAdapter<NearTransaction> = {
   computeHash: computeNearHash,
 
   renderSummary: (data) => <TransactionSummary transaction={data} />,
+
+  classifyTransaction: classifyNearTransaction,
 
   generateWarnings: (data) => {
     const warnings: { message: string }[] = [];

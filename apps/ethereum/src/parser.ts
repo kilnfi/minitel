@@ -10,7 +10,7 @@ import {
   serializeTransaction,
 } from 'viem';
 import { formatAbiItem } from 'viem/utils';
-import { ABIS, type ContractAbi } from '@/constant';
+import { ABIS, type ContractAbi, ETHEREUM_CHAIN_IDS } from '@/constant';
 import type { AugmentedTransaction, AugmentedTransactionWithFunction } from '@/types';
 import { normalizeHex } from '@/utils';
 
@@ -45,20 +45,28 @@ const tryDecodeWithAbi = async (tx: AugmentedTransaction, abi: ContractAbi) => {
   }
 };
 
+const isSupportedEthereumChain = (chainId: AugmentedTransaction['chainId']): boolean => {
+  return chainId !== undefined && ETHEREUM_CHAIN_IDS.includes(Number(chainId));
+};
+
 const tryDecodeInputData = async (tx: AugmentedTransaction) => {
   if (!tx.data || !tx.to) {
     return null;
   }
 
-  const contractAddress = tx.to;
-  const matchingAddress = Object.keys(ABIS)
-    .filter((addr) => isAddress(addr))
-    .find((addr) => isAddressEqual(addr as `0x${string}`, contractAddress)) as keyof typeof ABIS;
+  // The same address may be empty or attacker-controlled on another EVM chain, so matching by
+  // address alone would produce a false protocol attribution.
+  if (isSupportedEthereumChain(tx.chainId)) {
+    const contractAddress = tx.to;
+    const matchingAddress = Object.keys(ABIS)
+      .filter((addr) => isAddress(addr))
+      .find((addr) => isAddressEqual(addr as `0x${string}`, contractAddress)) as keyof typeof ABIS;
 
-  if (matchingAddress) {
-    const result = await tryDecodeWithAbi(tx, ABIS[matchingAddress]);
-    if (result) {
-      return result;
+    if (matchingAddress) {
+      const result = await tryDecodeWithAbi(tx, ABIS[matchingAddress]);
+      if (result) {
+        return result;
+      }
     }
   }
 

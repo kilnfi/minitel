@@ -4,8 +4,22 @@ import { TrxProtobuf } from '@/protos';
 const TronWeb = tronweb.TronWeb;
 const addressUtils = TronWeb.address;
 
+/** One entry of `raw.contractList`, protobuf.js's rendering of `Transaction.raw.contract`. */
+export type TrxContract = {
+  type: number;
+  parameter: { typeUrl: string; value: string };
+};
+
+export type TrxTransaction = {
+  decodedValue: Record<string, unknown>;
+  raw: {
+    contractList: TrxContract[];
+    [key: string]: unknown;
+  };
+};
+
 export class TrxParser {
-  public serializedToPb(tx_serialized: string): unknown {
+  public serializedToPb(tx_serialized: string): TrxTransaction {
     // @ts-expect-error
     const txData = globalThis.proto.Transaction.raw.deserializeBinary(Buffer.from(tx_serialized, 'hex'));
     const txDataObj = txData.toObject();
@@ -19,7 +33,7 @@ export class TrxParser {
       raw: { ...txDataObj },
     };
 
-    return enhancedDecoded;
+    return enhancedDecoded as TrxTransaction;
   }
 
   private formatAddress(hexBuffer: Buffer): string | null {
@@ -154,7 +168,7 @@ export class TrxParser {
 
 const trxParser = new TrxParser();
 
-export const parseTrxTx = async (tx_serialized: string) => {
+export const parseTrxTx = async (tx_serialized: string): Promise<TrxTransaction> => {
   try {
     const pbTx = trxParser.serializedToPb(tx_serialized);
     return pbTx;

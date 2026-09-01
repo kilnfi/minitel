@@ -1,10 +1,10 @@
-import { getCurrentProtocol, PROTOCOLS, type Protocol } from '@protocols/shared';
+import { ETH, PROTOCOLS, type Protocol } from '@protocols/shared';
 import { Background, cn, Header, ProtocolTransactionDecoder, TransactionPlaybook } from '@protocols/ui';
 import { useState } from 'react';
 import { ETHEREUM_PLAYBOOK_OPERATIONS } from '@/config/playbook-operations';
 import { ethereumAdapter } from '@/ethereum-adapter';
 
-const currentProtocol = getCurrentProtocol();
+const currentProtocol = ETH;
 
 function App() {
   const [playbook, setPlaybook] = useState<boolean>(false);

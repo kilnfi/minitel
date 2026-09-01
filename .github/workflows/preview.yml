@@ -1,0 +1,300 @@
+name: Preview
+
+# Label a pull request `preview:solana` for that app, or `preview` for the apps the
+# branch changes, and every push redeploys what is labelled. Removing the label
+# takes that app's previews down again, and closing the pull request takes down
+# all of them — Vercel keeps preview deployments forever otherwise, since each one
+# is immutable and nothing expires them.
+#
+# A label rather than a comment command, because it needs no permission check of
+# its own: GitHub already restricts labelling to people with write access, and the
+# commit to build arrives in the event payload instead of being looked up after the
+# check — a lookup leaves a window for a push to land in between and be built with
+# the deploy credentials.
+on:
+  pull_request:
+    types: [labeled, unlabeled, synchronize, reopened, closed]
+
+# A new push supersedes the previous run: the URLs it was about to post point at
+# code the branch no longer has. Label events get a lane each, so asking for a
+# second app does not cancel the first one's deploy — while removing a label lands
+# in the same lane as adding it, and rightly cancels a deploy still in flight.
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}-${{ github.event.label.name || 'branch' }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  select:
+    # Fork pull requests get no secrets, so the deploy could only fail at
+    # `vercel pull` with an authentication error nobody can act on.
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      ((contains(fromJson('["labeled", "unlabeled"]'), github.event.action) &&
+        startsWith(github.event.label.name, 'preview')) ||
+       (contains(fromJson('["synchronize", "reopened", "closed"]'), github.event.action) &&
+        (contains(github.event.pull_request.labels.*.name, 'preview') ||
+         contains(join(github.event.pull_request.labels.*.name, ','), 'preview:'))))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      targets: ${{ steps.targets.outputs.targets }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Select the apps to deploy
+        id: targets
+        env:
+          ACTION: ${{ github.event.action }}
+          NEW_LABEL: ${{ github.event.label.name }}
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          available=$(for dir in apps/*/; do basename "$dir"; done | sort)
+
+          # A label event, either direction, is about that one app: the others
+          # already have a preview of this commit, and rebuilding them spends a
+          # deploy to arrive at the same page under a new URL. A push is the
+          # opposite — every labelled preview is stale, so they all go again — and
+          # so is a close, which takes down everything the branch deployed.
+          case "$ACTION" in
+            labeled | unlabeled) labels="$NEW_LABEL" ;;
+            *) labels="$LABELS" ;;
+          esac
+          requested=$(tr ' ' '\n' <<<"$labels" | sed -n 's#^preview:##p' | sort -u)
+
+          if [ -n "$requested" ]; then
+            # A label naming an app that does not exist is ignored rather than
+            # failing the run: it is a typo in a label, not a broken branch.
+            selected=$(comm -12 <(echo "$requested") <(echo "$available"))
+          else
+            # Against the merge base, not the tip of main, or every commit landed on
+            # main since the branch started would count as this branch's change.
+            # Anything shared then rebuilds everything: shared and ui are imported by
+            # all eighteen apps, and resolving which apps a cosmos-shared change
+            # reaches would mean walking the workspace graph here to save a few
+            # builds — label the app instead when that matters.
+            changed=$(git diff --name-only "$(git merge-base "$BASE_SHA" HEAD)" HEAD)
+            if grep -qE '^(packages/|bun\.lock|package\.json|tsconfig\.json|biome\.json|bunfig\.toml)' <<<"$changed"; then
+              selected="$available"
+            else
+              # A deleted app is still a path in the diff.
+              selected=$(sed -n 's#^apps/\([^/]*\)/.*#\1#p' <<<"$changed" | sort -u)
+              selected=$(comm -12 <(echo "$selected") <(echo "$available"))
+            fi
+          fi
+
+          # The Vercel project id lives in a per-app secret, so each target carries
+          # the name of the one to read.
+          targets=$(jq -Rnc '[inputs | select(length > 0) | {app: ., secret: ("VERCEL_PROJECT_ID_" + ascii_upcase)}]' <<<"$selected")
+          echo "targets=$targets" >> "$GITHUB_OUTPUT"
+          echo "Previewing: $(jq -r 'if length == 0 then "nothing" else [.[].app] | join(", ") end' <<<"$targets")"
+
+  preview:
+    needs: select
+    if: >-
+      !contains(fromJson('["closed", "unlabeled"]'), github.event.action) &&
+      needs.select.outputs.targets != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Hold VERCEL_TOKEN and the project ids as environment secrets, so the only job
+    # that runs the branch's code is also the only one that can read them. The url
+    # is how the deployment reaches the pull request as a "View deployment" link:
+    # GitHub renders it from the job, so it survives an IP allow list that refuses
+    # the API to the runner.
+    environment:
+      name: preview
+      url: ${{ steps.deploy.outputs.url }}
+    strategy:
+      # Same reason as the production deploy: one app's failure must not cancel the
+      # others, or a single broken app reads as "the previews are broken".
+      fail-fast: false
+      matrix:
+        target: ${{ fromJson(needs.select.outputs.targets) }}
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets[matrix.target.secret] }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76
+        with:
+          bun-version: latest
+
+      - name: Install Vercel CLI
+        run: bun add --global vercel@latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ./apps/${{ matrix.target.app }}
+
+      - name: Build Project Artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ./apps/${{ matrix.target.app }}
+        timeout-minutes: 10
+
+      - name: Deploy Project Artifacts to Vercel
+        id: deploy
+        run: |
+          set -euo pipefail
+          DEPLOYMENT_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} \
+            --meta githubPrNumber=${{ github.event.pull_request.number }} \
+            --meta githubCommitSha=${{ github.event.pull_request.head.sha }} \
+            --meta previewApp=${{ matrix.target.app }} | tail -n1)
+          echo "url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+          mkdir -p "$RUNNER_TEMP/urls"
+          echo "$DEPLOYMENT_URL" > "$RUNNER_TEMP/urls/${{ matrix.target.app }}"
+          echo "🔍 Preview for ${{ matrix.target.app }}: $DEPLOYMENT_URL"
+        working-directory: ./apps/${{ matrix.target.app }}
+
+      # One artifact per app rather than a job output: matrix jobs share a single
+      # output slot and would overwrite each other down to one URL.
+      - name: Publish the URL for the comment job
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: preview-url-${{ matrix.target.app }}
+          path: ${{ runner.temp }}/urls/
+          retention-days: 1
+
+  comment:
+    needs: [select, preview]
+    # always(), so a run where some apps failed still reports the ones that shipped.
+    if: >-
+      always() && !contains(fromJson('["closed", "unlabeled"]'), github.event.action) &&
+      needs.select.result == 'success' && needs.select.outputs.targets != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Collect the preview URLs
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          pattern: preview-url-*
+          merge-multiple: true
+          path: urls
+
+      - name: Post the preview table
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          TARGETS: ${{ needs.select.outputs.targets }}
+          MARKER: '<!-- preview-deployments -->'
+        run: |
+          set -euo pipefail
+          {
+            echo "$MARKER"
+            echo "### Preview deployments"
+            echo
+            echo "| App | Preview |"
+            echo "| --- | --- |"
+            for app in $(jq -r '.[].app' <<<"$TARGETS"); do
+              if [ -f "urls/$app" ]; then
+                echo "| \`$app\` | $(cat "urls/$app") |"
+              else
+                echo "| \`$app\` | deploy failed — see the run log |"
+              fi
+            done
+            echo
+            echo "_Built from \`${HEAD_SHA:0:7}\`. Signing in with a Kiln Vercel account is required._"
+          } > body.md
+          cat body.md >> "$GITHUB_STEP_SUMMARY"
+          jq -Rs '{body: .}' body.md > payload.json
+
+          # One table that follows the branch rather than a new comment on every
+          # push, found by its marker. Best effort, and deliberately not fatal: the
+          # kilnfi IP allow list refuses the API from some Actions runners and not
+          # others, and a preview that deployed should not report as failed because
+          # the runner drew an address the organization does not know. The summary
+          # above carries the same table either way.
+          post() {
+            existing=$(gh api --paginate "repos/$GH_REPO/issues/$PR_NUMBER/comments" \
+              --jq "[.[] | select(.body | contains(\"$MARKER\"))] | last | .id // empty") || return 1
+            if [ -n "$existing" ]; then
+              gh api --silent -X PATCH "repos/$GH_REPO/issues/comments/$existing" --input payload.json
+            else
+              gh api --silent -X POST "repos/$GH_REPO/issues/$PR_NUMBER/comments" --input payload.json
+            fi
+          }
+          post || echo "::warning::Could not comment the preview URLs; they are in this run's summary."
+
+  teardown:
+    needs: select
+    if: >-
+      contains(fromJson('["closed", "unlabeled"]'), github.event.action) &&
+      needs.select.outputs.targets != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: preview
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJson(needs.select.outputs.targets) }}
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets[matrix.target.secret] }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76
+        with:
+          bun-version: latest
+
+      - name: Install Vercel CLI
+        run: bun add --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ./apps/${{ matrix.target.app }}
+
+      - name: Remove this app's deployments for this pull request
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          APP: ${{ matrix.target.app }}
+        run: |
+          set -euo pipefail
+          # This app's deployments for this pull request, and no others: `vercel ls`
+          # answers for the whole team rather than the linked project, so removing
+          # by the pull request number alone would take down a sibling app that only
+          # shares the branch. Deploys are stamped with the app; the project name
+          # covers the ones made before that stamp existed.
+          # --scope, because `vercel ls` reaches for the token's default scope
+          # rather than the project just pulled, and answered "not authorized" under
+          # a personal account nobody deploys to.
+          urls=$(vercel ls -m "githubPrNumber=$PR_NUMBER" --json \
+            --scope=${{ secrets.VERCEL_ORG_ID }} --token=${{ secrets.VERCEL_TOKEN }} \
+            | jq -r --arg app "$APP" '.deployments[]
+                | select(.meta.previewApp == $app or (.name | endswith("-" + $app)))
+                | .url')
+          if [ -z "$urls" ]; then
+            echo "Nothing left to remove for $APP."
+            exit 0
+          fi
+          # shellcheck disable=SC2086
+          vercel remove $urls --safe --yes \
+            --scope=${{ secrets.VERCEL_ORG_ID }} --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ./apps/${{ matrix.target.app }}

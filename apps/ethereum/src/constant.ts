@@ -9,6 +9,28 @@ import { POL_CONTRACT_ABI } from '@/abi/POL_CONTRACT_ABI';
 import { POL_STAKE_MANAGER_ABI } from '@/abi/POL_STAKE_MANAGER_ABI';
 import { POL_VALIDATOR_SHARES_CONTRACT_ABI } from '@/abi/POL_VALIDATOR_SHARES_CONTRACT_ABI';
 
+// Chains the address-keyed protocol ABIs below are deployed on. Decoding is gated on these so
+// a transaction reusing one of those addresses elsewhere is not labeled as an Ethereum action.
+export const ETHEREUM_CHAIN_IDS: readonly number[] = [
+  1, // mainnet
+  11155111, // sepolia
+  560048, // hoodi
+];
+
+// Chains Kiln's vaults run on. Their calls are ERC-4626 and ERC-20, identified by selector
+// rather than address, and the product is deliberately multi-chain.
+export const DEFI_CHAIN_IDS: readonly number[] = [
+  1, // mainnet
+  10, // optimism
+  56, // bnb smart chain
+  137, // polygon
+  8453, // base
+  42161, // arbitrum
+  42220, // celo
+  11155111, // sepolia
+  560048, // hoodi
+];
+
 // Contract addresses
 export const CCTP_MESSAGE_TRANSMITTER_ADDRESS = '0x0a992d191deec32afe36203ad87d7d289a738f81' as const;
 export const POL_STAKE_MANAGER_ADDRESS = '0x5e3Ef299fDDf15eAa0432E6e66473ace8c13D908' as const;

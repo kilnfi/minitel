@@ -13,5 +13,6 @@ export enum DataTests {
   transaction_decoder_tab_summary_trigger = 'transaction_decoder_tab_summary_trigger',
   transaction_decoder_tab_json_trigger = 'transaction_decoder_tab_json_trigger',
   transaction_decoder_warning = 'transaction_decoder_warning',
-  transaction_decoder_error = 'transaction_decoder_error'
+  transaction_decoder_error = 'transaction_decoder_error',
+  transaction_decoder_verdict = 'transaction_decoder_verdict'
 }

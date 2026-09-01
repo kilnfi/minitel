@@ -1,5 +1,6 @@
 import { type ProtocolAdapter, TRX } from '@protocols/shared';
-import { parseTrxTx } from '@/parser';
+import { classifyTrxTransaction } from '@/kiln-operations';
+import { parseTrxTx, type TrxTransaction } from '@/parser';
 
 const isValidTrxInput = (rawTx: string): boolean => {
   const input = rawTx.trim();
@@ -20,7 +21,7 @@ const computeTrxHash = async (rawTx: string): Promise<string> => {
   }
 };
 
-export const trxAdapter: ProtocolAdapter<unknown> = {
+export const trxAdapter: ProtocolAdapter<TrxTransaction> = {
   protocol: TRX,
   name: 'trx',
   displayName: 'Tron',
@@ -28,4 +29,5 @@ export const trxAdapter: ProtocolAdapter<unknown> = {
   validateInput: isValidTrxInput,
   parseTransaction: parseTrxTx,
   computeHash: computeTrxHash,
+  classifyTransaction: classifyTrxTransaction,
 };

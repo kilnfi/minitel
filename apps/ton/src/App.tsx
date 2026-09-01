@@ -1,8 +1,8 @@
-import { getCurrentProtocol, PROTOCOLS, type Protocol } from '@protocols/shared';
+import { PROTOCOLS, type Protocol, TON } from '@protocols/shared';
 import { Background, cn, Header, ProtocolTransactionDecoder } from '@protocols/ui';
 import { tonAdapter } from '@/ton-adapter';
 
-const currentProtocol = getCurrentProtocol();
+const currentProtocol = TON;
 
 function App() {
   const onChangeProtocol = (protocol: Protocol) => {

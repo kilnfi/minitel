@@ -1,8 +1,8 @@
-import { getCurrentProtocol, PROTOCOLS, type Protocol } from '@protocols/shared';
+import { PROTOCOLS, type Protocol, TRX } from '@protocols/shared';
 import { Background, cn, Header, ProtocolTransactionDecoder } from '@protocols/ui';
 import { trxAdapter } from '@/trx-adapter';
 
-const currentProtocol = getCurrentProtocol();
+const currentProtocol = TRX;
 
 function App() {
   const onChangeProtocol = (protocol: Protocol) => {

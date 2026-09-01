@@ -29,6 +29,8 @@ const getMessageLabel = (message: CosmosMessage): string => {
       return 'Authz Exec';
     case 'authzRevoke':
       return 'Authz Revoke';
+    case 'ibcTransfer':
+      return 'IBC Transfer';
     case 'unsupported':
       return 'Unsupported';
     default:
@@ -68,6 +70,8 @@ const getMessageAccount = (message: CosmosMessage): string => {
       return message.granter;
     case 'authzExec':
       return message.grantee;
+    case 'ibcTransfer':
+      return message.sender;
     default:
       return '-';
   }
@@ -81,6 +85,8 @@ const getMessageAmount = (message: CosmosMessage): string => {
       return formatCoin(message.amount);
     case 'send':
       return formatCoins(message.amount);
+    case 'ibcTransfer':
+      return formatCoin(message.token);
     default:
       return '-';
   }
@@ -98,11 +104,15 @@ const getMessageDetails = (message: CosmosMessage): string => {
     case 'send':
       return `To: ${message.toAddress}`;
     case 'authzGrant':
-      return `Grantee: ${message.grantee} (${message.authorizationType})`;
+      return message.stakeAuthorization
+        ? `Grantee: ${message.grantee} — may ${message.stakeAuthorization.authorizationType} to ${message.stakeAuthorization.allowList.join(', ') || 'any validator'}`
+        : `Grantee: ${message.grantee} (${message.authorizationType})`;
     case 'authzExec':
       return `Nested: ${message.innerTypeUrls.join(', ') || 'none'}`;
     case 'authzRevoke':
       return `Grantee: ${message.grantee} (${message.msgTypeUrl})`;
+    case 'ibcTransfer':
+      return `To: ${message.receiver} over ${message.sourcePort}/${message.sourceChannel}`;
     case 'unsupported':
       return message.typeUrl || 'unknown type';
     default:

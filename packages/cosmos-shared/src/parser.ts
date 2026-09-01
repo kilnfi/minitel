@@ -2,13 +2,25 @@ import { type DecodedTxRaw, decodeTxRaw } from '@cosmjs/proto-signing';
 import { MsgExec, MsgGrant, MsgRevoke } from 'cosmjs-types/cosmos/authz/v1beta1/tx';
 import { MsgSend } from 'cosmjs-types/cosmos/bank/v1beta1/tx';
 import { MsgWithdrawDelegatorReward } from 'cosmjs-types/cosmos/distribution/v1beta1/tx';
+import { AuthorizationType, StakeAuthorization } from 'cosmjs-types/cosmos/staking/v1beta1/authz';
 import { MsgBeginRedelegate, MsgDelegate, MsgUndelegate } from 'cosmjs-types/cosmos/staking/v1beta1/tx';
 import type { Any } from 'cosmjs-types/google/protobuf/any';
+import { MsgTransfer } from 'cosmjs-types/ibc/applications/transfer/v1/tx';
 
 /** A normalized coin amount, always rendered as decimal strings (never bigint). */
 export type CosmosCoin = {
   denom: string;
   amount: string;
+};
+
+/** What a `/cosmos.staking.v1beta1.StakeAuthorization` grant actually permits. */
+export type CosmosStakeAuthorization = {
+  /** 'unspecified' also covers an authorization type this cosmjs version does not name. */
+  authorizationType: 'unspecified' | 'delegate' | 'undelegate' | 'redelegate' | 'cancelUnbondingDelegation';
+  allowList: string[];
+  denyList: string[];
+  /** Absent means the grant is unbounded. */
+  maxTokens: CosmosCoin | null;
 };
 
 /**
@@ -50,7 +62,10 @@ export type CosmosMessage =
       typeUrl: string;
       granter: string;
       grantee: string;
+      /** typeUrl of the granted authorization, e.g. '/cosmos.staking.v1beta1.StakeAuthorization'. */
       authorizationType: string;
+      /** Null for any other authorization. The typeUrl alone says nothing about what is granted. */
+      stakeAuthorization: CosmosStakeAuthorization | null;
     }
   | {
       kind: 'authzExec';
@@ -64,6 +79,15 @@ export type CosmosMessage =
       granter: string;
       grantee: string;
       msgTypeUrl: string;
+    }
+  | {
+      kind: 'ibcTransfer';
+      typeUrl: string;
+      sender: string;
+      receiver: string;
+      sourcePort: string;
+      sourceChannel: string;
+      token: CosmosCoin | null;
     }
   | {
       kind: 'unsupported';
@@ -94,6 +118,7 @@ const TYPE_URLS = {
   authzGrant: '/cosmos.authz.v1beta1.MsgGrant',
   authzExec: '/cosmos.authz.v1beta1.MsgExec',
   authzRevoke: '/cosmos.authz.v1beta1.MsgRevoke',
+  ibcTransfer: '/ibc.applications.transfer.v1.MsgTransfer',
 } as const;
 
 const bytesToHex = (bytes: Uint8Array): string =>
@@ -106,6 +131,32 @@ const toCoin = (coin: { denom: string; amount: string } | undefined | null): Cos
 
 const toCoins = (coins: ReadonlyArray<{ denom: string; amount: string }>): CosmosCoin[] =>
   coins.map((coin) => ({ denom: coin.denom, amount: coin.amount }));
+
+const STAKE_AUTHORIZATION_TYPE_URL = '/cosmos.staking.v1beta1.StakeAuthorization';
+
+const AUTHORIZATION_TYPES: Record<number, CosmosStakeAuthorization['authorizationType']> = {
+  [AuthorizationType.AUTHORIZATION_TYPE_DELEGATE]: 'delegate',
+  [AuthorizationType.AUTHORIZATION_TYPE_UNDELEGATE]: 'undelegate',
+  [AuthorizationType.AUTHORIZATION_TYPE_REDELEGATE]: 'redelegate',
+  [AuthorizationType.AUTHORIZATION_TYPE_CANCEL_UNBONDING_DELEGATION]: 'cancelUnbondingDelegation',
+};
+
+/** Null for a non-StakeAuthorization or bytes that do not decode; both are unaccountable. */
+const decodeStakeAuthorization = (authorization: Any | undefined): CosmosStakeAuthorization | null => {
+  if (!authorization || authorization.typeUrl !== STAKE_AUTHORIZATION_TYPE_URL) return null;
+
+  try {
+    const decoded = StakeAuthorization.decode(authorization.value);
+    return {
+      authorizationType: AUTHORIZATION_TYPES[decoded.authorizationType] ?? 'unspecified',
+      allowList: decoded.allowList?.address ?? [],
+      denyList: decoded.denyList?.address ?? [],
+      maxTokens: toCoin(decoded.maxTokens),
+    };
+  } catch {
+    return null;
+  }
+};
 
 /**
  * Decode a single protobuf `Any` message body by its `typeUrl`. All values are
@@ -175,6 +226,7 @@ const decodeMessage = (message: Any): CosmosMessage => {
           granter: msg.granter,
           grantee: msg.grantee,
           authorizationType: msg.grant?.authorization?.typeUrl ?? 'unknown',
+          stakeAuthorization: decodeStakeAuthorization(msg.grant?.authorization),
         };
       }
       case TYPE_URLS.authzExec: {
@@ -194,6 +246,18 @@ const decodeMessage = (message: Any): CosmosMessage => {
           granter: msg.granter,
           grantee: msg.grantee,
           msgTypeUrl: msg.msgTypeUrl,
+        };
+      }
+      case TYPE_URLS.ibcTransfer: {
+        const msg = MsgTransfer.decode(value);
+        return {
+          kind: 'ibcTransfer',
+          typeUrl,
+          sender: msg.sender,
+          receiver: msg.receiver,
+          sourcePort: msg.sourcePort,
+          sourceChannel: msg.sourceChannel,
+          token: toCoin(msg.token),
         };
       }
       default:

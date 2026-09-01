@@ -1,10 +1,10 @@
-import { getCurrentProtocol, PROTOCOLS, type Protocol } from '@protocols/shared';
+import { NEAR, PROTOCOLS, type Protocol } from '@protocols/shared';
 import { Background, cn, Header, ProtocolTransactionDecoder, TransactionPlaybook } from '@protocols/ui';
 import { useState } from 'react';
 import { NEAR_PLAYBOOK_OPERATIONS } from '@/config/playbook-operations';
 import { nearAdapter } from '@/near-adapter';
 
-const currentProtocol = getCurrentProtocol();
+const currentProtocol = NEAR;
 
 function App() {
   const [playbook, setPlaybook] = useState<boolean>(false);

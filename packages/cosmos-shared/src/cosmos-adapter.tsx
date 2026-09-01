@@ -1,5 +1,6 @@
 import type { Protocol, ProtocolAdapter } from '@protocols/shared';
 import { CosmosTransactionSummary } from './CosmosTransactionSummary';
+import { type CosmosChainName, classifyCosmosTransaction } from './kiln-operations';
 import { type CosmosMessage, type CosmosTransaction, parseCosmosTx } from './parser';
 
 const isValidCosmosInput = (rawTx: string): boolean => {
@@ -42,6 +43,10 @@ const warningsForMessage = (message: CosmosMessage): string[] => {
       ];
     case 'authzRevoke':
       return [`⚠️ Authz revoke detected for ${message.grantee} (${message.msgTypeUrl})`];
+    case 'ibcTransfer':
+      return [
+        `⚠️ IBC transfer detected: ${message.token?.amount ?? '?'} ${message.token?.denom ?? '?'} to ${message.receiver} over ${message.sourceChannel}`,
+      ];
     default:
       return [];
   }
@@ -52,7 +57,9 @@ export const createCosmosAdapter = ({
   displayName,
   protocol,
 }: {
-  name: string;
+  // Typed as the chain union so a new Cosmos app cannot be added without declaring which
+  // operations Kiln crafts for it.
+  name: CosmosChainName;
   displayName: string;
   protocol: Protocol;
 }): ProtocolAdapter<CosmosTransaction> => {
@@ -65,6 +72,7 @@ export const createCosmosAdapter = ({
     parseTransaction: async (rawTx) => parseCosmosTx(rawTx),
     computeHash: computeCosmosHash,
     renderSummary: (data) => <CosmosTransactionSummary transaction={data} />,
+    classifyTransaction: (data) => classifyCosmosTransaction(name, data),
     generateWarnings: (data) => data.messages.flatMap(warningsForMessage).map((message) => ({ message })),
   };
 };
