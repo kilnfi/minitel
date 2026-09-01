@@ -201,14 +201,3 @@ export const PROTOCOLS: Protocol[] = [
   TON,
   TRX,
 ];
-
-export const getCurrentProtocol = () => {
-  const currentOrigin = window.location.origin;
-  const currentProtocol = PROTOCOLS.find(
-    (protocol) => protocol.url === currentOrigin || protocol.localUrl === currentOrigin,
-  );
-  if (!currentProtocol) {
-    throw new Error('Current protocol is not defined');
-  }
-  return currentProtocol;
-};

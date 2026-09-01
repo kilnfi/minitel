@@ -1,8 +1,8 @@
-import { getCurrentProtocol, PROTOCOLS, type Protocol } from '@protocols/shared';
+import { PROTOCOLS, type Protocol, SUI } from '@protocols/shared';
 import { Background, cn, Header, ProtocolTransactionDecoder } from '@protocols/ui';
 import { suiAdapter } from '@/sui-adapter';
 
-const currentProtocol = getCurrentProtocol();
+const currentProtocol = SUI;
 
 function App() {
   const onChangeProtocol = (protocol: Protocol) => {

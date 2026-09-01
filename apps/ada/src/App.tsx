@@ -1,8 +1,8 @@
-import { getCurrentProtocol, PROTOCOLS, type Protocol } from '@protocols/shared';
+import { ADA, PROTOCOLS, type Protocol } from '@protocols/shared';
 import { Background, cn, Header, ProtocolTransactionDecoder } from '@protocols/ui';
 import { adaAdapter } from '@/ada-adapter';
 
-const currentProtocol = getCurrentProtocol();
+const currentProtocol = ADA;
 
 function App() {
   const onChangeProtocol = (protocol: Protocol) => {

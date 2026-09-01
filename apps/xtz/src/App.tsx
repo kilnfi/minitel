@@ -1,8 +1,8 @@
-import { getCurrentProtocol, PROTOCOLS, type Protocol } from '@protocols/shared';
+import { PROTOCOLS, type Protocol, XTZ } from '@protocols/shared';
 import { Background, cn, Header, ProtocolTransactionDecoder } from '@protocols/ui';
 import { xtzAdapter } from '@/xtz-adapter';
 
-const currentProtocol = getCurrentProtocol();
+const currentProtocol = XTZ;
 
 function App() {
   const onChangeProtocol = (protocol: Protocol) => {

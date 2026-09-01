@@ -1,10 +1,10 @@
-import { getCurrentProtocol, PROTOCOLS, type Protocol } from '@protocols/shared';
+import { PROTOCOLS, type Protocol, SOL } from '@protocols/shared';
 import { Background, cn, Header, ProtocolTransactionDecoder, TransactionPlaybook } from '@protocols/ui';
 import { useState } from 'react';
 import { SOLANA_PLAYBOOK_OPERATIONS } from '@/config/playbook-operations';
 import { solanaAdapter } from '@/solana-adapter';
 
-const currentProtocol = getCurrentProtocol();
+const currentProtocol = SOL;
 
 function App() {
   const [playbook, setPlaybook] = useState<boolean>(false);
