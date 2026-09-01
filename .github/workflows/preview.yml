@@ -86,8 +86,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     # Hold VERCEL_TOKEN and the project ids as environment secrets, so the only job
-    # that runs the branch's code is also the only one that can read them.
-    environment: preview
+    # that runs the branch's code is also the only one that can read them. The url
+    # is how the deployment reaches the pull request as a "View deployment" link:
+    # GitHub renders it from the job, so it survives an IP allow list that refuses
+    # the API to the runner.
+    environment:
+      name: preview
+      url: ${{ steps.deploy.outputs.url }}
     strategy:
       # Same reason as the production deploy: one app's failure must not cancel the
       # others, or a single broken app reads as "the previews are broken".
@@ -125,11 +130,13 @@ jobs:
         timeout-minutes: 10
 
       - name: Deploy Project Artifacts to Vercel
+        id: deploy
         run: |
           set -euo pipefail
           DEPLOYMENT_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} \
             --meta githubPrNumber=${{ github.event.pull_request.number }} \
             --meta githubCommitSha=${{ github.event.pull_request.head.sha }} | tail -n1)
+          echo "url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
           mkdir -p "$RUNNER_TEMP/urls"
           echo "$DEPLOYMENT_URL" > "$RUNNER_TEMP/urls/${{ matrix.target.app }}"
           echo "🔍 Preview for ${{ matrix.target.app }}: $DEPLOYMENT_URL"
@@ -200,7 +207,7 @@ jobs:
           # above carries the same table either way.
           post() {
             existing=$(gh api --paginate "repos/$GH_REPO/issues/$PR_NUMBER/comments" \
-              --jq "[.[] | select(.body | contains(\"$MARKER\"))] | last | .id // empty")
+              --jq "[.[] | select(.body | contains(\"$MARKER\"))] | last | .id // empty") || return 1
             if [ -n "$existing" ]; then
               gh api --silent -X PATCH "repos/$GH_REPO/issues/comments/$existing" --input payload.json
             else
