@@ -1,152 +1,75 @@
 name: Preview
 
-# On demand rather than on every push: a change under packages/ reaches all
-# eighteen apps, and building all eighteen on each push to review one chain is
-# most of a deploy's cost for none of its value. Comment on a pull request:
+# Label a pull request `preview:solana` for that app, or `preview` for the apps the
+# branch changes, and every push redeploys what is labelled.
 #
-#   /preview <sha>                  the apps that commit changes
-#   /preview solana near <sha>      those apps at that commit
-#   /preview all <sha>              all eighteen
-#
-# The full commit sha is required, and a request without one is answered with the
-# command to paste rather than a build. See the authorize job for why.
+# A label rather than a comment command, because it needs no permission check of
+# its own: GitHub already restricts labelling to people with write access, and the
+# commit to build arrives in the event payload instead of being looked up after the
+# check — a lookup leaves a window for a push to land in between and be built with
+# the deploy credentials.
 on:
-  issue_comment:
-    types: [created]
+  pull_request:
+    types: [labeled, synchronize, reopened]
 
-# Requests queue rather than cancel each other: a second `/preview` is another
-# request, not a correction of the first, and two runs editing the same comment
-# would race.
+# A new push supersedes the previous run: the URLs it was about to post point at
+# code the branch no longer has.
 concurrency:
-  group: preview-${{ github.event.issue.number }}
-  cancel-in-progress: false
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
 
 jobs:
-  authorize:
-    # A cheap pre-filter only — author_association covers collaborators of any
-    # role, including read-only ones, so the job checks the actual permission
-    # below before it resolves anything.
+  select:
+    # Fork pull requests get no secrets, so the deploy could only fail at
+    # `vercel pull` with an authentication error nobody can act on.
     if: >-
-      github.event.issue.pull_request &&
-      startsWith(github.event.comment.body, '/preview') &&
-      contains(fromJson('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      (contains(github.event.pull_request.labels.*.name, 'preview') ||
+       contains(join(github.event.pull_request.labels.*.name, ','), 'preview:'))
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    permissions:
-      contents: read
-      issues: write
-      pull-requests: write
     outputs:
-      sha: ${{ steps.commit.outputs.sha }}
       targets: ${{ steps.targets.outputs.targets }}
 
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      GH_REPO: ${{ github.repository }}
-      PR_NUMBER: ${{ github.event.issue.number }}
-
     steps:
-      - name: Acknowledge the request
-        run: |
-          gh api --silent -X POST \
-            "repos/$GH_REPO/issues/comments/${{ github.event.comment.id }}/reactions" \
-            -f content=eyes
-
-      - name: Check the commenter can write to this repository
-        env:
-          COMMENTER: ${{ github.event.comment.user.login }}
-        run: |
-          set -euo pipefail
-          # Fails the job if the lookup fails, so an unanswerable question denies
-          # the request rather than waving it through.
-          level=$(gh api "repos/$GH_REPO/collaborators/$COMMENTER/permission" --jq .permission)
-          case "$level" in
-            admin | maintain | write) echo "$COMMENTER has $level access." ;;
-            *)
-              gh pr comment "$PR_NUMBER" --body \
-                "@$COMMENTER — previewing needs write access to this repository."
-              exit 1
-              ;;
-          esac
-
-      - name: Take the commit from the comment
-        id: commit
-        env:
-          BODY: ${{ github.event.comment.body }}
-        run: |
-          set -euo pipefail
-          # The permission check above is made against the comment, so the code
-          # built has to be the code the commenter was looking at when they wrote
-          # it. Reading the branch tip here instead would leave a window for a push
-          # to land between the two and be built with the deploy credentials — the
-          # check and the thing checked would not be the same commit. So the sha
-          # below is the one in the comment, verbatim and in full, and nothing that
-          # runs after it can move it.
-          sha=$(head -n1 <<<"$BODY" | tr -d '\r' | tr '[:upper:]' '[:lower:]' \
-            | grep -oE '\b[0-9a-f]{40}\b' | head -n1 || true)
-          echo "sha=$sha" >> "$GITHUB_OUTPUT"
-
-          if [ -z "$sha" ]; then
-            echo "No commit named; the suggest job will answer with the command."
-            exit 0
-          fi
-
-          # It has to be a commit of this pull request, so the argument cannot aim
-          # the build at an arbitrary object in the repository. The answer is a
-          # yes or a no — the sha itself still comes from the comment.
-          if ! gh api --paginate "repos/$GH_REPO/pulls/$PR_NUMBER/commits" --jq '.[].sha' \
-            | grep -qx "$sha"; then
-            gh pr comment "$PR_NUMBER" --body \
-              "\`${sha:0:7}\` is not a commit of this pull request."
-            exit 1
-          fi
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
 
       - name: Select the apps to deploy
         id: targets
-        if: steps.commit.outputs.sha != ''
         env:
-          BODY: ${{ github.event.comment.body }}
-          SHA: ${{ steps.commit.outputs.sha }}
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           set -euo pipefail
-          # Read over the API rather than from a checkout: this job authorizes the
-          # request and has no business fetching the branch's code to do it.
-          available=$(gh api "repos/$GH_REPO/contents/apps?ref=$SHA" \
-            --jq '.[] | select(.type == "dir") | .name' | sort)
-          requested=$(head -n1 <<<"$BODY" | tr -d '\r' | tr '[:upper:]' '[:lower:]' \
-            | sed -E 's#^/preview[[:space:]]*##' | tr ',' ' ' | tr -s '[:space:]' '\n' \
-            | grep -v '^$' | grep -vE '^[0-9a-f]{40}$' || true)
+          available=$(for dir in apps/*/; do basename "$dir"; done | sort)
+          requested=$(tr ' ' '\n' <<<"$LABELS" | sed -n 's#^preview:##p' | sort -u)
 
-          if [ -z "$requested" ]; then
-            # Anything shared rebuilds everything: shared and ui are imported by all
-            # eighteen apps, and resolving which apps a cosmos-shared change reaches
-            # would mean walking the workspace graph here to save a few builds.
-            changed=$(gh api --paginate "repos/$GH_REPO/pulls/$PR_NUMBER/files" --jq '.[].filename')
+          if [ -n "$requested" ]; then
+            # A label naming an app that does not exist is ignored rather than
+            # failing the run: it is a typo in a label, not a broken branch.
+            selected=$(comm -12 <(echo "$requested") <(echo "$available"))
+          else
+            # Against the merge base, not the tip of main, or every commit landed on
+            # main since the branch started would count as this branch's change.
+            # Anything shared then rebuilds everything: shared and ui are imported by
+            # all eighteen apps, and resolving which apps a cosmos-shared change
+            # reaches would mean walking the workspace graph here to save a few
+            # builds — label the app instead when that matters.
+            changed=$(git diff --name-only "$(git merge-base "$BASE_SHA" HEAD)" HEAD)
             if grep -qE '^(packages/|bun\.lock|package\.json|tsconfig\.json|biome\.json|bunfig\.toml)' <<<"$changed"; then
               selected="$available"
             else
+              # A deleted app is still a path in the diff.
               selected=$(sed -n 's#^apps/\([^/]*\)/.*#\1#p' <<<"$changed" | sort -u)
+              selected=$(comm -12 <(echo "$selected") <(echo "$available"))
             fi
-            # A deleted app is still a path in the diff.
-            selected=$(comm -12 <(echo "$selected") <(echo "$available"))
-          elif [ "$requested" = "all" ]; then
-            selected="$available"
-          else
-            selected=$(sort -u <<<"$requested")
-            unknown=$(comm -23 <(echo "$selected") <(echo "$available") | paste -sd' ' -)
-            if [ -n "$unknown" ]; then
-              gh pr comment "$PR_NUMBER" --body \
-                "No such app: \`$unknown\`. Available: $(paste -sd' ' - <<<"$available")."
-              exit 1
-            fi
-          fi
-
-          if [ -z "$selected" ]; then
-            gh pr comment "$PR_NUMBER" --body \
-              "Nothing to preview: that commit changes no app. Name one, or ask for \`all\`."
           fi
 
           # The Vercel project id lives in a per-app secret, so each target carries
@@ -155,60 +78,29 @@ jobs:
           echo "targets=$targets" >> "$GITHUB_OUTPUT"
           echo "Previewing: $(jq -r 'if length == 0 then "nothing" else [.[].app] | join(", ") end' <<<"$targets")"
 
-  suggest:
-    # Answering a request that named no commit is the one thing here that needs the
-    # branch tip, and it goes in a job of its own so that no step which resolves a
-    # ref at runtime sits next to the one that checks a commit out.
-    needs: authorize
-    if: needs.authorize.outputs.sha == ''
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      pull-requests: write
-
-    steps:
-      - name: Answer with the command to paste
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.issue.number }}
-          BODY: ${{ github.event.comment.body }}
-        run: |
-          set -euo pipefail
-          tip=$(gh api "repos/$GH_REPO/pulls/$PR_NUMBER" --jq .head.sha)
-          args=$(head -n1 <<<"$BODY" | tr -d '\r' | sed -E 's#^/preview[[:space:]]*##')
-          gh pr comment "$PR_NUMBER" --body \
-            "Name the commit to build: \`/preview ${args:+$args }$tip\`"
-
   preview:
-    needs: authorize
-    # An unanswered request leaves both empty, and an empty targets is not a matrix.
-    if: needs.authorize.outputs.sha != '' && needs.authorize.outputs.targets != '[]'
+    needs: select
+    if: needs.select.outputs.targets != '[]'
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    # Hold VERCEL_TOKEN and the project ids as environment secrets, so the only
-    # job that runs the branch's code is also the only one that can read them.
+    # Hold VERCEL_TOKEN and the project ids as environment secrets, so the only job
+    # that runs the branch's code is also the only one that can read them.
     environment: preview
     strategy:
       # Same reason as the production deploy: one app's failure must not cancel the
       # others, or a single broken app reads as "the previews are broken".
       fail-fast: false
       matrix:
-        target: ${{ fromJson(needs.authorize.outputs.targets) }}
+        target: ${{ fromJson(needs.select.outputs.targets) }}
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets[matrix.target.secret] }}
 
     steps:
-      - name: Checkout the authorized commit
+      - name: Checkout
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
         with:
-          ref: ${{ needs.authorize.outputs.sha }}
-
-      - name: Verify the checkout is the authorized commit
-        run: |
-          set -euo pipefail
-          test "$(git rev-parse HEAD)" = "${{ needs.authorize.outputs.sha }}"
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76
@@ -234,8 +126,8 @@ jobs:
         run: |
           set -euo pipefail
           DEPLOYMENT_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} \
-            --meta githubPrNumber=${{ github.event.issue.number }} \
-            --meta githubCommitSha=${{ needs.authorize.outputs.sha }} | tail -n1)
+            --meta githubPrNumber=${{ github.event.pull_request.number }} \
+            --meta githubCommitSha=${{ github.event.pull_request.head.sha }} | tail -n1)
           mkdir -p "$RUNNER_TEMP/urls"
           echo "$DEPLOYMENT_URL" > "$RUNNER_TEMP/urls/${{ matrix.target.app }}"
           echo "🔍 Preview for ${{ matrix.target.app }}: $DEPLOYMENT_URL"
@@ -251,11 +143,9 @@ jobs:
           retention-days: 1
 
   comment:
-    needs: [authorize, preview]
+    needs: [select, preview]
     # always(), so a run where some apps failed still reports the ones that shipped.
-    if: >-
-      always() && needs.authorize.result == 'success' &&
-      needs.authorize.outputs.sha != '' && needs.authorize.outputs.targets != '[]'
+    if: always() && needs.select.result == 'success' && needs.select.outputs.targets != '[]'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -273,9 +163,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.issue.number }}
-          SHA: ${{ needs.authorize.outputs.sha }}
-          TARGETS: ${{ needs.authorize.outputs.targets }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          TARGETS: ${{ needs.select.outputs.targets }}
         run: |
           set -euo pipefail
           {
@@ -291,8 +181,8 @@ jobs:
               fi
             done
             echo
-            echo "_Built from \`${SHA:0:7}\`. Signing in with a Kiln Vercel account is required._"
+            echo "_Built from \`${HEAD_SHA:0:7}\`. Signing in with a Kiln Vercel account is required._"
           } > body.md
-          # --edit-last keeps one table that tracks the branch rather than a new
-          # comment every time someone asks for a preview.
+          # --edit-last keeps one table that follows the branch rather than a new
+          # comment on every push.
           gh pr comment "$PR_NUMBER" --body-file body.md --edit-last --create-if-none
