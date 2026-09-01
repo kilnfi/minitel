@@ -282,8 +282,11 @@ jobs:
           # by the pull request number alone would take down a sibling app that only
           # shares the branch. Deploys are stamped with the app; the project name
           # covers the ones made before that stamp existed.
+          # --scope, because `vercel ls` reaches for the token's default scope
+          # rather than the project just pulled, and answered "not authorized" under
+          # a personal account nobody deploys to.
           urls=$(vercel ls -m "githubPrNumber=$PR_NUMBER" --json \
-            --token=${{ secrets.VERCEL_TOKEN }} \
+            --scope=${{ secrets.VERCEL_ORG_ID }} --token=${{ secrets.VERCEL_TOKEN }} \
             | jq -r --arg app "$APP" '.deployments[]
                 | select(.meta.previewApp == $app or (.name | endswith("-" + $app)))
                 | .url')
@@ -292,5 +295,6 @@ jobs:
             exit 0
           fi
           # shellcheck disable=SC2086
-          vercel remove $urls --safe --yes --token=${{ secrets.VERCEL_TOKEN }}
+          vercel remove $urls --safe --yes \
+            --scope=${{ secrets.VERCEL_ORG_ID }} --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./apps/${{ matrix.target.app }}
