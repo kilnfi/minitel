@@ -1,6 +1,4 @@
 import { describe, expect, test } from 'bun:test';
-// tronweb installs the protobuf runtime the parser reads off globalThis.
-import 'tronweb';
 import { classifyTrxTransaction } from '@/kiln-operations';
 import { parseTrxTx } from '@/parser';
 
