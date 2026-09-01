@@ -166,9 +166,11 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           TARGETS: ${{ needs.select.outputs.targets }}
+          MARKER: '<!-- preview-deployments -->'
         run: |
           set -euo pipefail
           {
+            echo "$MARKER"
             echo "### Preview deployments"
             echo
             echo "| App | Preview |"
@@ -183,6 +185,16 @@ jobs:
             echo
             echo "_Built from \`${HEAD_SHA:0:7}\`. Signing in with a Kiln Vercel account is required._"
           } > body.md
-          # --edit-last keeps one table that follows the branch rather than a new
-          # comment on every push.
-          gh pr comment "$PR_NUMBER" --body-file body.md --edit-last --create-if-none
+          jq -Rs '{body: .}' body.md > payload.json
+
+          # One table that follows the branch rather than a new comment on every
+          # push. Found by its marker over REST: `gh pr comment --edit-last` reads
+          # the comment list over GraphQL, which the organization's IP allow list
+          # refuses from an Actions runner.
+          existing=$(gh api --paginate "repos/$GH_REPO/issues/$PR_NUMBER/comments" \
+            --jq "[.[] | select(.body | contains(\"$MARKER\"))] | last | .id // empty")
+          if [ -n "$existing" ]; then
+            gh api --silent -X PATCH "repos/$GH_REPO/issues/comments/$existing" --input payload.json
+          else
+            gh api --silent -X POST "repos/$GH_REPO/issues/$PR_NUMBER/comments" --input payload.json
+          fi
