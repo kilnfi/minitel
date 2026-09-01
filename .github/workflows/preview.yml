@@ -8,6 +8,7 @@ name: Preview
 #   /preview                 the apps this pull request can change
 #   /preview solana near     those apps
 #   /preview all             all eighteen
+#   /preview solana 9cbbcff  that app at a named commit
 on:
   issue_comment:
     types: [created]
@@ -39,6 +40,7 @@ jobs:
     outputs:
       targets: ${{ steps.targets.outputs.targets }}
       head_sha: ${{ steps.pr.outputs.head_sha }}
+      pinned: ${{ steps.pr.outputs.pinned }}
 
     steps:
       - name: Acknowledge the request
@@ -49,23 +51,53 @@ jobs:
             "repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions" \
             -f content=eyes
 
-      - name: Read the pull request
+      # The write-access check above is made against the comment, but the branch tip
+      # is read here, afterwards — a push landing in between would be built with
+      # deploy credentials and nobody would have read it. Naming a commit in the
+      # comment closes that window, since the commit the approver saw is the commit
+      # that gets built; a bare /preview takes the tip and pays for it with the
+      # approval gate on the deploy job below.
+      - name: Resolve the commit to build
         id: pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
+          BODY: ${{ github.event.comment.body }}
+          PR_NUMBER: ${{ github.event.issue.number }}
         run: |
           set -euo pipefail
-          pr=$(gh pr view "${{ github.event.issue.number }}" \
-            --json headRefOid,baseRefOid,headRepository,headRepositoryOwner,isCrossRepository)
+          pr=$(gh pr view "$PR_NUMBER" --json headRefOid,baseRefOid,isCrossRepository)
 
           if [ "$(jq -r .isCrossRepository <<<"$pr")" = "true" ]; then
             echo "::error::Refusing to build a fork's code with deploy credentials." >&2
             exit 1
           fi
 
-          echo "head_sha=$(jq -r .headRefOid <<<"$pr")" >> "$GITHUB_OUTPUT"
-          echo "base_sha=$(jq -r .baseRefOid <<<"$pr")" >> "$GITHUB_OUTPUT"
+          requested=$(head -n1 <<<"$BODY" | tr -d '\r' | tr '[:upper:]' '[:lower:]' \
+            | grep -oE '\b[0-9a-f]{7,40}\b' | head -n1 || true)
+
+          if [ -n "$requested" ]; then
+            # Only a commit of this pull request, so the argument cannot point the
+            # build at an arbitrary object in the repository.
+            head_sha=$(gh api --paginate "repos/$GH_REPO/pulls/$PR_NUMBER/commits" --jq '.[].sha' \
+              | grep -m1 -E "^$requested" || true)
+            if [ -z "$head_sha" ]; then
+              gh pr comment "$PR_NUMBER" --body \
+                "\`$requested\` is not a commit of this pull request."
+              exit 1
+            fi
+            pinned=named
+          else
+            head_sha=$(jq -r .headRefOid <<<"$pr")
+            pinned=tip
+          fi
+
+          {
+            echo "head_sha=$head_sha"
+            echo "base_sha=$(jq -r .baseRefOid <<<"$pr")"
+            echo "pinned=$pinned"
+          } >> "$GITHUB_OUTPUT"
+          echo "Building $head_sha (${pinned})"
 
       - name: Checkout
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
@@ -83,7 +115,7 @@ jobs:
         run: |
           set -euo pipefail
           available=$(for dir in apps/*/; do basename "$dir"; done | sort)
-          requested=$(head -n1 <<<"$BODY" | tr -d '\r' | tr '[:upper:]' '[:lower:]' | sed -E 's#^/preview[[:space:]]*##' | tr ',' ' ' | tr -s '[:space:]' '\n' | grep -v '^$' || true)
+          requested=$(head -n1 <<<"$BODY" | tr -d '\r' | tr '[:upper:]' '[:lower:]' | sed -E 's#^/preview[[:space:]]*##' | tr ',' ' ' | tr -s '[:space:]' '\n' | grep -v '^$' | grep -vE '^[0-9a-f]{7,40}$' || true)
 
           if [ -z "$requested" ]; then
             # A bare /preview reviews what the branch touched. Anything shared
@@ -128,6 +160,11 @@ jobs:
     if: needs.resolve.outputs.targets != '[]'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # The gate that makes a bare /preview safe: with required reviewers on this
+    # environment the deploy waits for a human, and the run it waits on already has
+    # its commit frozen and on screen. Hold VERCEL_TOKEN and the project ids as
+    # environment secrets so the branch's code cannot be built without passing it.
+    environment: preview
     strategy:
       # Same reason as the production deploy: one app's failure must not cancel the
       # others, or a single broken app reads as "the previews are broken".
@@ -143,6 +180,11 @@ jobs:
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
         with:
           ref: ${{ needs.resolve.outputs.head_sha }}
+
+      - name: Verify the checkout is the commit that was approved
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ needs.resolve.outputs.head_sha }}"
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76
@@ -207,6 +249,7 @@ jobs:
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.issue.number }}
           HEAD_SHA: ${{ needs.resolve.outputs.head_sha }}
+          PINNED: ${{ needs.resolve.outputs.pinned }}
           TARGETS: ${{ needs.resolve.outputs.targets }}
         run: |
           set -euo pipefail
@@ -223,7 +266,8 @@ jobs:
               fi
             done
             echo
-            echo "_Built from ${HEAD_SHA:0:7}. Signing in with a Kiln Vercel account is required._"
+            if [ "$PINNED" = "named" ]; then origin="the commit the request named"; else origin="the branch tip when the request was read"; fi
+            echo "_Built from \`${HEAD_SHA:0:7}\`, $origin. Signing in with a Kiln Vercel account is required._"
           } > body.md
           # --edit-last keeps one table that tracks the branch rather than a new
           # comment every time someone asks for a preview.
