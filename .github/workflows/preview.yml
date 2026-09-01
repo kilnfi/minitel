@@ -4,12 +4,12 @@ name: Preview
 # eighteen apps, and building all eighteen on each push to review one chain is
 # most of a deploy's cost for none of its value. Comment on a pull request:
 #
-#   /preview 9cbbcff                the apps that commit changes
-#   /preview solana near 9cbbcff    those apps at that commit
-#   /preview all 9cbbcff            all eighteen
+#   /preview <sha>                  the apps that commit changes
+#   /preview solana near <sha>      those apps at that commit
+#   /preview all <sha>              all eighteen
 #
-# The commit is required, and a request without one is answered with the command
-# to paste rather than a build. See the authorize job for why.
+# The full commit sha is required, and a request without one is answered with the
+# command to paste rather than a build. See the authorize job for why.
 on:
   issue_comment:
     types: [created]
@@ -82,34 +82,31 @@ jobs:
           # built has to be the code the commenter was looking at when they wrote
           # it. Reading the branch tip here instead would leave a window for a push
           # to land between the two and be built with the deploy credentials — the
-          # check and the thing checked would not be the same commit. So the commit
-          # comes out of the comment body, and nothing that follows can move it.
-          requested=$(head -n1 <<<"$BODY" | tr -d '\r' | tr '[:upper:]' '[:lower:]' \
-            | grep -oE '\b[0-9a-f]{7,40}\b' | head -n1 || true)
-
-          if [ -z "$requested" ]; then
-            head_sha=$(gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid)
-            args=$(head -n1 <<<"$BODY" | tr -d '\r' | sed -E 's#^/preview[[:space:]]*##')
-            gh pr comment "$PR_NUMBER" --body \
-              "Name the commit to build: \`/preview ${args:+$args }${head_sha:0:7}\`"
-            exit 1
-          fi
-
-          # A commit of this pull request, so the argument cannot aim the build at
-          # an arbitrary object in the repository.
-          sha=$(gh api --paginate "repos/$GH_REPO/pulls/$PR_NUMBER/commits" --jq '.[].sha' \
-            | grep -m1 -E "^$requested" || true)
-          if [ -z "$sha" ]; then
-            gh pr comment "$PR_NUMBER" --body \
-              "\`$requested\` is not a commit of this pull request."
-            exit 1
-          fi
-
+          # check and the thing checked would not be the same commit. So the sha
+          # below is the one in the comment, verbatim and in full, and nothing that
+          # runs after it can move it.
+          sha=$(head -n1 <<<"$BODY" | tr -d '\r' | tr '[:upper:]' '[:lower:]' \
+            | grep -oE '\b[0-9a-f]{40}\b' | head -n1 || true)
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
-          echo "Building $sha"
+
+          if [ -z "$sha" ]; then
+            echo "No commit named; the suggest job will answer with the command."
+            exit 0
+          fi
+
+          # It has to be a commit of this pull request, so the argument cannot aim
+          # the build at an arbitrary object in the repository. The answer is a
+          # yes or a no — the sha itself still comes from the comment.
+          if ! gh api --paginate "repos/$GH_REPO/pulls/$PR_NUMBER/commits" --jq '.[].sha' \
+            | grep -qx "$sha"; then
+            gh pr comment "$PR_NUMBER" --body \
+              "\`${sha:0:7}\` is not a commit of this pull request."
+            exit 1
+          fi
 
       - name: Select the apps to deploy
         id: targets
+        if: steps.commit.outputs.sha != ''
         env:
           BODY: ${{ github.event.comment.body }}
           SHA: ${{ steps.commit.outputs.sha }}
@@ -121,7 +118,7 @@ jobs:
             --jq '.[] | select(.type == "dir") | .name' | sort)
           requested=$(head -n1 <<<"$BODY" | tr -d '\r' | tr '[:upper:]' '[:lower:]' \
             | sed -E 's#^/preview[[:space:]]*##' | tr ',' ' ' | tr -s '[:space:]' '\n' \
-            | grep -v '^$' | grep -vE '^[0-9a-f]{7,40}$' || true)
+            | grep -v '^$' | grep -vE '^[0-9a-f]{40}$' || true)
 
           if [ -z "$requested" ]; then
             # Anything shared rebuilds everything: shared and ui are imported by all
@@ -158,9 +155,35 @@ jobs:
           echo "targets=$targets" >> "$GITHUB_OUTPUT"
           echo "Previewing: $(jq -r 'if length == 0 then "nothing" else [.[].app] | join(", ") end' <<<"$targets")"
 
+  suggest:
+    # Answering a request that named no commit is the one thing here that needs the
+    # branch tip, and it goes in a job of its own so that no step which resolves a
+    # ref at runtime sits next to the one that checks a commit out.
+    needs: authorize
+    if: needs.authorize.outputs.sha == ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Answer with the command to paste
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          BODY: ${{ github.event.comment.body }}
+        run: |
+          set -euo pipefail
+          tip=$(gh api "repos/$GH_REPO/pulls/$PR_NUMBER" --jq .head.sha)
+          args=$(head -n1 <<<"$BODY" | tr -d '\r' | sed -E 's#^/preview[[:space:]]*##')
+          gh pr comment "$PR_NUMBER" --body \
+            "Name the commit to build: \`/preview ${args:+$args }$tip\`"
+
   preview:
     needs: authorize
-    if: needs.authorize.outputs.targets != '[]'
+    # An unanswered request leaves both empty, and an empty targets is not a matrix.
+    if: needs.authorize.outputs.sha != '' && needs.authorize.outputs.targets != '[]'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     # Hold VERCEL_TOKEN and the project ids as environment secrets, so the only
@@ -230,7 +253,9 @@ jobs:
   comment:
     needs: [authorize, preview]
     # always(), so a run where some apps failed still reports the ones that shipped.
-    if: always() && needs.authorize.result == 'success' && needs.authorize.outputs.targets != '[]'
+    if: >-
+      always() && needs.authorize.result == 'success' &&
+      needs.authorize.outputs.sha != '' && needs.authorize.outputs.targets != '[]'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
