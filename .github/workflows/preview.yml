@@ -185,16 +185,22 @@ jobs:
             echo
             echo "_Built from \`${HEAD_SHA:0:7}\`. Signing in with a Kiln Vercel account is required._"
           } > body.md
+          cat body.md >> "$GITHUB_STEP_SUMMARY"
           jq -Rs '{body: .}' body.md > payload.json
 
           # One table that follows the branch rather than a new comment on every
-          # push. Found by its marker over REST: `gh pr comment --edit-last` reads
-          # the comment list over GraphQL, which the organization's IP allow list
-          # refuses from an Actions runner.
-          existing=$(gh api --paginate "repos/$GH_REPO/issues/$PR_NUMBER/comments" \
-            --jq "[.[] | select(.body | contains(\"$MARKER\"))] | last | .id // empty")
-          if [ -n "$existing" ]; then
-            gh api --silent -X PATCH "repos/$GH_REPO/issues/comments/$existing" --input payload.json
-          else
-            gh api --silent -X POST "repos/$GH_REPO/issues/$PR_NUMBER/comments" --input payload.json
-          fi
+          # push, found by its marker. Best effort, and deliberately not fatal: the
+          # kilnfi IP allow list refuses the API from some Actions runners and not
+          # others, and a preview that deployed should not report as failed because
+          # the runner drew an address the organization does not know. The summary
+          # above carries the same table either way.
+          post() {
+            existing=$(gh api --paginate "repos/$GH_REPO/issues/$PR_NUMBER/comments" \
+              --jq "[.[] | select(.body | contains(\"$MARKER\"))] | last | .id // empty")
+            if [ -n "$existing" ]; then
+              gh api --silent -X PATCH "repos/$GH_REPO/issues/comments/$existing" --input payload.json
+            else
+              gh api --silent -X POST "repos/$GH_REPO/issues/$PR_NUMBER/comments" --input payload.json
+            fi
+          }
+          post || echo "::warning::Could not comment the preview URLs; they are in this run's summary."
