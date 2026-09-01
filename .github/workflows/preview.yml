@@ -1,9 +1,10 @@
 name: Preview
 
 # Label a pull request `preview:solana` for that app, or `preview` for the apps the
-# branch changes, and every push redeploys what is labelled. Closing the pull
-# request removes what it deployed — Vercel keeps preview deployments forever
-# otherwise, since each one is immutable and nothing expires them.
+# branch changes, and every push redeploys what is labelled. Removing the label
+# takes that app's previews down again, and closing the pull request takes down
+# all of them — Vercel keeps preview deployments forever otherwise, since each one
+# is immutable and nothing expires them.
 #
 # A label rather than a comment command, because it needs no permission check of
 # its own: GitHub already restricts labelling to people with write access, and the
@@ -12,12 +13,14 @@ name: Preview
 # the deploy credentials.
 on:
   pull_request:
-    types: [labeled, synchronize, reopened, closed]
+    types: [labeled, unlabeled, synchronize, reopened, closed]
 
 # A new push supersedes the previous run: the URLs it was about to post point at
-# code the branch no longer has.
+# code the branch no longer has. Label events get a lane each, so asking for a
+# second app does not cancel the first one's deploy — while removing a label lands
+# in the same lane as adding it, and rightly cancels a deploy still in flight.
 concurrency:
-  group: preview-${{ github.event.pull_request.number }}
+  group: preview-${{ github.event.pull_request.number }}-${{ github.event.label.name || 'branch' }}
   cancel-in-progress: true
 
 permissions:
@@ -29,9 +32,11 @@ jobs:
     # `vercel pull` with an authentication error nobody can act on.
     if: >-
       github.event.pull_request.head.repo.full_name == github.repository &&
-      (github.event.action != 'labeled' || startsWith(github.event.label.name, 'preview')) &&
-      (contains(github.event.pull_request.labels.*.name, 'preview') ||
-       contains(join(github.event.pull_request.labels.*.name, ','), 'preview:'))
+      ((contains(fromJson('["labeled", "unlabeled"]'), github.event.action) &&
+        startsWith(github.event.label.name, 'preview')) ||
+       (contains(fromJson('["synchronize", "reopened", "closed"]'), github.event.action) &&
+        (contains(github.event.pull_request.labels.*.name, 'preview') ||
+         contains(join(github.event.pull_request.labels.*.name, ','), 'preview:'))))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -55,11 +60,15 @@ jobs:
           set -euo pipefail
           available=$(for dir in apps/*/; do basename "$dir"; done | sort)
 
-          # Adding a label asks for that one app. The others already have a preview
-          # of this commit, and rebuilding them spends a deploy to arrive at the same
-          # page under a new URL. A push is the opposite: every labelled preview is
-          # stale, so they all go again.
-          if [ "$ACTION" = "labeled" ]; then labels="$NEW_LABEL"; else labels="$LABELS"; fi
+          # A label event, either direction, is about that one app: the others
+          # already have a preview of this commit, and rebuilding them spends a
+          # deploy to arrive at the same page under a new URL. A push is the
+          # opposite — every labelled preview is stale, so they all go again — and
+          # so is a close, which takes down everything the branch deployed.
+          case "$ACTION" in
+            labeled | unlabeled) labels="$NEW_LABEL" ;;
+            *) labels="$LABELS" ;;
+          esac
           requested=$(tr ' ' '\n' <<<"$labels" | sed -n 's#^preview:##p' | sort -u)
 
           if [ -n "$requested" ]; then
@@ -91,7 +100,9 @@ jobs:
 
   preview:
     needs: select
-    if: github.event.action != 'closed' && needs.select.outputs.targets != '[]'
+    if: >-
+      !contains(fromJson('["closed", "unlabeled"]'), github.event.action) &&
+      needs.select.outputs.targets != '[]'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     # Hold VERCEL_TOKEN and the project ids as environment secrets, so the only job
@@ -164,7 +175,7 @@ jobs:
     needs: [select, preview]
     # always(), so a run where some apps failed still reports the ones that shipped.
     if: >-
-      always() && github.event.action != 'closed' &&
+      always() && !contains(fromJson('["closed", "unlabeled"]'), github.event.action) &&
       needs.select.result == 'success' && needs.select.outputs.targets != '[]'
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -227,7 +238,9 @@ jobs:
 
   teardown:
     needs: select
-    if: github.event.action == 'closed' && needs.select.outputs.targets != '[]'
+    if: >-
+      contains(fromJson('["closed", "unlabeled"]'), github.event.action) &&
+      needs.select.outputs.targets != '[]'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: preview
@@ -257,7 +270,7 @@ jobs:
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./apps/${{ matrix.target.app }}
 
-      - name: Remove this pull request's deployments
+      - name: Remove this app's deployments for this pull request
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
